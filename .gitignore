@@ -1,0 +1,7 @@
+#Environment Variable
+.env
+
+#data
+data/
+.venv/
+*.pyc
