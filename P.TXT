@@ -1,0 +1,303 @@
+For your project, I'd avoid overengineering with dozens of agents. Since you already decided to **remove the macro agent** and keep a **Portfolio Agent**, this architecture is both research-worthy and implementable.
+
+# Final Architecture
+
+```text
+                                    USER
+                                      │
+                                      ▼
+                          ┌────────────────────┐
+                          │        UI          │
+                          │ Chat + Dashboard   │
+                          └─────────┬──────────┘
+                                    │
+                                    ▼
+                         LangGraph Orchestrator
+                    (Planner + State Management)
+                                    │
+          ┌─────────────────────────┼─────────────────────────┐
+          │                         │                         │
+          ▼                         ▼                         ▼
+   Memory Retrieval          Tool Router             Session State
+          │                         │                     (Working Memory)
+          │                         │
+          ▼                         ▼
+ ┌───────────────────────────────────────────────────────────────┐
+ │                     Specialized Agents                        │
+ │                                                               │
+ │  Portfolio Agent   Filing Agent   Market Agent   News Agent   │
+ └───────────────────────────────────────────────────────────────┘
+          │              │              │              │
+          └──────────────┴───────┬──────┴──────────────┘
+                                 ▼
+                      Evidence Aggregator
+                                 │
+                                 ▼
+                       Response Generator
+                                 │
+                                 ▼
+                        Reflection Agent
+                                 │
+                                 ▼
+                        Memory Scheduler
+                                 │
+      ┌──────────────────────────┼───────────────────────────┐
+      ▼                          ▼                           ▼
+ Episodic Memory           Semantic Memory             Forget/Update
+(PostgreSQL JSON)             (Qdrant)                Merge/Decay
+                                 │
+                                 ▼
+                         Long-Term Memory
+```
+
+---
+
+# Data Layer
+
+```text
+                        Data Layer
+
+        ┌─────────────────────────────────────────────┐
+        │ PostgreSQL                                 │
+        │--------------------------------------------│
+        │ Users                                      │
+        │ Portfolios                                 │
+        │ Holdings                                   │
+        │ Transactions                               │
+        │ Watchlists                                 │
+        │ Conversation Episodes                      │
+        └─────────────────────────────────────────────┘
+
+                    │
+
+        ┌─────────────────────────────────────────────┐
+        │ Qdrant                                     │
+        │--------------------------------------------│
+        │ Annual Reports                             │
+        │ SEC/BSE/NSE Filings                         │
+        │ RBI Documents                              │
+        │ News Embeddings                            │
+        │ Images (CLIP embeddings)                   │
+        │ Semantic Memory                            │
+        └─────────────────────────────────────────────┘
+
+                    │
+
+        ┌─────────────────────────────────────────────┐
+        │ Neo4j                                      │
+        │--------------------------------------------│
+        │ Company Relationships                      │
+        │ Subsidiaries                               │
+        │ Supply Chains                              │
+        │ Sector Graph                               │
+        └─────────────────────────────────────────────┘
+
+                    │
+
+        ┌─────────────────────────────────────────────┐
+        │ Redis                                      │
+        │--------------------------------------------│
+        │ Working Memory                             │
+        │ Session Cache                              │
+        │ Tool Cache                                 │
+        └─────────────────────────────────────────────┘
+```
+
+---
+
+# RAG Pipeline
+
+```text
+PDFs
+Annual Reports
+Financial Statements
+Research Papers
+News
+Images
+Tables
+
+        │
+
+ Document Parser
+        │
+ OCR (if needed)
+        │
+ Table Extractor
+        │
+ Image Captioning / CLIP
+        │
+ Chunking
+        │
+ Embeddings
+        │
+ Qdrant
+        │
+ Hybrid Retrieval (Vector + BM25)
+        │
+ Cross-Encoder Reranker
+        │
+ Top-k Evidence
+        │
+ Agents
+```
+
+---
+
+# Portfolio Flow
+
+```text
+User
+
+↓
+
+"Analyze my portfolio"
+
+↓
+
+Portfolio Agent
+
+↓
+
+PostgreSQL
+
+↓
+
+Current Holdings
+
+↓
+
+Market Agent
+
+↓
+
+Latest Prices
+
+↓
+
+News Agent
+
+↓
+
+Relevant News
+
+↓
+
+Filing Agent
+
+↓
+
+Latest Financials
+
+↓
+
+Evidence Aggregator
+
+↓
+
+LLM
+
+↓
+
+Answer
+```
+
+---
+
+# Memory Flow (MemOS-inspired)
+
+```text
+Conversation
+
+↓
+
+Reflection Agent
+
+↓
+
+Should this be remembered?
+
+        │
+   ┌────┴────┐
+   │         │
+  No        Yes
+             │
+             ▼
+      Memory Scheduler
+             │
+   ┌─────────┼──────────┐
+   ▼         ▼          ▼
+Working  Episodic   Semantic
+```
+
+Only **important, stable** information becomes long-term memory.
+
+---
+
+# UI Architecture
+
+```text
+────────────────────────────────────────────────────────────
+│ Header                                                  │
+│ Logo | Search | Profile | Settings                     │
+────────────────────────────────────────────────────────────
+
+┌───────────────┬─────────────────────────────────────────┐
+│ Portfolio     │                                         │
+│ Holdings      │                                         │
+│ Watchlist     │           AI Chat                       │
+│ Recent News   │                                         │
+│ Reports       │                                         │
+│ Memory        │                                         │
+│               │                                         │
+│               │                                         │
+├───────────────┤                                         │
+│ Market Heatmap│                                         │
+│ Sector View   │                                         │
+└───────────────┴─────────────────────────────────────────┘
+
+Bottom:
+----------------------------------------------------------
+Message Box
+Attach PDF
+Attach Image
+Voice
+Send
+----------------------------------------------------------
+```
+
+---
+
+# Tech Stack
+
+| Layer           | Technology                     |
+| --------------- | ------------------------------ |
+| Orchestration   | LangGraph                      |
+| LLM             | GPT-4.1 / Llama 3.3 / Qwen 3   |
+| Portfolio DB    | PostgreSQL                     |
+| Working Memory  | Redis                          |
+| Semantic Memory | Qdrant                         |
+| Knowledge Graph | Neo4j                          |
+| RAG             | LlamaIndex or LangChain        |
+| Embeddings      | BAAI BGE-M3 or Qwen3 Embedding |
+| Image Retrieval | CLIP or SigLIP                 |
+| Reranker        | BGE Reranker v2                |
+| Frontend        | Next.js + React                |
+| Backend         | FastAPI                        |
+
+---
+
+## One suggestion I'd make
+
+For a **college project**, **Neo4j is optional**.
+
+If your goal is to maximize impact while keeping implementation manageable, I'd build **Version 1** with:
+
+* ✅ LangGraph
+* ✅ MemOS-inspired memory manager
+* ✅ PostgreSQL (users + portfolios + episodic memory)
+* ✅ Qdrant (RAG + semantic memory)
+* ✅ Redis (working memory)
+* ✅ Multi-modal RAG (PDFs, tables, images)
+* ✅ Four specialized agents (Portfolio, Market, Filing, News)
+
+Then, if you have extra time, add **Neo4j** as an enhancement for company relationships. This keeps the core system achievable while still incorporating modern research ideas.

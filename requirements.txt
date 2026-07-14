@@ -37,3 +37,6 @@ pandas
 regex
 sentence-transformers
 langsmith
+fastapi[all]
+fastmcp
+qdrant-client
