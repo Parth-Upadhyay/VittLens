@@ -151,22 +151,19 @@ class NewsFetcher:
         self, symbol: str, company_name: str
     ) -> List[Dict[str, Any]]:
         """
-        Primary entrypoint for fetching news articles for a company symbol.
-        Tries Google News RSS first (primary); falls back to Marketaux REST API (secondary) if empty or failing.
+        Company-wise news ingestion via Google News RSS only (free, unlimited).
+        Marketaux is reserved for the macro agent's global news pipeline.
 
         Args:
             symbol: Canonical symbol (e.g., 'RELIANCE').
             company_name: Primary company name (e.g. 'Reliance Industries').
 
         Returns:
-            List of article metadata dicts.
+            List of up to 10 article metadata dicts (sorted newest-first by caller).
         """
-        # Primary: Google News RSS
         articles = self.fetch_google_news_rss(company_name)
-
-        # Secondary fallback: Marketaux REST API
         if not articles:
-            logger.info(f"Google RSS primary fetch returned 0 articles for '{company_name}'. Triggering Marketaux fallback...")
-            articles = self.fetch_marketaux_api(symbol)
-
+            # Try alternate query with just symbol name
+            articles = self.fetch_google_news_rss(f"{symbol} NSE India")
         return articles
+

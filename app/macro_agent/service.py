@@ -74,6 +74,8 @@ async def run_macro_pipeline():
         try:
             redis = await RedisClient.get_client()
             if redis:
+                # Merge sector_impacts with key_events sector data for richer context
+                key_events = summary_result.get("key_events", [])
                 cache_data = {
                     "timestamp": datetime.utcnow().isoformat(),
                     "market_snapshot": market_snapshot,
@@ -84,11 +86,12 @@ async def run_macro_pipeline():
                         "watchlist": summary.watchlist
                     },
                     "events": classified_events,
-                    "sector_impacts": sector_impacts
+                    "sector_impacts": sector_impacts,
+                    "key_events": key_events,  # Rich per-event breakdown
                 }
-                await redis.set("macro_agent:latest", json.dumps(cache_data), ex=3600*2) # Cache for 2 hours
-        except Exception as e:
-            pass # Non-critical if cache fails
+                await redis.set("macro_agent:latest", json.dumps(cache_data, default=str), ex=3600*2)
+        except Exception:
+            pass  # Non-critical if cache fails
             
     except Exception as e:
         repo.update_run_status(run.id, "failed", error=str(e))

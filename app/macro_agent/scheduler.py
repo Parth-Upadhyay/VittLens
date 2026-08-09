@@ -7,9 +7,9 @@ logger = get_logger("finnai.macro_agent.scheduler")
 
 _scheduler_task: Optional[asyncio.Task] = None
 
-async def _macro_loop(interval_hours: int = 1):
-    """Background loop that runs the macro intelligence pipeline periodically."""
-    logger.info(f"Macro Intelligence Agent scheduler started. Interval: {interval_hours} hour(s).")
+async def _macro_loop(interval_minutes: int = 30):
+    """Background loop that runs the macro intelligence pipeline every N minutes."""
+    logger.info(f"Macro Intelligence Agent scheduler started. Interval: {interval_minutes} minute(s).")
     
     # We delay the first run slightly to allow FastAPI to fully boot
     await asyncio.sleep(10)
@@ -22,11 +22,11 @@ async def _macro_loop(interval_hours: int = 1):
         except Exception as e:
             logger.error(f"Error during Macro Intelligence Pipeline execution: {e}")
             
-        await asyncio.sleep(interval_hours * 3600)
+        await asyncio.sleep(interval_minutes * 60)
 
-def start_macro_scheduler(app, interval_hours: int = 1):
-    """Starts the asyncio background task for the macro agent."""
+def start_macro_scheduler(app, interval_minutes: int = 30):
+    """Starts the asyncio background task for the macro agent (every 30 minutes)."""
     global _scheduler_task
     if _scheduler_task is None:
-        _scheduler_task = asyncio.create_task(_macro_loop(interval_hours))
+        _scheduler_task = asyncio.create_task(_macro_loop(interval_minutes))
     return _scheduler_task

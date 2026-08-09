@@ -269,9 +269,12 @@ class OrchestratorPromptBuilder:
             "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or '[Evidence Chunk...' tags. Extract clear factual points as narrative.\n"
             "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
             "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
-            "6. MACRO AS BACKGROUND ONLY: The macro intelligence section provides global background context only. "
-            "Do NOT let macro watchlist companies hijack the analysis — the primary focus must remain on the queried stock(s). "
-            "Mention relevant macro events only as supporting context, not as the main subject."
+            "6. MACRO & NEWS WEIGHTAGE (CRITICAL): "
+            "Any macro events marked ⚡ DIRECTLY RELEVANT carry EQUAL weight to real-time market data — treat them as primary inputs in your analysis, not footnotes. "
+            "Reference specific event titles and their sector impacts when discussing the queried stock's outlook. "
+            "Other macro events (background context) should inform the broader market environment section only. "
+            "Do NOT let background macro watchlist companies become the primary subject — focus stays on the queried stock(s).\n"
+            "7. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below."
         )
 
         return "\n".join(prompt_parts)

@@ -7,7 +7,8 @@ and generates an optimal multi-agent execution Plan without requiring LLM pre-pl
 import json
 import os
 import re
-from typing import List, Optional, Set
+from pathlib import Path
+from typing import Dict, List, Optional, Set
 from app.config.settings import Settings
 from app.schemas import AgentTask, ChatRequest, Plan
 from app.utils import CompanyNormalizer
@@ -24,14 +25,85 @@ class Planner:
     def __init__(self, settings: Optional[Settings] = None) -> None:
         self.settings = settings or Settings()
         self.normalizer = CompanyNormalizer(self.settings.aliases_file_path)
-        
+
         # Hardcoded NIFTY 20 RAG supported symbols
         self.rag_symbols: Set[str] = {
-            "RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY", 
-            "BHARTIARTL", "ITC", "SBIN", "LT", "HINDUNILVR", 
-            "AXISBANK", "KOTAKBANK", "M&M", "MARUTI", "SUNPHARMA", 
+            "RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY",
+            "BHARTIARTL", "ITC", "SBIN", "LT", "HINDUNILVR",
+            "AXISBANK", "KOTAKBANK", "M&M", "MARUTI", "SUNPHARMA",
             "BAJFINANCE", "HCLTECH", "TATAMOTORS", "TATASTEEL", "NTPC"
         }
+
+        # Load company metadata for sector-based discovery
+        _meta_path = Path(__file__).parent.parent / "macro_agent" / "rules" / "company_metadata.json"
+        try:
+            with open(_meta_path, encoding="utf-8") as f:
+                self._company_meta: Dict[str, dict] = json.load(f)
+        except Exception:
+            self._company_meta: Dict[str, dict] = {}
+
+        # Sector/theme keyword → list of sectors in company_metadata
+        self._sector_theme_map: Dict[str, List[str]] = {
+            "it": ["IT Services"],
+            "tech": ["IT Services"],
+            "software": ["IT Services"],
+            "banking": ["Banking"],
+            "bank": ["Banking"],
+            "nbfc": ["NBFC", "NBFC & Insurance", "NBFC & Fintech"],
+            "pharma": ["Pharma"],
+            "healthcare": ["Healthcare", "Pharma"],
+            "fmcg": ["FMCG", "FMCG & Conglomerate"],
+            "consumer": ["FMCG", "Consumer Discretionary", "Retail"],
+            "auto": ["Automobile"],
+            "automobile": ["Automobile"],
+            "ev": ["Automobile"],
+            "energy": ["Energy", "Energy & Conglomerate", "Power & Utilities"],
+            "oil": ["Energy", "Energy & Conglomerate"],
+            "power": ["Power & Utilities"],
+            "telecom": ["Telecom"],
+            "steel": ["Metals & Mining"],
+            "metal": ["Metals & Mining"],
+            "cement": ["Building Materials"],
+            "infra": ["Engineering & Construction"],
+            "defence": ["Conglomerate", "Engineering & Construction"],
+            "insurance": ["Insurance", "NBFC & Insurance"],
+            "realty": ["Real Estate"],
+            "real estate": ["Real Estate"],
+            "internet": ["Consumer Internet"],
+            "fintech": ["NBFC & Fintech"],
+            "aviation": ["Aviation"],
+            "airline": ["Aviation"],
+            "retail": ["Retail"],
+            "conglomerate": ["Conglomerate", "Energy & Conglomerate"],
+            "capital goods": ["Capital Goods & Consumer Electronics", "Engineering & Capital Goods"],
+            "chemicals": ["Chemicals & Consumer", "Agrochemicals"],
+            "agro": ["Agrochemicals"],
+        }
+
+    def _discover_companies_by_sector(self, text_lower: str, max_companies: int = 7) -> List[str]:
+        """
+        Discover relevant company symbols when no explicit company is mentioned.
+        Matches query keywords to sectors in company_metadata.json.
+        Returns up to max_companies symbols.
+        """
+        matched_sectors: Set[str] = set()
+        for keyword, sectors in self._sector_theme_map.items():
+            if keyword in text_lower:
+                matched_sectors.update(sectors)
+
+        if not matched_sectors:
+            return []
+
+        matched_symbols = []
+        for sym, meta in self._company_meta.items():
+            sym_sector = meta.get("sector", "")
+            sym_subsectors = meta.get("subsectors", [])
+            all_sym_sectors = {sym_sector} | set(sym_subsectors)
+            if matched_sectors & all_sym_sectors:
+                matched_symbols.append(sym)
+
+        # Cap at max_companies
+        return sorted(matched_symbols)[:max_companies]
 
     def extract_symbols(self, text: str, explicit_symbols: Optional[List[str]] = None) -> List[str]:
         """
@@ -81,11 +153,16 @@ class Planner:
                 elif len(token) >= 3 and not token.isdigit():
                     found_symbols.add(token)
 
-        # Fallback default if no symbol detected
+        # Fallback: try sector-theme discovery if no company symbol found
         if not found_symbols:
-            found_symbols.add("RELIANCE")
+            discovered = self._discover_companies_by_sector(text_lower)
+            if discovered:
+                found_symbols.update(discovered)
+            else:
+                # Last resort: NIFTY 50 broad query — return top blue-chips
+                found_symbols.update(["RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY", "BHARTIARTL", "SBIN"])
 
-        return sorted(list(found_symbols))
+        return sorted(list(found_symbols))[:8]  # Cap at 8 symbols max
 
     def detect_intent(self, question: str, symbols: List[str]) -> str:
         """
