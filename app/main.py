@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # 3. Start Macro Intelligence background scheduler (every 1 hour)
     from app.macro_agent.scheduler import start_macro_scheduler
-    macro_handle = start_macro_scheduler(app, interval_hours=1)
+    macro_handle = start_macro_scheduler(app, interval_minutes=30)
 
     yield
 
@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 # Instantiate FastAPI Application
 app = FastAPI(
-    title="FinnAI Financial Intelligence Platform API",
+    title="VittLens Financial Intelligence Platform API",
     description="Production-grade AI Financial Intelligence Platform for NIFTY Top 20 companies.",
     version="1.0.0",
     lifespan=lifespan,

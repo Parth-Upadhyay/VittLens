@@ -11,6 +11,8 @@ export const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
+  const [isColdStart, setIsColdStart] = useState(false);
+  const [coldStartSeconds, setColdStartSeconds] = useState(45);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isSubmittingRef = useRef(false);
 
@@ -25,13 +27,34 @@ export const ChatPage: React.FC = () => {
   // Cycle through agent processing steps when loading
   useEffect(() => {
     let interval: any;
+    let coldStartTimer: any;
+    let coldStartInterval: any;
+
     if (isLoading) {
       setProcessingStep(0);
+      setIsColdStart(false);
+      setColdStartSeconds(45);
+
       interval = setInterval(() => {
         setProcessingStep((prev) => (prev < processingSteps.length - 1 ? prev + 1 : prev));
       }, 2200);
+
+      // If it takes more than 4 seconds, assume Render cold start
+      coldStartTimer = setTimeout(() => {
+        setIsColdStart(true);
+        coldStartInterval = setInterval(() => {
+          setColdStartSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+      }, 4000);
+    } else {
+      setIsColdStart(false);
     }
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(coldStartTimer);
+      clearInterval(coldStartInterval);
+    };
   }, [isLoading]);
 
   // Load messages when activeThreadId changes (e.g. from sidebar selection)
@@ -159,10 +182,14 @@ export const ChatPage: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-xs font-medium text-cream">FinnAI Multi-Agent System Processing...</span>
+                <span className="text-xs font-medium text-cream">
+                  {isColdStart 
+                    ? `Waking up sleeping server (Render Free Tier)...` 
+                    : `VittLens Multi-Agent System Processing...`}
+                </span>
               </div>
               <span className="text-[10px] text-cream-muted font-mono tabular-nums bg-[#14251B] px-2.5 py-0.5 rounded border border-hairline">
-                Step {processingStep + 1} of {processingSteps.length}
+                {isColdStart ? `${coldStartSeconds}s` : `Step ${processingStep + 1} of ${processingSteps.length}`}
               </span>
             </div>
             <div className="flex items-center space-x-3 py-1">
@@ -173,7 +200,7 @@ export const ChatPage: React.FC = () => {
             <div className="w-full bg-[#14251B] h-1.5 rounded-full mt-2.5 overflow-hidden">
               <div
                 className="bg-accent h-full transition-all duration-500 rounded-full"
-                style={{ width: `${((processingStep + 1) / processingSteps.length) * 100}%` }}
+                style={{ width: isColdStart ? `${((45 - coldStartSeconds) / 45) * 100}%` : `${((processingStep + 1) / processingSteps.length) * 100}%` }}
               />
             </div>
           </div>

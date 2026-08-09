@@ -34,11 +34,15 @@ class GuestSession(BaseModel):
 
     session_id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="Unique guest session UUID.")
     queries_used: int = Field(default=0, description="Number of queries executed so far.")
-    queries_remaining: int = Field(default=-1, description="Number of free guest queries remaining (-1 = Unlimited).")
+    queries_remaining: int = Field(default=15, description="Number of free guest queries remaining (-1 = Unlimited).")
     purpose_of_visit: Optional[str] = Field(default=None, description="Optional guest stated purpose of visit.")
     created_at: str = Field(
         default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat(),
         description="UTC ISO 8601 timestamp of session creation.",
+    )
+    last_reset_date: str = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
+        description="Date string (YYYY-MM-DD) tracking the last time queries were reset."
     )
 
     model_config = ConfigDict(from_attributes=True)
@@ -52,7 +56,7 @@ class GuestCookieHandler:
     def __init__(self, secret_key: Optional[str] = None) -> None:
         self.settings = Settings()
         self.secret_key = secret_key or self.settings.secret_key or "finnai-guest-secret-2026"
-        self.limit = -1  # -1 = Unlimited guest queries
+        self.limit = 15  # Daily guest query limit
 
     @property
     def secret_bytes(self) -> bytes:
@@ -74,6 +78,7 @@ class GuestCookieHandler:
             "used": session.queries_used,
             "purpose": session.purpose_of_visit,
             "cat": session.created_at,
+            "lrd": session.last_reset_date,
         }
         json_bytes = json.dumps(payload_data, separators=(",", ":")).encode("utf-8")
         encoded_payload = self._b64_encode(json_bytes)
@@ -108,9 +113,10 @@ class GuestCookieHandler:
             return GuestSession(
                 session_id=data.get("sid", str(uuid.uuid4())),
                 queries_used=queries_used,
-                queries_remaining=-1,
+                queries_remaining=self.limit - queries_used,
                 purpose_of_visit=data.get("purpose"),
                 created_at=data.get("cat", datetime.datetime.now(datetime.timezone.utc).isoformat()),
+                last_reset_date=data.get("lrd", datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")),
             )
         except Exception as e:
             logger.warning(f"Failed to parse guest cookie: {e}")
@@ -122,7 +128,7 @@ _cookie_handler = GuestCookieHandler()
 
 def get_guest_session(request: Request, response: Response) -> GuestSession:
     """
-    FastAPI dependency managing guest sessions with unlimited query access.
+    FastAPI dependency managing guest sessions with daily limits.
     """
     cookie_val = request.cookies.get("guest_session")
     session = _cookie_handler.parse_cookie_payload(cookie_val) if cookie_val else None
@@ -130,9 +136,15 @@ def get_guest_session(request: Request, response: Response) -> GuestSession:
     if session is None:
         session = GuestSession()
 
-    # Increment queries_used for current request
-    session.queries_used += 1
-    session.queries_remaining = -1
+    # Daily Reset Logic
+    current_date = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    if session.last_reset_date != current_date:
+        session.queries_used = 0
+        session.last_reset_date = current_date
+
+    # IMPORTANT: We don't block here in `get_guest_session` because we want to allow 
+    # requests to endpoints that don't cost tokens (e.g. fetching chat history). 
+    # The actual blocking logic will be handled by a separate dependency `enforce_rate_limit`.
 
     # Set updated signed cookie in response
     signed_val = _cookie_handler.sign_cookie_payload(session)
@@ -144,7 +156,6 @@ def get_guest_session(request: Request, response: Response) -> GuestSession:
         samesite="lax",
     )
 
-    logger.info(f"Guest session '{session.session_id}' query allowed (unlimited).")
     return session
 
 """

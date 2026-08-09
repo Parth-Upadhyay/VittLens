@@ -41,8 +41,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 403) {
       const detail = error.response.data?.detail || '';
-      if (detail.includes('Guest query limit reached') || detail.includes('sign in')) {
+      if (detail.includes('GUEST_LIMIT_REACHED') || detail.includes('Guest query limit reached') || detail.includes('sign in')) {
         window.dispatchEvent(new CustomEvent('guest_limit_reached'));
+      } else if (detail.includes('USER_LIMIT_REACHED')) {
+        window.dispatchEvent(new CustomEvent('user_limit_reached'));
       }
     }
     return Promise.reject(error);

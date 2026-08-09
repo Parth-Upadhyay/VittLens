@@ -40,11 +40,17 @@ export const App: React.FC = () => {
       initSession();
     }
 
-    // Listen for custom guest limit reached event
+    // Listen for custom limit reached events
     const handleGuestLimit = () => setGuestLimitModalOpen(true);
+    const handleUserLimit = () => alert("You have reached your daily limit of 45 queries. Please come back tomorrow!");
+    
     window.addEventListener('guest_limit_reached', handleGuestLimit);
+    window.addEventListener('user_limit_reached', handleUserLimit);
 
-    return () => window.removeEventListener('guest_limit_reached', handleGuestLimit);
+    return () => {
+      window.removeEventListener('guest_limit_reached', handleGuestLimit);
+      window.removeEventListener('user_limit_reached', handleUserLimit);
+    };
   }, []);
 
   // Theme Sync Effect: Toggle light-mode class on body

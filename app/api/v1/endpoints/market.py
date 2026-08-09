@@ -146,6 +146,14 @@ async def get_deep_analyze(
                     continue
                 if isinstance(v, (list, dict)):
                     continue
+                
+                # Normalize dividend yield keys if present
+                if k in ("dividendYield", "fiveYearAvgDividendYield") and isinstance(v, (int, float)):
+                    div_val = service.repository._sanitize_dividend_yield(v)
+                    if div_val is None:
+                        continue
+                    v = div_val
+                    
                 result[k] = v
             return result
         

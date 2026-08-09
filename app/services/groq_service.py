@@ -152,15 +152,16 @@ class GroqProvider(LLMProvider):
                 last_exception = e
                 continue
 
-            except groq.RateLimitError as e:
-                logger.warning(f"Groq Rate Limit hit for model '{model_candidate}': {e}. Failing over to next candidate...")
+            except (groq.RateLimitError, groq.APIStatusError) as e:
+                logger.warning(f"Groq API error / Rate Limit for model '{model_candidate}': {e}. Failing over...")
                 last_exception = e
 
-                # If rate limit includes TPM/413 error, try truncating prompt context and retrying current model candidate once
+                # If rate limit includes TPM/413 error (request too large), try truncating prompt context and retrying
                 err_str = str(e).lower()
-                if "413" in err_str or "request_too_large" in err_str or "tpm" in err_str:
+                if "413" in err_str or "request_too_large" in err_str or "tpm" in err_str or "limit" in err_str:
                     try:
-                        truncated_prompt = current_user_prompt[:4000] + "\n\n[Context truncated for fallback model bounds]"
+                        # Limit context to ~6000 chars to fit within 8k TPM limits
+                        truncated_prompt = current_user_prompt[:6000] + "\n\n[Context truncated to fit model token limits]"
                         logger.info(f"Retrying Groq completion with model '{model_candidate}' using truncated prompt context...")
                         retry_messages = [
                             {"role": "system", "content": system_prompt},

@@ -264,6 +264,34 @@ class MarketRepository:
             return round(val, 4)
         return val
 
+    def _sanitize_dividend_yield(self, val: Any) -> Any:
+        """
+        Sanitize yfinance dividendYield which is returned inconsistently:
+        - Correct form: 0.0111 = 1.11% (decimal, abs <= 1.0)
+        - Corrupted form: 1.11 = already 1.11% (returned as percentage instead of decimal ratio)
+        - Extreme corrupted form: 111.0 = 1.11% (percentage multiplied by 100 twice or percentage 111)
+        
+        yfinance for some Indian / international stocks returns dividendYield as 1.11 (meaning 1.11%) 
+        instead of 0.0111. When multiplied by 100 in the UI, 1.11 becomes 111.00%!
+        
+        Normalization rule:
+        - If raw > 1.0 (e.g. 1.11 or 111.0): divide by 100 to standard decimal ratio (0.0111).
+        - If after division or initially raw > 0.5 (implying >50% dividend yield), null out as bad data.
+        """
+        raw = self._sanitize_val(val)
+        if raw is None:
+            return None
+        if isinstance(raw, (int, float)):
+            # If yfinance returned percentage like 1.11 (meaning 1.11%) or 111.0, scale down to decimal format
+            if abs(raw) > 1.0:
+                raw = raw / 100.0
+            if abs(raw) > 1.0:  # If still > 1.0 (e.g. 111.0 became 1.11)
+                raw = raw / 100.0
+            # Cap: if decimal yield is still > 0.5 (>50%), treat as bad data
+            if abs(raw) > 0.5:
+                return None
+        return raw
+
     def _execute_with_retry(self, func_name: str, ticker_symbol: str, func: Any) -> Any:
         """
         Helper executing a yfinance call with retries and exponential backoff.
@@ -490,7 +518,7 @@ class MarketRepository:
                 "peg_ratio": self._sanitize_val(info.get("pegRatio")),
                 "eps": self._sanitize_val(info.get("trailingEps")),
                 "beta": self._sanitize_val(info.get("beta")),
-                "dividend_yield": self._sanitize_val(info.get("dividendYield")),
+                "dividend_yield": self._sanitize_dividend_yield(info.get("dividendYield")),
                 "roe": self._sanitize_val(roe),
                 "profit_margins": self._sanitize_val(info.get("profitMargins")),
                 "gross_margins": self._sanitize_val(info.get("grossMargins")),

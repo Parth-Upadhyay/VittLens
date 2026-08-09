@@ -116,7 +116,16 @@ export const CompanyDetailPage: React.FC = () => {
               <MetricCard label="Debt to Equity" value={quant.leverage.debt_to_equity != null ? quant.leverage.debt_to_equity.toFixed(2) : 'N/A'} />
               <MetricCard label="Return on Capital (ROCE)" value={quant.profitability.roce != null ? `${(quant.profitability.roce * 100).toFixed(2)}%` : 'N/A'} />
               <MetricCard label="Price to Book (P/B)" value={quant.valuation.pb_ratio != null ? quant.valuation.pb_ratio.toFixed(2) : 'N/A'} />
-              <MetricCard label="Dividend Yield" value={quant.dividend.dividend_yield != null ? `${(quant.dividend.dividend_yield * 100).toFixed(2)}%` : 'N/A'} />
+              <MetricCard 
+                label="Dividend Yield" 
+                value={quant.dividend.dividend_yield != null ? (() => {
+                  let y = quant.dividend.dividend_yield;
+                  if (Math.abs(y) > 1.0) y = y / 100.0;
+                  if (Math.abs(y) > 1.0) y = y / 100.0;
+                  if (Math.abs(y) > 0.5) return 'N/A';
+                  return `${(y * 100).toFixed(2)}%`;
+                })() : 'N/A'} 
+              />
               <MetricCard label="PEG Ratio" value={quant.valuation.peg_ratio != null ? quant.valuation.peg_ratio.toFixed(2) : 'N/A'} />
             </div>
           </div>

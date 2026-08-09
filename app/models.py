@@ -282,3 +282,17 @@ class WatchlistItem(Base):
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
         nullable=False,
     )
+
+class UserRateLimit(Base):
+    """
+    Tracks daily API queries for authenticated users.
+    """
+    __tablename__ = "user_rate_limits"
+
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    queries_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_reset_date: Mapped[str] = mapped_column(
+        String(20),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
+        nullable=False
+    )

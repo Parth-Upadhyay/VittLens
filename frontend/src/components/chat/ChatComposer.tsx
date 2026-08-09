@@ -132,7 +132,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
 
       {/* Persistent SEBI Disclaimer Notice Line */}
       <div className="mt-2 text-[10px] text-cream-dim text-center font-sans tracking-wide">
-        SEBI Disclaimer: FinnAI is an AI analytical tool for educational purposes only and not a SEBI-registered advisor.
+        SEBI Disclaimer: VittLens is an AI analytical tool for educational purposes only and not a SEBI-registered advisor.
       </div>
     </div>
   );

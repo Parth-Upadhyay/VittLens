@@ -39,7 +39,7 @@ export const GuestPurposeModal: React.FC = () => {
             <Compass className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-medium text-cream">Welcome to FinnAI!</h2>
+            <h2 className="text-lg font-medium text-cream">Welcome to VittLens!</h2>
             <p className="text-xs text-cream-muted">What brings you to our platform today?</p>
           </div>
         </div>

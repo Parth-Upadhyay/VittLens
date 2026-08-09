@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </button>
 
           <Link to="/chat" className="flex items-center space-x-2">
-            <span className="text-base font-medium tracking-tight text-cream">Finn<span className="text-accent">AI</span></span>
+            <span className="text-base font-medium tracking-tight text-cream">Vitt<span className="text-accent">Lens</span></span>
             <span className="text-[10px] text-cream-muted border border-hairline px-1.5 py-0.5 rounded font-mono tabular-nums bg-[#14251B]">NIFTY 20</span>
           </Link>
 
@@ -73,31 +73,31 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </button>
         </div>
 
-        {/* Right Controls (Available Companies, Guest Badge & Auth Button) */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        {/* Right Controls */}
+        <div className="flex items-center space-x-2">
           {/* Available Companies Button */}
           <button
             onClick={() => setIsCompaniesModalOpen(true)}
-            className="flex items-center space-x-1.5 bg-[#14251B] hover:bg-[#1B3124] text-cream border border-hairline hover:border-accent/60 text-xs font-medium px-2.5 py-1.5 rounded-md transition-colors shadow-sm"
-            title="View all 20 available NIFTY companies with live data"
+            className="flex items-center space-x-1.5 bg-[#14251B] hover:bg-[#1B3124] text-cream border border-hairline hover:border-accent/60 text-xs px-2.5 py-1 rounded-md transition-colors"
+            title="View 20 available NIFTY companies"
           >
             <Building2 className="w-3.5 h-3.5 text-accent" />
-            <span className="hidden xs:inline">Available Companies</span>
-            <span className="xs:hidden">Companies</span>
+            <span className="hidden sm:inline">Coverage</span>
+            <span className="sm:hidden">20</span>
           </button>
 
           {/* Guest Query Counter Badge */}
           {!user && (
             <button
               onClick={() => queriesRemaining === 0 && setGuestLimitModalOpen(true)}
-              className={`hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-normal border transition-colors ${
+              className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-colors ${
                 queriesRemaining === 0
-                  ? 'border-semantic-red/40 bg-semantic-red/10 text-semantic-red cursor-pointer font-mono tabular-nums'
-                  : 'border-hairline bg-[#14251B] text-cream-muted font-mono tabular-nums'
+                  ? 'border border-semantic-red/40 bg-semantic-red/10 text-semantic-red font-mono'
+                  : 'border border-hairline bg-[#14251B] text-cream-muted font-mono'
               }`}
             >
               <Sparkles className="w-3 h-3 text-accent" />
-              <span>{queriesRemaining < 0 ? 'Unlimited' : `${queriesRemaining}/3 free queries`}</span>
+              <span>{queriesRemaining < 0 ? '∞' : `${queriesRemaining}/3`}</span>
             </button>
           )}
 
@@ -105,26 +105,26 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           {user ? (
             <div className="flex items-center space-x-2">
               {user.avatar_url ? (
-                <img src={user.avatar_url} alt={user.name || 'User'} className="w-7 h-7 rounded-full border border-hairline" />
+                <img src={user.avatar_url} alt={user.name || 'User'} className="w-6 h-6 rounded-full border border-hairline" />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-[#14251B] border border-hairline text-accent flex items-center justify-center text-xs font-medium">
-                  {user.name ? user.name[0].toUpperCase() : <UserIcon className="w-4 h-4" />}
+                <div className="w-6 h-6 rounded-full bg-[#14251B] border border-hairline text-accent flex items-center justify-center text-[10px] font-medium">
+                  {user.name ? user.name[0].toUpperCase() : <UserIcon className="w-3.5 h-3.5" />}
                 </div>
               )}
               <button
                 onClick={logout}
-                className="text-xs text-cream-muted hover:text-cream transition-colors ml-1"
+                className="text-xs text-cream-muted hover:text-cream transition-colors"
               >
-                Sign out
+                Exit
               </button>
             </div>
           ) : (
             <button
               onClick={handleGoogleLogin}
-              className="flex items-center space-x-1.5 bg-accent hover:bg-accent-hover text-cream text-xs font-medium px-3 py-1.5 rounded-md transition-colors shadow-sm"
+              className="flex items-center space-x-1.5 bg-accent hover:bg-accent-hover text-cream text-xs font-medium px-2.5 py-1 rounded-md transition-colors shadow-sm"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Sign in</span>
+              <span className="hidden xs:inline">Sign In</span>
             </button>
           )}
         </div>
@@ -217,10 +217,10 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
             <div className="space-y-3 text-xs text-cream-muted leading-relaxed font-sans border-t border-hairline pt-3">
               <p>
-                <strong className="text-cream">1. Educational & Information Purpose Only:</strong> FinnAI is an automated artificial intelligence analytical tool designed solely for informational, research, and educational purposes.
-              </p>
-              <p>
-                <strong className="text-cream">2. SEBI Non-Registration Notice:</strong> FinnAI is <strong className="text-cream">NOT</strong> a SEBI-registered Investment Adviser (IA) under the SEBI (Investment Advisers) Regulations, 2013, nor a SEBI-registered Research Analyst (RA) under the SEBI (Research Analysts) Regulations, 2014.
+                <strong className="text-cream">1. Educational & Information Purpose Only:</strong> VittLens is an automated artificial intelligence analytical tool designed solely for informational, research, and educational purposes.
+                The reports, valuation metrics, sentiment analyses, and quantitative scores generated by this system do <strong>NOT</strong> constitute financial advice, investment recommendations, endorsement, or solicitation to buy or sell any security.
+                <br /><br />
+                <strong className="text-cream">2. SEBI Non-Registration Notice:</strong> VittLens is <strong className="text-cream">NOT</strong> a SEBI-registered Investment Adviser (IA) under the SEBI (Investment Advisers) Regulations, 2013, nor a SEBI-registered Research Analyst (RA) under the SEBI (Research Analysts) Regulations, 2014.
               </p>
               <p>
                 <strong className="text-cream">3. No Financial Advice or Recommendations:</strong> No content, ratio snapshot, filing summary, or generated output provided on this platform constitutes investment advice, stock tips, buy/sell recommendations, or financial endorsement.

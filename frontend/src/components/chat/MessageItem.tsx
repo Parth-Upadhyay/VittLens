@@ -142,7 +142,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         <div className="flex-1 space-y-3 min-w-0 overflow-hidden break-words">
           {/* Header Metadata (Agent Chips & Symbol Labels) */}
           <div className="flex flex-wrap items-center gap-2 text-xs text-cream-muted">
-            <span className="font-sans font-medium text-cream">{isUser ? 'You' : 'FinnAI Analyst'}</span>
+            <span className="font-sans font-medium text-cream">{isUser ? 'You' : 'VittLens Analyst'}</span>
 
             {!isUser && agents_used && agents_used.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 ml-1">

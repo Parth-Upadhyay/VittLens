@@ -129,7 +129,15 @@ function formatDeepValue(key: string, val: any): string {
     'targetMeanPrice', 'targetHighPrice', 'targetLowPrice', 'bookValue', 'totalCashPerShare',
     'revenuePerShare', 'dividendRate', 'trailingEps', 'forwardEps'];
 
-  if (percentKeys.includes(key)) return `${(val * 100).toFixed(2)}%`;
+  if (percentKeys.includes(key)) {
+    let num = typeof val === 'number' ? val : parseFloat(val);
+    if (!isNaN(num)) {
+      if (Math.abs(num) > 1.0) num = num / 100.0;
+      if (Math.abs(num) > 1.0) num = num / 100.0;
+      if (Math.abs(num) > 0.5) return 'N/A';
+      return `${(num * 100).toFixed(2)}%`;
+    }
+  }
   if (largeNumKeys.includes(key)) {
     if (val >= 1e12) return `₹${(val / 1e12).toFixed(2)}T`;
     if (val >= 1e9) return `₹${(val / 1e9).toFixed(2)}B`;

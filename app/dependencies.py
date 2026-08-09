@@ -107,3 +107,52 @@ def get_optional_user(
     """Dependency returning User instance if authenticated, or None if guest."""
     user, _ = get_current_user_or_guest(request, response, auth, db)
     return user
+
+
+import datetime
+from app.models import UserRateLimit
+
+def enforce_rate_limit(
+    request: Request,
+    response: Response,
+    auth: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: Session = Depends(get_db),
+) -> Tuple[Optional[User], Optional[GuestSession]]:
+    """
+    Enforces daily rate limits:
+    - 45 queries for logged-in users
+    - 15 queries for guests
+    """
+    user, guest = get_current_user_or_guest(request, response, auth, db)
+    
+    if user:
+        today_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+        rate_limit = db.query(UserRateLimit).filter(UserRateLimit.user_id == user.id).first()
+        
+        if not rate_limit:
+            rate_limit = UserRateLimit(user_id=user.id, queries_used=0, last_reset_date=today_str)
+            db.add(rate_limit)
+        
+        if rate_limit.last_reset_date != today_str:
+            rate_limit.queries_used = 0
+            rate_limit.last_reset_date = today_str
+            
+        if rate_limit.queries_used >= 45:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="USER_LIMIT_REACHED"
+            )
+            
+        rate_limit.queries_used += 1
+        db.commit()
+        return user, None
+        
+    elif guest:
+        if guest.queries_used > 15:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="GUEST_LIMIT_REACHED"
+            )
+        return None, guest
+        
+    return None, None

@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.auth import GuestSession
-from app.dependencies import get_current_user_or_guest, get_db, get_orchestrator, get_settings
+from app.dependencies import get_current_user_or_guest, enforce_rate_limit, get_db, get_orchestrator, get_settings
 from app.models import ChatMessage, ChatThread
 from app.models import User
 from app.orchestrator.orchestrator import FinancialOrchestrator
@@ -57,7 +57,7 @@ def generate_thread_title(question: str, settings) -> str:
 @router.post("", response_model=EnrichedChatResponse, summary="Execute financial analysis query")
 async def process_chat_query(
     request_body: ExtendedChatRequest,
-    auth_identity: tuple = Depends(get_current_user_or_guest),
+    auth_identity: tuple = Depends(enforce_rate_limit),
     orchestrator: FinancialOrchestrator = Depends(get_orchestrator),
     db: Session = Depends(get_db),
     settings = Depends(get_settings),
@@ -182,7 +182,7 @@ async def process_chat_query(
 @router.post("/stream", summary="Execute real-time streaming financial analysis query (SSE)")
 async def process_chat_query_stream(
     request_body: ExtendedChatRequest,
-    auth_identity: tuple = Depends(get_current_user_or_guest),
+    auth_identity: tuple = Depends(enforce_rate_limit),
     orchestrator: FinancialOrchestrator = Depends(get_orchestrator),
 ) -> StreamingResponse:
     """

@@ -20,13 +20,10 @@ load_dotenv()
 
 # Verified active models on Groq
 DEFAULT_FALLBACK_MODELS = [
-    "llama-3.1-8b-instant",
     "llama-3.3-70b-versatile",
-    "groq/compound",
-    "groq/compound-mini",
-    "qwen/qwen3.6-27b",
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b"
+    "llama-3.1-8b-instant",
+    "qwen-2.5-72b-instruct",
+    "gemma2-9b-it"
 ]
 
 
