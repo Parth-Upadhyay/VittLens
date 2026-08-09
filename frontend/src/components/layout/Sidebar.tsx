@@ -247,13 +247,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
             <div className="min-w-0 flex-1">
               <div className="text-xs font-sans font-medium text-cream truncate">
-                {user?.name || 'Parth Upadhyay'}
+                {user?.name || 'Guest User'}
               </div>
               <div className="text-[10px] font-sans text-cream-muted truncate">
-                {user ? 'Pro Analyst' : 'Free Guest Tier'}
+                {user ? 'Pro Analyst' : 'Free Tier'}
               </div>
             </div>
           </div>
+          {!user && (
+            <button 
+              onClick={() => navigate('/login')}
+              className="ml-2 px-3 py-1.5 bg-[#E5D5B5] hover:bg-[#D4C3A3] text-[#060E0A] rounded font-medium text-[10px] transition-colors shadow-sm whitespace-nowrap"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </aside>
     </>

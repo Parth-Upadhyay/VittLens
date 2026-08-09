@@ -14,6 +14,7 @@ import { PortfolioAnalyzerPage } from './pages/PortfolioAnalyzerPage';
 import { DeepAnalyzePage } from './pages/DeepAnalyzePage';
 import { FilingAgentPage } from './pages/FilingAgentPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { LoginPage } from './pages/LoginPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,8 +25,24 @@ const queryClient = new QueryClient({
   },
 });
 
-export const App: React.FC = () => {
+});
+
+const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  return (
+    <>
+      <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <div className="flex-1 flex overflow-hidden relative min-h-0">
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto h-full bg-[#060E0A]">
+          {children}
+        </main>
+      </div>
+    </>
+  );
+};
+
+export const App: React.FC = () => {
   const { initSession, setGuestLimitModalOpen, preferences } = useAppStore();
 
   useEffect(() => {
@@ -66,26 +83,25 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="h-screen max-h-screen bg-[#060E0A] text-[#F5EFE6] flex flex-col font-sans overflow-hidden">
-          <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-
-          <div className="flex-1 flex overflow-hidden relative min-h-0">
-            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-            <main className="flex-1 flex flex-col min-w-0 overflow-y-auto h-full bg-[#060E0A]">
-              <Routes>
-                <Route path="/" element={<Navigate to="/chat" replace />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/news" element={<NewsPage />} />
-                <Route path="/company/:symbol" element={<CompanyDetailPage />} />
-                <Route path="/portfolio-analyzer" element={<PortfolioAnalyzerPage />} />
-                <Route path="/deep-analyze" element={<DeepAnalyzePage />} />
-                <Route path="/filing-agent" element={<FilingAgentPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="*" element={<Navigate to="/chat" replace />} />
-              </Routes>
-            </main>
-          </div>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/*" element={
+              <MainLayout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/chat" replace />} />
+                  <Route path="/chat" element={<ChatPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/company/:symbol" element={<CompanyDetailPage />} />
+                  <Route path="/portfolio-analyzer" element={<PortfolioAnalyzerPage />} />
+                  <Route path="/deep-analyze" element={<DeepAnalyzePage />} />
+                  <Route path="/filing-agent" element={<FilingAgentPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="*" element={<Navigate to="/chat" replace />} />
+                </Routes>
+              </MainLayout>
+            } />
+          </Routes>
 
           {/* Global Modals */}
           <GuestLimitModal />

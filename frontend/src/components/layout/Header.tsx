@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             </div>
           ) : (
             <button
-              onClick={handleGoogleLogin}
+              onClick={() => navigate('/login')}
               className="flex items-center space-x-1.5 bg-accent hover:bg-accent-hover text-cream text-xs font-medium px-2.5 py-1 rounded-md transition-colors shadow-sm"
             >
               <LogIn className="w-3.5 h-3.5" />
