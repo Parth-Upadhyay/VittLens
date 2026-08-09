@@ -194,7 +194,7 @@ class OrchestratorPromptBuilder:
             "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or repeat string tags like '[Evidence Chunk...'. Use filing text to extract clear factual narrative points under Section 4.\n"
             "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financial entities evaluated on NIM and loan growth (NOT asset-light IT models).\n"
             "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs at the end. The website UI automatically displays a persistent SEBI legal disclaimer.\n"
-            "6. LIVE NEWS & MACRO WEIGHTAGE: Live news and macro intelligence events are critical. Give significant weightage and priority to recent news articles, sentiment changes, and the provided macro agent intelligence summary when synthesizing the final analysis."
+            "6. LIVE NEWS & MACRO WEIGHTAGE: Live news and macro intelligence events are critical. Give significant weightage and priority to recent news articles, sentiment changes, and the provided macro agent intelligence summary when synthesizing the final analysis. Crucially, always keep the primary focus of your response on the queried symbols (e.g., RELIANCE) and do not substitute or dilute the analysis of the requested stock with unrelated macro watchlist companies."
         )
 
         return "\n".join(prompt_parts)
