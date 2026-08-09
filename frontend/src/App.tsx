@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
   },
 });
 
-});
+
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
