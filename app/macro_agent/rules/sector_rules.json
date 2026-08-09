@@ -1,22 +1,138 @@
 {
   "Oil Rising": {
-    "Positive": ["Oil & Gas", "Refineries"],
-    "Negative": ["Paint", "Airlines", "Chemicals", "Logistics"]
+    "Positive": ["Energy", "Oil & Gas", "Refineries", "Upstream Oil & Gas", "Mining & Energy"],
+    "Negative": ["Airlines", "Aviation", "Paints", "Consumer Discretionary", "Chemicals", "Logistics", "Automobile", "FMCG", "Petrochemicals"]
   },
-  "Rate Cuts": {
-    "Positive": ["IT", "Real Estate", "Consumer Discretionary"],
-    "Negative": ["Banks", "Insurance"]
+  "Oil Falling": {
+    "Positive": ["Airlines", "Aviation", "FMCG", "Consumer Discretionary", "Automobile", "Paints", "Chemicals", "Logistics"],
+    "Negative": ["Energy", "Oil & Gas", "Upstream Oil & Gas", "Mining & Energy"]
   },
-  "Weak Rupee": {
-    "Positive": ["IT", "Pharma", "Exporters"],
-    "Negative": ["Importers", "Automobile"]
+  "Rate Cut (RBI)": {
+    "Positive": ["IT Services", "Real Estate", "Consumer Discretionary", "NBFC", "Automobile", "Retail", "Consumer Internet", "Capital Goods & Consumer Electronics"],
+    "Negative": ["Banking", "NBFC & Insurance", "Insurance", "Asset Management"]
+  },
+  "Rate Hike (RBI)": {
+    "Positive": ["Banking", "Insurance", "Asset Management"],
+    "Negative": ["IT Services", "Real Estate", "Consumer Discretionary", "NBFC", "Automobile", "Retail", "Consumer Internet"]
+  },
+  "Weak Rupee (INR Depreciation)": {
+    "Positive": ["IT Services", "Pharma", "Automobile Ancillaries", "Engineering & Capital Goods", "Agrochemicals"],
+    "Negative": ["Aviation", "Airlines", "Oil & Gas", "Energy", "Automobile", "Consumer Electronics", "Conglomerate"]
+  },
+  "Strong Rupee (INR Appreciation)": {
+    "Positive": ["Aviation", "Airlines", "Importers", "Oil & Gas", "Consumer Electronics", "Automobile"],
+    "Negative": ["IT Services", "Pharma", "Automobile Ancillaries", "Agrochemicals"]
   },
   "AI Boom": {
-    "Positive": ["IT Services", "Data Centers", "Semiconductors"],
-    "Negative": []
+    "Positive": ["IT Services", "Engineering & Capital Goods", "Consumer Internet", "Capital Goods & Consumer Electronics"],
+    "Negative": ["BPO", "Traditional IT Outsourcing"]
   },
   "High Inflation": {
-    "Positive": ["FMCG", "Commodities"],
-    "Negative": ["Consumer Discretionary", "Automobile", "Real Estate"]
+    "Positive": ["FMCG", "Metals & Mining", "Energy", "Agrochemicals"],
+    "Negative": ["Consumer Discretionary", "Automobile", "Real Estate", "NBFC", "Retail"]
+  },
+  "Inflation Cooling": {
+    "Positive": ["Consumer Discretionary", "Automobile", "Retail", "NBFC", "Consumer Internet", "FMCG & Conglomerate"],
+    "Negative": ["Metals & Mining", "Energy", "Agrochemicals"]
+  },
+  "Government Capex Surge": {
+    "Positive": ["Engineering & Construction", "Capital Goods & Consumer Electronics", "Metals & Mining", "Power & Utilities", "Building Materials", "Conglomerate", "Defence"],
+    "Negative": []
+  },
+  "Budget Deficit / Fiscal Tightening": {
+    "Positive": [],
+    "Negative": ["Engineering & Construction", "Capital Goods & Consumer Electronics", "Power & Utilities", "Building Materials", "Conglomerate", "Defence"]
+  },
+  "US Economy Slowdown": {
+    "Positive": [],
+    "Negative": ["IT Services", "Pharma", "Automobile Ancillaries", "Engineering R&D Services", "Agrochemicals"]
+  },
+  "US Economy Recovery": {
+    "Positive": ["IT Services", "Pharma", "Automobile Ancillaries", "Engineering R&D Services", "Agrochemicals"],
+    "Negative": []
+  },
+  "China Slowdown": {
+    "Positive": ["Pharma", "Agrochemicals", "IT Services"],
+    "Negative": ["Metals & Mining", "Energy", "Automobile", "FMCG"]
+  },
+  "China Demand Recovery": {
+    "Positive": ["Metals & Mining", "Energy", "Automobile", "Mining & Energy"],
+    "Negative": ["Pharma", "Agrochemicals"]
+  },
+  "Coal Prices Rising": {
+    "Positive": ["Mining & Energy"],
+    "Negative": ["Power & Utilities", "Metals & Mining", "Building Materials", "Cement"]
+  },
+  "Coal Prices Falling": {
+    "Positive": ["Power & Utilities", "Metals & Mining", "Building Materials"],
+    "Negative": ["Mining & Energy"]
+  },
+  "Gold Prices Rising": {
+    "Positive": ["Consumer Discretionary", "Jewellery"],
+    "Negative": ["Consumer Discretionary", "Retail"]
+  },
+  "Monsoon Weak": {
+    "Positive": [],
+    "Negative": ["FMCG", "Agrochemicals", "Automobile", "Rural NBFC", "Consumer Discretionary"]
+  },
+  "Monsoon Normal / Good": {
+    "Positive": ["FMCG", "Agrochemicals", "Automobile", "Rural NBFC", "Consumer Discretionary"],
+    "Negative": []
+  },
+  "5G Rollout": {
+    "Positive": ["Telecom", "IT Services", "Engineering & Capital Goods", "Consumer Internet"],
+    "Negative": []
+  },
+  "USFDA Crackdown": {
+    "Positive": [],
+    "Negative": ["Pharma", "API Manufacturing"]
+  },
+  "USFDA Approvals Surge": {
+    "Positive": ["Pharma", "API Manufacturing"],
+    "Negative": []
+  },
+  "Defence Spending Increase": {
+    "Positive": ["Engineering & Construction", "Conglomerate", "Defence"],
+    "Negative": []
+  },
+  "Defence Budget Constraint": {
+    "Positive": [],
+    "Negative": ["Engineering & Construction", "Defence", "Capital Goods & Consumer Electronics"]
+  },
+  "FII Inflows": {
+    "Positive": ["Banking", "IT Services", "Consumer Discretionary", "NBFC & Insurance", "Asset Management"],
+    "Negative": []
+  },
+  "FII Outflows": {
+    "Positive": [],
+    "Negative": ["Banking", "IT Services", "Consumer Discretionary", "NBFC & Insurance", "Asset Management", "Consumer Internet"]
+  },
+  "Housing Boom": {
+    "Positive": ["Real Estate", "Building Materials", "Capital Goods & Consumer Electronics", "Consumer Discretionary"],
+    "Negative": []
+  },
+  "EV Adoption Acceleration": {
+    "Positive": ["Automobile", "Power & Utilities", "Consumer Internet"],
+    "Negative": ["Oil & Gas", "Energy", "Automobile Ancillaries"]
+  },
+  "Renewable Energy Policy Push": {
+    "Positive": ["Power & Utilities", "Engineering & Capital Goods", "Conglomerate"],
+    "Negative": ["Coal Mining", "Mining & Energy", "Thermal Power"]
+  },
+  "Rupee Stable": {
+    "Positive": ["Aviation", "Consumer Electronics", "Automobile"],
+    "Negative": []
+  },
+  "Global Recession Risk": {
+    "Positive": ["FMCG", "Pharma"],
+    "Negative": ["IT Services", "Metals & Mining", "Automobile", "Consumer Discretionary", "Energy", "Engineering & Construction"]
+  },
+  "Credit Rating Upgrade (India Sovereign)": {
+    "Positive": ["Banking", "NBFC", "Real Estate", "Asset Management", "Consumer Internet"],
+    "Negative": []
+  },
+  "Geopolitical Tensions": {
+    "Positive": ["Defence", "Energy", "Metals & Mining"],
+    "Negative": ["Aviation", "IT Services", "Consumer Discretionary", "Automobile"]
   }
 }

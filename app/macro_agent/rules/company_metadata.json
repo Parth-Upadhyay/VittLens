@@ -1,27 +1,344 @@
 {
-  "Infosys": {
-    "sector": "IT",
-    "subsector": "IT Services",
-    "exposures": ["USD", "US Economy", "AI Spending"]
-  },
-  "Asian Paints": {
-    "sector": "Paint",
-    "subsector": "Consumer Discretionary",
-    "exposures": ["Crude Oil", "Consumer Spending", "Housing"]
-  },
-  "Reliance": {
-    "sector": "Energy",
-    "subsector": "Integrated Oil",
-    "exposures": ["Oil", "Retail", "Telecom", "Petchem"]
+  "RELIANCE": {
+    "name": "Reliance Industries",
+    "sector": "Energy & Conglomerate",
+    "subsectors": ["Integrated Oil & Gas", "Retail", "Telecom", "Petrochemicals"],
+    "exposures": ["Crude Oil", "Petchem Margins", "Jio ARPU", "Retail Expansion", "Green Energy CapEx", "USD/INR"]
   },
   "TCS": {
-    "sector": "IT",
-    "subsector": "IT Services",
-    "exposures": ["USD", "US Economy", "AI Spending"]
+    "name": "Tata Consultancy Services",
+    "sector": "IT Services",
+    "subsectors": ["IT Services", "Consulting", "BPO"],
+    "exposures": ["USD Revenue", "US Economy", "AI/Cloud Spending", "BFSI Client Budgets", "H1B Visa Policy"]
   },
-  "HDFC Bank": {
-    "sector": "Banks",
-    "subsector": "Private Banks",
-    "exposures": ["Interest Rates", "Liquidity", "Consumer Spending"]
+  "HDFCBANK": {
+    "name": "HDFC Bank",
+    "sector": "Banking",
+    "subsectors": ["Private Banks", "Retail Banking", "Wholesale Banking"],
+    "exposures": ["RBI Repo Rate", "Liquidity Conditions", "NIM Compression", "Consumer Credit Growth", "Asset Quality"]
+  },
+  "INFY": {
+    "name": "Infosys",
+    "sector": "IT Services",
+    "subsectors": ["IT Services", "Consulting", "Digital Transformation"],
+    "exposures": ["USD Revenue", "US Economy", "AI/Cloud Spending", "BFSI Client Budgets", "Visa Policy"]
+  },
+  "ICICIBANK": {
+    "name": "ICICI Bank",
+    "sector": "Banking",
+    "subsectors": ["Private Banks", "Retail Banking", "Wholesale Banking"],
+    "exposures": ["RBI Repo Rate", "Liquidity Conditions", "NIM", "Retail Credit Growth", "Asset Quality"]
+  },
+  "KOTAKBANK": {
+    "name": "Kotak Mahindra Bank",
+    "sector": "Banking",
+    "subsectors": ["Private Banks", "Retail Banking"],
+    "exposures": ["RBI Repo Rate", "NIM", "Liquidity", "Retail Credit Growth"]
+  },
+  "AXISBANK": {
+    "name": "Axis Bank",
+    "sector": "Banking",
+    "subsectors": ["Private Banks", "Retail Banking", "Wholesale Banking"],
+    "exposures": ["RBI Repo Rate", "NIM", "Credit Growth", "Asset Quality"]
+  },
+  "SBIN": {
+    "name": "State Bank of India",
+    "sector": "Banking",
+    "subsectors": ["PSU Banks", "Retail Banking", "Government Lending"],
+    "exposures": ["RBI Policy", "Government Capex", "Agri Credit", "Infrastructure Lending", "NPA Cycle"]
+  },
+  "BHARTIARTL": {
+    "name": "Bharti Airtel",
+    "sector": "Telecom",
+    "subsectors": ["Mobile Services", "Broadband", "Enterprise"],
+    "exposures": ["ARPU Growth", "5G CapEx", "Spectrum Auction", "Africa Revenue", "OTT Competition"]
+  },
+  "HINDUNILVR": {
+    "name": "Hindustan Unilever",
+    "sector": "FMCG",
+    "subsectors": ["FMCG", "Consumer Staples"],
+    "exposures": ["Crude Derivatives (Palm Oil)", "Rural Consumption", "Inflation", "Commodity Input Costs", "GST"]
+  },
+  "ITC": {
+    "name": "ITC Limited",
+    "sector": "FMCG & Conglomerate",
+    "subsectors": ["FMCG", "Hotels", "Paperboards", "Agri"],
+    "exposures": ["Cigarette Taxation", "Rural Consumption", "Tourism Recovery", "Agri Commodity Prices"]
+  },
+  "LT": {
+    "name": "Larsen & Toubro",
+    "sector": "Engineering & Construction",
+    "subsectors": ["Infrastructure", "Defence", "Hydrocarbon", "IT Services (LTIMindtree)"],
+    "exposures": ["Government Capex", "Defence Spending", "Middle East Orders", "Infrastructure Spending", "Interest Rates"]
+  },
+  "BAJFINANCE": {
+    "name": "Bajaj Finance",
+    "sector": "NBFC",
+    "subsectors": ["Consumer Lending", "SME Lending", "Housing Finance"],
+    "exposures": ["RBI Repo Rate", "Consumer Credit Demand", "Asset Quality", "Digital Lending Competition"]
+  },
+  "HCLTECH": {
+    "name": "HCL Technologies",
+    "sector": "IT Services",
+    "subsectors": ["IT Services", "Engineering R&D", "Products & Platforms"],
+    "exposures": ["USD Revenue", "US/Europe Economy", "AI Spending", "BFSI/Mfg Client Budgets"]
+  },
+  "TATAMOTORS": {
+    "name": "Tata Motors",
+    "sector": "Automobile",
+    "subsectors": ["Passenger Vehicles", "Commercial Vehicles", "EV", "Jaguar Land Rover"],
+    "exposures": ["UK Economy (JLR)", "EV Transition", "Steel Prices", "Semiconductor Supply", "China EV Competition", "USD/GBP"]
+  },
+  "TATASTEEL": {
+    "name": "Tata Steel",
+    "sector": "Metals & Mining",
+    "subsectors": ["Steel", "Mining"],
+    "exposures": ["Global Steel Prices", "China Demand", "Coal Prices", "Iron Ore", "UK Operations", "Infrastructure Spending"]
+  },
+  "SUNPHARMA": {
+    "name": "Sun Pharmaceutical",
+    "sector": "Pharma",
+    "subsectors": ["Branded Generics", "Specialty Pharma", "US Generics"],
+    "exposures": ["US FDA Approvals", "USD Revenue", "USFDA Compliance", "Specialty Product Pipeline", "India Branded Market"]
+  },
+  "NTPC": {
+    "name": "NTPC",
+    "sector": "Power & Utilities",
+    "subsectors": ["Thermal Power", "Renewable Energy", "Transmission"],
+    "exposures": ["Coal Prices", "Government Tariffs", "Renewable Transition", "Power Demand Growth"]
+  },
+  "MARUTI": {
+    "name": "Maruti Suzuki",
+    "sector": "Automobile",
+    "subsectors": ["Passenger Vehicles", "SUV", "CNG"],
+    "exposures": ["Rural Income", "Fuel Prices", "Competition (Hyundai/Tata)", "EV Transition", "Yen/INR"]
+  },
+  "WIPRO": {
+    "name": "Wipro",
+    "sector": "IT Services",
+    "subsectors": ["IT Services", "Consulting", "Digital"],
+    "exposures": ["USD Revenue", "US/Europe Economy", "BFSI/Energy Client Budgets", "AI Spending"]
+  },
+  "M&M": {
+    "name": "Mahindra & Mahindra",
+    "sector": "Automobile & Conglomerate",
+    "subsectors": ["SUV", "Tractors", "Farm Equipment", "EV"],
+    "exposures": ["Rural Income", "Farm Sector", "EV Adoption", "Export Markets", "Commodity Prices"]
+  },
+  "ADANIENT": {
+    "name": "Adani Enterprises",
+    "sector": "Conglomerate",
+    "subsectors": ["Airports", "Green Energy", "Mining", "Data Centers", "Defence"],
+    "exposures": ["Government Capex", "Coal Prices", "Green Energy Policy", "FII Sentiment", "Regulatory Risk"]
+  },
+  "JIOFIN": {
+    "name": "Jio Financial Services",
+    "sector": "NBFC & Fintech",
+    "subsectors": ["Insurance", "AMC", "Digital Payments", "Lending"],
+    "exposures": ["RBI Fintech Regulation", "Digital Adoption", "BFSI Competition", "JioMart Ecosystem"]
+  },
+  "ZOMATO": {
+    "name": "Zomato",
+    "sector": "Consumer Internet",
+    "subsectors": ["Food Delivery", "Quick Commerce (Blinkit)", "Hyperpure"],
+    "exposures": ["Consumer Spending", "Fuel Costs (Delivery)", "Competition (Swiggy)", "Urban Consumption"]
+  },
+  "POWERGRID": {
+    "name": "Power Grid Corporation",
+    "sector": "Power & Utilities",
+    "subsectors": ["Transmission", "Infrastructure"],
+    "exposures": ["Government Capex", "Renewable Integration", "Tariff Regulation", "Power Demand"]
+  },
+  "ONGC": {
+    "name": "Oil & Natural Gas Corporation",
+    "sector": "Energy",
+    "subsectors": ["Upstream Oil & Gas", "Exploration"],
+    "exposures": ["Crude Oil Prices", "APM Gas Prices", "Government Subsidy Policy", "Exploration Output"]
+  },
+  "COALINDIA": {
+    "name": "Coal India",
+    "sector": "Mining & Energy",
+    "subsectors": ["Coal Mining"],
+    "exposures": ["Power Sector Demand", "Thermal Coal Prices", "Monsoon (Mining Disruption)", "Renewable Transition Policy"]
+  },
+  "TITAN": {
+    "name": "Titan Company",
+    "sector": "Consumer Discretionary",
+    "subsectors": ["Jewellery (Tanishq)", "Watches", "EyeCare"],
+    "exposures": ["Gold Prices", "Urban Consumption", "Wedding Season", "Import Duties (Gold)"]
+  },
+  "TRENT": {
+    "name": "Trent (Tata Group)",
+    "sector": "Retail",
+    "subsectors": ["Fashion Retail", "Grocery (Zudio, Westside)"],
+    "exposures": ["Urban Consumer Spending", "Retail Expansion CapEx", "Competition (Reliance Retail)"]
+  },
+  "NESTLEIND": {
+    "name": "Nestle India",
+    "sector": "FMCG",
+    "subsectors": ["Food & Beverages", "Consumer Staples"],
+    "exposures": ["Commodity Input Costs", "Rural Consumption", "Inflation", "Cocoa/Milk Prices"]
+  },
+  "ULTRACEMCO": {
+    "name": "UltraTech Cement",
+    "sector": "Building Materials",
+    "subsectors": ["Cement"],
+    "exposures": ["Infrastructure Spending", "Housing Demand", "Coal/Petcoke Prices", "Government Capex"]
+  },
+  "GRASIM": {
+    "name": "Grasim Industries",
+    "sector": "Building Materials & Conglomerate",
+    "subsectors": ["Cement (UltraTech)", "Chemicals", "Paints"],
+    "exposures": ["Infrastructure Spending", "Chemical Margins", "Housing Demand"]
+  },
+  "JSWSTEEL": {
+    "name": "JSW Steel",
+    "sector": "Metals & Mining",
+    "subsectors": ["Steel"],
+    "exposures": ["Global Steel Prices", "China Demand", "Iron Ore Prices", "Infrastructure Spending"]
+  },
+  "DRREDDY": {
+    "name": "Dr Reddy's Laboratories",
+    "sector": "Pharma",
+    "subsectors": ["US Generics", "India Branded", "Biosimilars"],
+    "exposures": ["USFDA Approvals", "USD Revenue", "Biosimilar Pipeline", "Pricing Pressure in US Generics"]
+  },
+  "CIPLA": {
+    "name": "Cipla",
+    "sector": "Pharma",
+    "subsectors": ["India Branded", "US Generics", "Africa"],
+    "exposures": ["USFDA Compliance", "India Price Control", "Africa Revenue", "Respiratory Portfolio"]
+  },
+  "DIVISLAB": {
+    "name": "Divi's Laboratories",
+    "sector": "Pharma",
+    "subsectors": ["API Manufacturing", "CDMO"],
+    "exposures": ["Global Pharma API Demand", "USD Revenue", "Regulatory Compliance", "China API Competition"]
+  },
+  "HDFCLIFE": {
+    "name": "HDFC Life Insurance",
+    "sector": "Insurance",
+    "subsectors": ["Life Insurance"],
+    "exposures": ["Equity Market Performance", "Mortality Experience", "New Business Premium Growth", "RBI Rates (annuity pricing)"]
+  },
+  "SBILIFE": {
+    "name": "SBI Life Insurance",
+    "sector": "Insurance",
+    "subsectors": ["Life Insurance"],
+    "exposures": ["Equity Market Performance", "SBI Distribution Network", "NBP Growth", "Regulatory Changes"]
+  },
+  "HDFCAMC": {
+    "name": "HDFC AMC",
+    "sector": "Asset Management",
+    "subsectors": ["Mutual Funds"],
+    "exposures": ["Equity Market Performance", "SIP Flows", "SEBI Regulation", "Market AUM Growth"]
+  },
+  "INDIGO": {
+    "name": "InterGlobe Aviation (IndiGo)",
+    "sector": "Aviation",
+    "subsectors": ["Airlines"],
+    "exposures": ["Crude Oil / ATF Prices", "USD/INR (Aircraft Leases)", "Passenger Load Factor", "Tourism Demand", "Competition (Air India)"]
+  },
+  "SHRIRAMFIN": {
+    "name": "Shriram Finance",
+    "sector": "NBFC",
+    "subsectors": ["Vehicle Finance", "SME Lending"],
+    "exposures": ["Rural Economy", "Used Vehicle Market", "RBI Rate Cycle", "Asset Quality"]
+  },
+  "MAXHEALTH": {
+    "name": "Max Healthcare",
+    "sector": "Healthcare",
+    "subsectors": ["Hospitals", "Healthcare Services"],
+    "exposures": ["Healthcare Demand", "Medical Tourism", "Expansion CapEx", "Insurance Penetration"]
+  },
+  "TATACONSUM": {
+    "name": "Tata Consumer Products",
+    "sector": "FMCG",
+    "subsectors": ["Food & Beverages", "Tea", "Salt"],
+    "exposures": ["Tea/Coffee Prices", "Rural Consumption", "India FMCG Distribution", "International Markets"]
+  },
+  "TATAPOWER": {
+    "name": "Tata Power",
+    "sector": "Power & Utilities",
+    "subsectors": ["Thermal Power", "Renewable Energy", "Solar EPC"],
+    "exposures": ["Coal Prices", "Solar Policy", "EV Charging Infrastructure", "Renewable Capacity Expansion"]
+  },
+  "TECHM": {
+    "name": "Tech Mahindra",
+    "sector": "IT Services",
+    "subsectors": ["Telecom IT", "Enterprise IT", "BPO"],
+    "exposures": ["USD Revenue", "Telecom Sector Capex", "5G Rollout", "US Economy", "AI Spending"]
+  },
+  "BAJAJ-AUTO": {
+    "name": "Bajaj Auto",
+    "sector": "Automobile",
+    "subsectors": ["Two-Wheelers", "Three-Wheelers", "EV"],
+    "exposures": ["Rural Income", "Fuel Prices", "Export Markets (Africa/LatAm)", "EV Transition", "Competition"]
+  },
+  "BAJAJFINSV": {
+    "name": "Bajaj Finserv",
+    "sector": "NBFC & Insurance",
+    "subsectors": ["Consumer Lending (Bajaj Finance)", "Life Insurance", "General Insurance"],
+    "exposures": ["Consumer Credit Demand", "RBI Rate Policy", "Insurance Penetration", "Health Claims"]
+  },
+  "BPCL": {
+    "name": "Bharat Petroleum",
+    "sector": "Energy",
+    "subsectors": ["Oil Refining", "Fuel Retail", "Petrochemicals"],
+    "exposures": ["Crude Oil Prices", "Government Fuel Pricing Policy", "Refining Margins (GRM)", "Petchem Margins"]
+  },
+  "PIDILITIND": {
+    "name": "Pidilite Industries",
+    "sector": "Chemicals & Consumer",
+    "subsectors": ["Adhesives", "Sealants", "Consumer & Industrial"],
+    "exposures": ["Vinyl Acetate Monomer (VAM) Prices", "Construction Activity", "Consumer Spending"]
+  },
+  "SIEMENS": {
+    "name": "Siemens India",
+    "sector": "Engineering & Capital Goods",
+    "subsectors": ["Power Transmission", "Industrial Automation", "Smart Infrastructure"],
+    "exposures": ["Government Capex", "Infrastructure Spending", "Power Sector Investment", "Germany Economy (Parent)"]
+  },
+  "HAVELLS": {
+    "name": "Havells India",
+    "sector": "Capital Goods & Consumer Electronics",
+    "subsectors": ["Electrical Equipment", "Consumer Durables", "Cables & Wires"],
+    "exposures": ["Construction Activity", "Copper Prices", "Consumer Spending", "Real Estate Demand"]
+  },
+  "ASIANPAINT": {
+    "name": "Asian Paints",
+    "sector": "Consumer Discretionary",
+    "subsectors": ["Decorative Paints", "Industrial Coatings"],
+    "exposures": ["Crude Oil (TiO2/VAM)", "Housing Demand", "Consumer Spending", "Competition (Grasim/Berger)"]
+  },
+  "APOLLOHOSP": {
+    "name": "Apollo Hospitals",
+    "sector": "Healthcare",
+    "subsectors": ["Hospitals", "Pharmacy (Apollo Pharmacy)", "Digital Health"],
+    "exposures": ["Healthcare Demand", "Medical Tourism", "Insurance Penetration", "Expansion CapEx"]
+  },
+  "AUROPHARMA": {
+    "name": "Aurobindo Pharma",
+    "sector": "Pharma",
+    "subsectors": ["US Generics", "Europe Generics", "API"],
+    "exposures": ["USFDA Approvals", "USD Revenue", "US Generics Pricing", "API Margins"]
+  },
+  "LTTS": {
+    "name": "L&T Technology Services",
+    "sector": "IT Services",
+    "subsectors": ["Engineering R&D Services"],
+    "exposures": ["USD Revenue", "Auto/Aerospace Client Capex", "AI/IoT Adoption", "US Economy"]
+  },
+  "PIIND": {
+    "name": "PI Industries",
+    "sector": "Agrochemicals",
+    "subsectors": ["Agrochemicals", "CDMO"],
+    "exposures": ["Monsoon Season", "Global Agri Demand", "CSM Export Revenue", "Regulatory Approvals"]
+  },
+  "BOSCHLTD": {
+    "name": "Bosch India",
+    "sector": "Automobile Ancillaries",
+    "subsectors": ["Auto Components", "Mobility Solutions"],
+    "exposures": ["Automotive Production Volumes", "EV Transition", "Germany Economy (Parent)", "Semiconductor Supply"]
   }
 }

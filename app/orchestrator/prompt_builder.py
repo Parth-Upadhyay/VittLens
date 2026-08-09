@@ -5,8 +5,17 @@ Supports single-symbol deep dives and multi-symbol side-by-side comparison layou
 Includes automated Lakh Crore currency conversion and sector metadata injection.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set
+from pathlib import Path
+import json
 from app.schemas import InvestorContext
+
+_COMPANY_META_PATH = Path(__file__).parent.parent / "macro_agent" / "rules" / "company_metadata.json"
+try:
+    with open(_COMPANY_META_PATH, encoding="utf-8") as _f:
+        _COMPANY_META: Dict[str, Any] = json.load(_f)
+except Exception:
+    _COMPANY_META: Dict[str, Any] = {}
 
 
 class OrchestratorPromptBuilder:
@@ -46,6 +55,30 @@ class OrchestratorPromptBuilder:
             return f"₹{cap_in_lakh_crores:.2f} Lakh Crores (₹{cap_in_crores:,.0f} Crores)"
         else:
             return f"₹{cap_in_crores:,.0f} Crores"
+
+    @staticmethod
+    def _get_queried_sectors(symbols: List[str]) -> Set[str]:
+        """Return all sectors/subsectors for the queried symbols using company_metadata.json."""
+        sectors: Set[str] = set()
+        for sym in symbols:
+            meta = _COMPANY_META.get(sym)
+            if meta:
+                if meta.get("sector"):
+                    sectors.add(meta["sector"])
+                for sub in meta.get("subsectors", []):
+                    sectors.add(sub)
+        return sectors
+
+    @staticmethod
+    def _sectors_overlap(impact_sectors_str: str, queried_sectors: Set[str]) -> bool:
+        """Check if a macro sector impact string overlaps with any queried sector."""
+        if not impact_sectors_str or not queried_sectors:
+            return False
+        impact_lower = impact_sectors_str.lower()
+        for s in queried_sectors:
+            if s.lower() in impact_lower or impact_lower in s.lower():
+                return True
+        return False
 
     @classmethod
     def build_prompt(
@@ -130,18 +163,18 @@ class OrchestratorPromptBuilder:
         # 3. Macro Intelligence Context
         if macro_summary:
             prompt_parts.append("### 3. MACRO INTELLIGENCE SUMMARY (MACRO AGENT)")
-            # Support both raw db model Dict format and Redis nested format
             sum_data = macro_summary.get("summary", {}) if "summary" in macro_summary else macro_summary
             prompt_parts.append(
-                f"Market Sentiment: {sum_data.get('sentiment') or sum_data.get('market_sentiment', 'Neutral')} (Confidence: {sum_data.get('confidence', 0.5)})\n"
+                f"Market Sentiment: {sum_data.get('sentiment') or sum_data.get('market_sentiment', 'Neutral')} "
+                f"(Confidence: {sum_data.get('confidence', 0.5)})\n"
                 f"Summary: {sum_data.get('text') or sum_data.get('summary_text', '')}\n"
-                f"Watchlist Sectors/Companies: {', '.join(sum_data.get('watchlist', []))}"
+                f"Global Watchlist Sectors: {', '.join(sum_data.get('watchlist', []))}"
             )
-            
-            # Detailed Macro Events
+
+            # All major macro events (LLM gets full picture)
             events = macro_summary.get("events", [])
             if events:
-                prompt_parts.append("\nMajor Macro Events:")
+                prompt_parts.append("\nMajor Macro Events (Global Context):")
                 for ev in events:
                     importance_str = f" [Importance: {ev.get('importance', 'N/A')}]"
                     prompt_parts.append(
@@ -149,16 +182,34 @@ class OrchestratorPromptBuilder:
                         f"    Details: {ev.get('summary')}\n"
                         f"    Source: {ev.get('source', 'N/A')}"
                     )
-            
-            # Detailed Sector Impacts
+
+            # Sector impacts — split into RELEVANT (for queried symbols) vs OTHER
             sector_impacts = macro_summary.get("sector_impacts", [])
             if sector_impacts:
-                prompt_parts.append("\nSector Impacts:")
+                queried_sectors = cls._get_queried_sectors(queried_symbols or [])
+                relevant = []
+                other = []
                 for si in sector_impacts:
-                    prompt_parts.append(
-                        f"  • Sector: {si.get('sector')} | Impact: {si.get('impact')}\n"
-                        f"    Reason: {si.get('reason')}"
-                    )
+                    si_sector = si.get("sector", "")
+                    if queried_sectors and cls._sectors_overlap(si_sector, queried_sectors):
+                        relevant.append(si)
+                    else:
+                        other.append(si)
+
+                if relevant:
+                    prompt_parts.append("\n⚡ DIRECTLY RELEVANT Sector Impacts (for queried stocks):")
+                    for si in relevant:
+                        prompt_parts.append(
+                            f"  ★ Sector: {si.get('sector')} | Impact: {si.get('impact')}\n"
+                            f"    Reason: {si.get('reason')}"
+                        )
+                if other:
+                    prompt_parts.append("\nOther Macro Sector Impacts (background context only):")
+                    for si in other:
+                        prompt_parts.append(
+                            f"  • Sector: {si.get('sector')} | Impact: {si.get('impact')}\n"
+                            f"    Reason: {si.get('reason')}"
+                        )
             prompt_parts.append("")
 
         # 4. News Timeline & AI Sentiment Section
