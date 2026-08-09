@@ -6,7 +6,7 @@ Repository: **ArthDrishti**
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 VittLens utilizes a microservices-inspired Orchestrator-Worker (Router) architecture to process complex financial queries while strictly minimizing LLM API calls.
 
@@ -18,7 +18,7 @@ VittLens utilizes a microservices-inspired Orchestrator-Worker (Router) architec
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 ### 1. Orchestrator-Worker Pattern (Single LLM Call)
 Instead of a true multi-agent system that wastes API calls, VittLens uses a deterministic Planner to dynamically route your questions to specialized concurrent data workers:
@@ -40,7 +40,7 @@ Designed specifically to respect strict free-tier quotas:
 
 ---
 
-## 🐳 Deployment (Docker & Cloud)
+## Deployment (Docker & Cloud)
 
 VittLens is fully containerized with a highly optimized `Dockerfile` tailored for Render.
 
@@ -49,7 +49,7 @@ VittLens is fully containerized with a highly optimized `Dockerfile` tailored fo
 
 ---
 
-## 📥 Setup & Local Development
+## Setup & Local Development
 
 1. **Clone and Install Backend**:
    ```bash
