@@ -1,6 +1,6 @@
 # VittLens (formerly FinnAI)
 
-A production-grade Financial Intelligence Platform built with a multi-agent AI architecture. VittLens empowers retail investors, researchers, and traders with AI-driven insights, RAG-powered SEC filing analysis, and real-time market data—all designed to operate efficiently within "No Credit Card" free-tier infrastructure.
+A production-grade Financial Intelligence Platform built with a high-efficiency Orchestrator-Worker AI architecture. VittLens empowers retail investors, researchers, and traders with AI-driven insights, RAG-powered SEC filing analysis, and real-time market data—all designed to operate efficiently within "No Credit Card" free-tier infrastructure.
 
 Repository: **ArthDrishti**
 
@@ -8,7 +8,7 @@ Repository: **ArthDrishti**
 
 ## 🏛️ System Architecture
 
-VittLens utilizes a microservices-inspired multi-agent architecture to process complex financial queries.
+VittLens utilizes a microservices-inspired Orchestrator-Worker (Router) architecture to process complex financial queries while strictly minimizing LLM API calls.
 
 - **Frontend**: React, TypeScript, Tailwind CSS, Vite (Deployed on **Vercel**)
 - **Backend**: FastAPI, Python (Deployed on **Render**)
@@ -20,11 +20,12 @@ VittLens utilizes a microservices-inspired multi-agent architecture to process c
 
 ## 🚀 Key Features
 
-### 1. Multi-Agent Orchestration
-VittLens dynamically routes your questions to specialized AI agents:
-- **News Agent**: Analyzes the latest financial news, extracting sentiment and key entities.
-- **Portfolio Agent**: Evaluates user portfolios against NIFTY 20/50 benchmarks and provides rebalancing suggestions.
-- **Filing Agent (RAG)**: Conducts semantic search across Qdrant-vectorized corporate filings and reports.
+### 1. Orchestrator-Worker Pattern (Single LLM Call)
+Instead of a true multi-agent system that wastes API calls, VittLens uses a deterministic Planner to dynamically route your questions to specialized concurrent data workers:
+- **News Worker**: Fetches the latest financial news, extracting sentiment and key entities from the database.
+- **Portfolio Worker**: Evaluates user portfolios against NIFTY 20/50 benchmarks and retrieves allocation metrics.
+- **Filing Worker (RAG)**: Conducts semantic search across Qdrant-vectorized corporate filings and reports.
+Once all workers fetch their structured data, the **Financial Orchestrator** builds a massive unified context block and synthesizes the final answer using exactly **one single LLM call**. This saves costs and drastically improves speed.
 
 ### 2. Rate-Limiting & "No Credit Card" Cost Control
 Designed specifically to respect strict free-tier quotas:
