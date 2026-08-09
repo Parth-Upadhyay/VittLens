@@ -1,0 +1,22 @@
+{
+  "Oil Rising": {
+    "Positive": ["Oil & Gas", "Refineries"],
+    "Negative": ["Paint", "Airlines", "Chemicals", "Logistics"]
+  },
+  "Rate Cuts": {
+    "Positive": ["IT", "Real Estate", "Consumer Discretionary"],
+    "Negative": ["Banks", "Insurance"]
+  },
+  "Weak Rupee": {
+    "Positive": ["IT", "Pharma", "Exporters"],
+    "Negative": ["Importers", "Automobile"]
+  },
+  "AI Boom": {
+    "Positive": ["IT Services", "Data Centers", "Semiconductors"],
+    "Negative": []
+  },
+  "High Inflation": {
+    "Positive": ["FMCG", "Commodities"],
+    "Negative": ["Consumer Discretionary", "Automobile", "Real Estate"]
+  }
+}

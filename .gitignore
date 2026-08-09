@@ -1,7 +1,63 @@
-#Environment Variable
+# Environment Variables & Secrets
 .env
+.env.*
+!.env.example
 
-#data
-data/
+# Python & Virtual Environments
 .venv/
-*.pyc
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Node & Frontend Build Artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.vite/
+.eslintcache
+
+# Testing & Cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Local Database & Temporary Vector Data
+data/
+*.db
+*.sqlite
+*.sqlite3
+finnai.db
+qdrant_storage/
+chroma_db/
+
+# Logs, Scratch Scripts & Temporary Files
+*.log
+logs/
+git_push.py
+scratch/
+tmp/
+temp/
+*.tmp
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

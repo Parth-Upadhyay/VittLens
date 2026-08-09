@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #060E0A;
+    color: #F5EFE6;
+    font-family: 'Söhne', 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Force font-weight bounds: max 500 for chrome (never bold), font-mono tabular nums for figures */
+  b, strong {
+    font-weight: 500;
+  }
+}
+
+/* Tabular figures for numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Custom Design System Utilities (Dark Mode Default) */
+.bg-surface-dark {
+  background-color: #060E0A;
+}
+
+.bg-surface-panel {
+  background-color: #0D1912;
+}
+
+.bg-surface-elevated {
+  background-color: #14251B;
+}
+
+.border-hairline {
+  border-width: 1px;
+  border-color: rgba(245, 239, 230, 0.12);
+}
+
+/* Typographic Split: Serif face reserved ONLY for AI-generated answer text */
+.ai-answer-serif {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+  font-optical-sizing: auto;
+  line-height: 1.75;
+  color: #F5EFE6;
+}
+
+.ai-answer-serif em, .ai-answer-serif i {
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #060E0A;
+}
+::-webkit-scrollbar-thumb {
+  background: #1B3124;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2B4C38;
+}
+
+/* ==========================================================================
+   LIGHT MODE COLOR INVERSION
+   Uses exact same palette inverted: Cream background, Dark Forest Green text
+   ========================================================================== */
+body.light-mode {
+  background-color: #F5EFE6 !important;
+  color: #060E0A !important;
+}
+
+body.light-mode header {
+  background-color: #EBE4D8 !important;
+  border-color: rgba(13, 25, 18, 0.12) !important;
+}
+
+body.light-mode aside {
+  background-color: #EBE4D8 !important;
+  border-color: rgba(13, 25, 18, 0.12) !important;
+}
+
+body.light-mode main {
+  background-color: #F5EFE6 !important;
+  color: #060E0A !important;
+}
+
+body.light-mode .bg-\[\#060E0A\] {
+  background-color: #F5EFE6 !important;
+}
+
+body.light-mode .bg-\[\#0D1912\] {
+  background-color: #EBE4D8 !important;
+}
+
+body.light-mode .bg-\[\#14251B\] {
+  background-color: #E2D9C9 !important;
+}
+
+body.light-mode .bg-\[\#1A2E22\] {
+  background-color: #D9CEBD !important;
+}
+
+body.light-mode .text-cream {
+  color: #060E0A !important;
+}
+
+body.light-mode .text-cream-muted {
+  color: #3D4D43 !important;
+}
+
+body.light-mode .text-cream-dim {
+  color: #5C6E63 !important;
+}
+
+body.light-mode .text-white {
+  color: #060E0A !important;
+}
+
+body.light-mode .border-hairline {
+  border-color: rgba(13, 25, 18, 0.15) !important;
+}
+
+body.light-mode .ai-answer-serif {
+  color: #060E0A !important;
+}

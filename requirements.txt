@@ -1,42 +1,19 @@
-# --- LLM Orchestration & Agents ---
-langchain          # Core framework for prompt engineering and RAG [cite: 316]
-langgraph          # For stateful research sessions and agentic loops (Phase 4) [cite: 317]
-crewai             # For the multi-agent system (Phase 4) [cite: 317]
-langchain-openai   # Assuming you are using OpenAI's models via API for reasoning [cite: 18, 208]
-# --- Document Parsing & Extraction ---
-pdfplumber         # Extracting text from tabular and messy PDFs [cite: 318]
-PyMuPDF            # Alternative fast PDF parser [cite: 318]
-# --- Vector Databases & Embeddings ---
-chromadb           # Local-first vector database for development [cite: 319]
-faiss-cpu          # High-scale vector store for production (use faiss-gpu if you have a compatible Nvidia GPU) [cite: 320]
-# --- Data Ingestion & Web Scraping ---
-requests           # For sending HTTP requests to download PDFs [cite: 321]
-beautifulsoup4     # For parsing HTML and extracting PDF links from BSE pages [cite: 322]
-bseindia           # Wrapper for interacting with public BSE endpoints [cite: 323]
-yfinance           # For fetching historical stock prices and financial ratios [cite: 324]
-pandas             # Required for handling CSVs and structured tabular data [cite: 149, 150]
-# --- User Interface ---
-gradio             # To build the local chat and interaction UI [cite: 325]
-# streamlit        # Alternative UI framework (uncomment if you prefer Streamlit over Gradio) [cite: 325]
-playwright
-pymupdf
-langchain 
-langchain-community 
-langchain-chroma
-cloudscraper
-curl-cffi
-DrissionPage
-googlesearch-python
-langchain-groq
-dotenv
-langchain_google_genai
-langchain_community.embeddings 
-langchain_groq
-ollama
+groq==1.6.0
+huggingface_hub==1.23.0
+pydantic==2.13.4
+pydantic_settings==2.14.2
+python-dotenv==1.2.2
+qdrant_client==1.18.0
+Requests==2.34.2
+fastapi
+uvicorn
+httpx
+python-multipart
+pyjwt
+yfinance
+sqlalchemy
+redis>=5.0.0
+orjson
+openpyxl
 pandas
-regex
-sentence-transformers
-langsmith
-fastapi[all]
-fastmcp
-qdrant-client
+langgraph

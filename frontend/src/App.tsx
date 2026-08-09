@@ -1,0 +1,91 @@
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useAppStore } from './store/useAppStore';
+import { Header } from './components/layout/Header';
+import { Sidebar } from './components/layout/Sidebar';
+import { GuestLimitModal } from './components/common/GuestLimitModal';
+import { GuestPurposeModal } from './components/common/GuestPurposeModal';
+import { ChatPage } from './pages/ChatPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { NewsPage } from './pages/NewsPage';
+import { CompanyDetailPage } from './pages/CompanyDetailPage';
+import { PortfolioAnalyzerPage } from './pages/PortfolioAnalyzerPage';
+import { DeepAnalyzePage } from './pages/DeepAnalyzePage';
+import { FilingAgentPage } from './pages/FilingAgentPage';
+import { SettingsPage } from './pages/SettingsPage';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+export const App: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { initSession, setGuestLimitModalOpen, preferences } = useAppStore();
+
+  useEffect(() => {
+    initSession();
+
+    // Check for Google OAuth callback token in URL query
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('auth_token', token);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      initSession();
+    }
+
+    // Listen for custom guest limit reached event
+    const handleGuestLimit = () => setGuestLimitModalOpen(true);
+    window.addEventListener('guest_limit_reached', handleGuestLimit);
+
+    return () => window.removeEventListener('guest_limit_reached', handleGuestLimit);
+  }, []);
+
+  // Theme Sync Effect: Toggle light-mode class on body
+  useEffect(() => {
+    if (preferences.theme === 'Light') {
+      document.body.classList.add('light-mode');
+    } else {
+      document.body.classList.remove('light-mode');
+    }
+  }, [preferences.theme]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="h-screen max-h-screen bg-[#060E0A] text-[#F5EFE6] flex flex-col font-sans overflow-hidden">
+          <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+
+          <div className="flex-1 flex overflow-hidden relative min-h-0">
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+            <main className="flex-1 flex flex-col min-w-0 overflow-y-auto h-full bg-[#060E0A]">
+              <Routes>
+                <Route path="/" element={<Navigate to="/chat" replace />} />
+                <Route path="/chat" element={<ChatPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/news" element={<NewsPage />} />
+                <Route path="/company/:symbol" element={<CompanyDetailPage />} />
+                <Route path="/portfolio-analyzer" element={<PortfolioAnalyzerPage />} />
+                <Route path="/deep-analyze" element={<DeepAnalyzePage />} />
+                <Route path="/filing-agent" element={<FilingAgentPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to="/chat" replace />} />
+              </Routes>
+            </main>
+          </div>
+
+          {/* Global Modals */}
+          <GuestLimitModal />
+          <GuestPurposeModal />
+        </div>
+      </Router>
+    </QueryClientProvider>
+  );
+};

@@ -1,0 +1,133 @@
+{
+  "RELIANCE": [
+    "reliance industries",
+    "reliance industries limited",
+    "reliance industries ltd",
+    "reliance",
+    "ril"
+  ],
+  "TCS": [
+    "tata consultancy services",
+    "tata consultancy services limited",
+    "tata consultancy services ltd",
+    "tcs",
+    "tata consultancy"
+  ],
+  "HDFCBANK": [
+    "hdfc bank",
+    "hdfc bank limited",
+    "hdfc bank ltd",
+    "hdfc",
+    "hdfcbank"
+  ],
+  "ICICIBANK": [
+    "icici bank",
+    "icici bank limited",
+    "icici bank ltd",
+    "icici",
+    "icicibank"
+  ],
+  "INFY": [
+    "infosys",
+    "infosys limited",
+    "infosys ltd",
+    "infy"
+  ],
+  "BHARTIARTL": [
+    "bharti airtel",
+    "bharti airtel limited",
+    "bharti airtel ltd",
+    "airtel",
+    "bhartiartl"
+  ],
+  "ITC": [
+    "itc",
+    "itc limited",
+    "itc ltd",
+    "indian tobacco company"
+  ],
+  "SBIN": [
+    "state bank of india",
+    "sbi",
+    "sbin",
+    "state bank"
+  ],
+  "LT": [
+    "larsen & toubro",
+    "larsen and toubro",
+    "l&t",
+    "lt",
+    "larsen & toubro limited"
+  ],
+  "HINDUNILVR": [
+    "hindustan unilever",
+    "hindustan unilever limited",
+    "hindustan unilever ltd",
+    "hul",
+    "hindunilvr"
+  ],
+  "AXISBANK": [
+    "axis bank",
+    "axis bank limited",
+    "axis bank ltd",
+    "axis",
+    "axisbank"
+  ],
+  "KOTAKBANK": [
+    "kotak mahindra bank",
+    "kotak mahindra bank limited",
+    "kotak bank",
+    "kotak",
+    "kotakbank"
+  ],
+  "M&M": [
+    "mahindra & mahindra",
+    "mahindra and mahindra",
+    "mahindra & mahindra limited",
+    "m&m",
+    "mahindra"
+  ],
+  "MARUTI": [
+    "maruti suzuki",
+    "maruti suzuki india limited",
+    "maruti suzuki ltd",
+    "maruti",
+    "maruti suzuki india"
+  ],
+  "SUNPHARMA": [
+    "sun pharmaceutical industries",
+    "sun pharma",
+    "sun pharmaceutical",
+    "sunpharma"
+  ],
+  "BAJFINANCE": [
+    "bajaj finance",
+    "bajaj finance limited",
+    "bajaj finance ltd",
+    "bajfinance"
+  ],
+  "HCLTECH": [
+    "hcl technologies",
+    "hcl tech",
+    "hcl technologies limited",
+    "hcltech"
+  ],
+  "TATAMOTORS": [
+    "tata motors",
+    "tata motors limited",
+    "tata motors ltd",
+    "tatamotors"
+  ],
+  "TATASTEEL": [
+    "tata steel",
+    "tata steel limited",
+    "tata steel ltd",
+    "tatasteel"
+  ],
+  "NTPC": [
+    "ntpc",
+    "ntpc limited",
+    "ntpc ltd",
+    "national thermal power corporation"
+  ]
+}

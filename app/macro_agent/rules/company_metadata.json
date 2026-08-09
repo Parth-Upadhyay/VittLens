@@ -1,0 +1,27 @@
+{
+  "Infosys": {
+    "sector": "IT",
+    "subsector": "IT Services",
+    "exposures": ["USD", "US Economy", "AI Spending"]
+  },
+  "Asian Paints": {
+    "sector": "Paint",
+    "subsector": "Consumer Discretionary",
+    "exposures": ["Crude Oil", "Consumer Spending", "Housing"]
+  },
+  "Reliance": {
+    "sector": "Energy",
+    "subsector": "Integrated Oil",
+    "exposures": ["Oil", "Retail", "Telecom", "Petchem"]
+  },
+  "TCS": {
+    "sector": "IT",
+    "subsector": "IT Services",
+    "exposures": ["USD", "US Economy", "AI Spending"]
+  },
+  "HDFC Bank": {
+    "sector": "Banks",
+    "subsector": "Private Banks",
+    "exposures": ["Interest Rates", "Liquidity", "Consumer Spending"]
+  }
+}
