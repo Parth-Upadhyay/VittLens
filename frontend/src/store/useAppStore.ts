@@ -118,6 +118,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   logout: () => {
     localStorage.removeItem('auth_token');
     set({ user: null, guestSession: null, queriesRemaining: -1, activeThreadId: null, threads: [] });
-    window.location.reload();
+    window.location.href = '/login';
   },
 }));

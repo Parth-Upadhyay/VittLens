@@ -6,15 +6,15 @@ import { LineChart, Lock } from 'lucide-react';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAppStore();
+  const { user } = useAppStore();
 
   useEffect(() => {
     // If user is already authenticated, redirect them away from the login page
-    if (isAuthenticated) {
+    if (user) {
       const origin = (location.state as any)?.from?.pathname || '/chat';
       navigate(origin, { replace: true });
     }
-  }, [isAuthenticated, navigate, location]);
+  }, [user, navigate, location]);
 
   const handleGoogleLogin = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';

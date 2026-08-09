@@ -88,7 +88,7 @@ export const App: React.FC = () => {
             <Route path="/*" element={
               <MainLayout>
                 <Routes>
-                  <Route path="/" element={<Navigate to="/chat" replace />} />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
                   <Route path="/chat" element={<ChatPage />} />
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/news" element={<NewsPage />} />
