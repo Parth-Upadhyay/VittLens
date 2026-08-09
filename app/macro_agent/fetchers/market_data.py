@@ -1,4 +1,5 @@
 import yfinance as yf
+import math
 from typing import Dict, Any
 
 def fetch_market_snapshot() -> Dict[str, Any]:
@@ -33,7 +34,12 @@ def fetch_market_snapshot() -> Dict[str, Any]:
                     last_close = data['Close'].iloc[-1]
                 else:
                     last_close = data[symbol]['Close'].iloc[-1]
-                snapshot[name] = float(last_close)
+                
+                val = float(last_close)
+                if math.isnan(val):
+                    snapshot[name] = None
+                else:
+                    snapshot[name] = val
             except Exception:
                 snapshot[name] = None
                 
