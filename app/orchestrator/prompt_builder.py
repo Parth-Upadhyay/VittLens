@@ -53,7 +53,8 @@ class OrchestratorPromptBuilder:
         question: str,
         context: InvestorContext,
         chat_history: Optional[List[Dict[str, str]]] = None,
-        macro_summary: Optional[Dict[str, Any]] = None
+        macro_summary: Optional[Dict[str, Any]] = None,
+        queried_symbols: Optional[List[str]] = None
     ) -> str:
         """
         Build complete prompt string from question, InvestorContext, and chat history.
@@ -68,6 +69,22 @@ class OrchestratorPromptBuilder:
             Formatted prompt string.
         """
         prompt_parts: List[str] = []
+
+        # Inject queried symbols banner at the very top so the LLM knows what the user asked about
+        if queried_symbols:
+            sym_list = ", ".join(queried_symbols)
+            is_multi = len(queried_symbols) > 1
+            table_hint = (
+                f"Output a side-by-side comparison table for these {len(queried_symbols)} stocks."
+                if is_multi else
+                "Output a single-stock factsheet table for this ONE stock only. Do NOT add rows for other companies."
+            )
+            prompt_parts.append(
+                f"### QUERIED STOCKS: {sym_list}\n"
+                f"CRITICAL: Your ENTIRE analysis must focus ONLY on {sym_list}. {table_hint}\n"
+                f"Do NOT include data or rows for any other companies not listed above."
+            )
+            prompt_parts.append("")
 
         # Chat History
         if chat_history:
@@ -187,14 +204,23 @@ class OrchestratorPromptBuilder:
             )
 
         # 8. Synthesis Instructions
+        is_multi = queried_symbols and len(queried_symbols) > 1
+        table_rule = (
+            "Output ONE side-by-side Markdown table comparing prices, market caps, P/E, ROE, and margins "
+            f"for ONLY these stocks: {', '.join(queried_symbols or [])}." if is_multi
+            else f"Output ONE single-stock factsheet table for ONLY {(queried_symbols or ['the queried stock'])[0]}. "
+                 "Do NOT add rows for other companies."
+        )
         prompt_parts.append(
             "### SYNTHESIS INSTRUCTIONS:\n"
-            "1. STRUCTURE: Organize response into 4 sections: ### Executive Takeaway, ### Market Data & Valuation Comparison, ### Financial Performance & Sector Analysis, and ### Corporate Highlights & Filing Insights.\n"
-            "2. EXACTLY ONE TABLE: Output EXACTLY ONE unified side-by-side Markdown table comparing prices, market caps, P/E, ROE, and margins. Do NOT output duplicate or secondary tables.\n"
-            "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or repeat string tags like '[Evidence Chunk...'. Use filing text to extract clear factual narrative points under Section 4.\n"
-            "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financial entities evaluated on NIM and loan growth (NOT asset-light IT models).\n"
-            "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs at the end. The website UI automatically displays a persistent SEBI legal disclaimer.\n"
-            "6. LIVE NEWS & MACRO WEIGHTAGE: Live news and macro intelligence events are critical. Give significant weightage and priority to recent news articles, sentiment changes, and the provided macro agent intelligence summary when synthesizing the final analysis. Crucially, always keep the primary focus of your response on the queried symbols (e.g., RELIANCE) and do not substitute or dilute the analysis of the requested stock with unrelated macro watchlist companies."
+            f"1. STRUCTURE: Organize into: ### Executive Takeaway, ### Market Data & Valuation, ### Financial Performance & Sector Analysis, ### News & Macro Catalysts.\n"
+            f"2. TABLE: {table_rule}\n"
+            "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or '[Evidence Chunk...' tags. Extract clear factual points as narrative.\n"
+            "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
+            "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
+            "6. MACRO AS BACKGROUND ONLY: The macro intelligence section provides global background context only. "
+            "Do NOT let macro watchlist companies hijack the analysis — the primary focus must remain on the queried stock(s). "
+            "Mention relevant macro events only as supporting context, not as the main subject."
         )
 
         return "\n".join(prompt_parts)

@@ -151,7 +151,7 @@ class FinancialOrchestrator:
 
         context = self.context_builder.build_context(agent_results)
         macro_summary = await self._get_latest_macro_summary()
-        synthesis_prompt = self.prompt_builder.build_prompt(request.question, context, request.chat_history, macro_summary=macro_summary)
+        synthesis_prompt = self.prompt_builder.build_prompt(request.question, context, request.chat_history, macro_summary=macro_summary, queried_symbols=symbols)
 
         return context, synthesis_prompt, agent_names_used, symbols, agent_results
 
