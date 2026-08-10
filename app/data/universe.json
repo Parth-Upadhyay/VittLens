@@ -3518,87 +3518,87 @@
   "etfs": {
     "NIFTYBEES": {
       "symbol": "NIFTYBEES",
-      "name": "Nippon India ETF Nifty 50 BeES",
+      "name": "Nippon India Nifty 50 ETF",
       "type": "etf",
       "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "market_cap_rank": 0
     },
     "BANKBEES": {
       "symbol": "BANKBEES",
-      "name": "Nippon India ETF Bank BeES",
+      "name": "Nippon India Nifty Bank ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Sectoral ETF (Banking)",
+      "market_cap_rank": 0
     },
     "GOLDBEES": {
       "symbol": "GOLDBEES",
       "name": "Nippon India ETF Gold BeES",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Commodity ETF (Gold)",
+      "market_cap_rank": 0
     },
     "SILVERBEES": {
       "symbol": "SILVERBEES",
-      "name": "Nippon India ETF Silver BeES",
+      "name": "Nippon India Silver ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Commodity ETF (Silver)",
+      "market_cap_rank": 0
     },
     "JUNIORBEES": {
       "symbol": "JUNIORBEES",
-      "name": "Nippon India ETF Nifty Next 50",
+      "name": "Nippon India Nifty Next 50 ETF",
       "type": "etf",
       "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "market_cap_rank": 0
     },
     "MON100": {
       "symbol": "MON100",
       "name": "Motilal Oswal Nasdaq 100 ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "International ETF",
+      "market_cap_rank": 0
     },
     "ITBEES": {
       "symbol": "ITBEES",
-      "name": "Nippon India ETF Nifty IT",
+      "name": "Nippon India Nifty IT ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Sectoral ETF (IT)",
+      "market_cap_rank": 0
     },
     "PHARMABEES": {
       "symbol": "PHARMABEES",
-      "name": "Nippon India ETF Nifty Pharma",
+      "name": "Nippon India Nifty Pharma ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Sectoral ETF (Pharma)",
+      "market_cap_rank": 0
     },
     "AUTOBEES": {
       "symbol": "AUTOBEES",
-      "name": "Nippon India ETF Nifty Auto",
+      "name": "Nippon India Nifty Auto ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Sectoral ETF (Auto)",
+      "market_cap_rank": 0
     },
     "MID150BEES": {
       "symbol": "MID150BEES",
-      "name": "Nippon India ETF Nifty Midcap 150",
+      "name": "Nippon India Nifty Midcap 150 ETF",
       "type": "etf",
       "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "market_cap_rank": 0
     },
     "LIQUIDBEES": {
       "symbol": "LIQUIDBEES",
       "name": "Nippon India ETF Liquid BeES",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Liquid ETF",
+      "market_cap_rank": 0
     },
     "CPSEETF": {
       "symbol": "CPSEETF",
       "name": "CPSE ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "Thematic ETF (PSU)",
+      "market_cap_rank": 0
     },
     "BHARAT22": {
       "symbol": "BHARAT22",
@@ -3611,8 +3611,8 @@
       "symbol": "MAFANG",
       "name": "Mirae Asset NYSE FANG+ ETF",
       "type": "etf",
-      "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "sector": "International ETF",
+      "market_cap_rank": 0
     },
     "MASPTOP50": {
       "symbol": "MASPTOP50",
@@ -3626,21 +3626,252 @@
       "name": "HDFC Nifty 50 ETF",
       "type": "etf",
       "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "market_cap_rank": 0
     },
     "ICICINIFTY": {
       "symbol": "ICICINIFTY",
       "name": "ICICI Prudential Nifty 50 ETF",
       "type": "etf",
       "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "market_cap_rank": 0
     },
     "SETFNIF50": {
       "symbol": "SETFNIF50",
-      "name": "SBI ETF Nifty 50",
+      "name": "SBI Nifty 50 ETF",
       "type": "etf",
       "sector": "Broad Market ETF",
-      "category": "Exchange Traded Fund"
+      "market_cap_rank": 0
+    },
+    "NIFTYIETF": {
+      "symbol": "NIFTYIETF",
+      "name": "ICICI Prudential Nifty 50 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "market_cap_rank": 0
+    },
+    "SETFNIFBK": {
+      "symbol": "SETFNIFBK",
+      "name": "SBI Nifty Bank ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (Banking)",
+      "market_cap_rank": 0
+    },
+    "KOTAKNIFTY": {
+      "symbol": "KOTAKNIFTY",
+      "name": "Kotak Nifty 50 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "market_cap_rank": 0
+    },
+    "UTINIFTETF": {
+      "symbol": "UTINIFTETF",
+      "name": "UTI Nifty 50 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "market_cap_rank": 0
+    },
+    "MOMOMENTUM": {
+      "symbol": "MOMOMENTUM",
+      "name": "Motilal Oswal Nifty 200 Momentum 30 ETF",
+      "type": "etf",
+      "sector": "Smart Beta ETF",
+      "market_cap_rank": 0
+    },
+    "KOTAKBKETF": {
+      "symbol": "KOTAKBKETF",
+      "name": "Kotak Nifty Bank ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (Banking)",
+      "market_cap_rank": 0
+    },
+    "CONSUMBEES": {
+      "symbol": "CONSUMBEES",
+      "name": "Nippon India Nifty Consumption ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (Consumption)",
+      "market_cap_rank": 0
+    },
+    "INFRAETF": {
+      "symbol": "INFRAETF",
+      "name": "ICICI Prudential Nifty Infrastructure ETF",
+      "type": "etf",
+      "sector": "Thematic ETF (Infra)",
+      "market_cap_rank": 0
+    },
+    "PSUBNKBEES": {
+      "symbol": "PSUBNKBEES",
+      "name": "Nippon India Nifty PSU Bank ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (PSU Bank)",
+      "market_cap_rank": 0
+    },
+    "PVTBANIETF": {
+      "symbol": "PVTBANIETF",
+      "name": "ICICI Prudential Nifty Private Bank ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (Private Bank)",
+      "market_cap_rank": 0
+    },
+    "FMCGIETF": {
+      "symbol": "FMCGIETF",
+      "name": "ICICI Prudential Nifty FMCG ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (FMCG)",
+      "market_cap_rank": 0
+    },
+    "HEALTHY": {
+      "symbol": "HEALTHY",
+      "name": "ICICI Prudential Nifty Healthcare ETF",
+      "type": "etf",
+      "sector": "Sectoral ETF (Healthcare)",
+      "market_cap_rank": 0
+    },
+    "MAKEINDIA": {
+      "symbol": "MAKEINDIA",
+      "name": "Nippon India Nifty India Manufacturing ETF",
+      "type": "etf",
+      "sector": "Thematic ETF (Manufacturing)",
+      "market_cap_rank": 0
+    },
+    "COMMODIES": {
+      "symbol": "COMMODIES",
+      "name": "ICICI Prudential Nifty Commodities ETF",
+      "type": "etf",
+      "sector": "Thematic ETF (Commodities)",
+      "market_cap_rank": 0
+    },
+    "INFRABEES": {
+      "symbol": "INFRABEES",
+      "name": "Nippon India Nifty Infrastructure ETF",
+      "type": "etf",
+      "sector": "Thematic ETF (Infra)",
+      "market_cap_rank": 0
+    },
+    "DIVOPPBEES": {
+      "symbol": "DIVOPPBEES",
+      "name": "Nippon India Nifty Dividend Opportunities 50 ETF",
+      "type": "etf",
+      "sector": "Smart Beta ETF",
+      "market_cap_rank": 0
+    },
+    "NV20IETF": {
+      "symbol": "NV20IETF",
+      "name": "ICICI Prudential Nifty50 Value 20 ETF",
+      "type": "etf",
+      "sector": "Smart Beta ETF (Value)",
+      "market_cap_rank": 0
+    },
+    "LOWVOLIETF": {
+      "symbol": "LOWVOLIETF",
+      "name": "ICICI Prudential Nifty100 Low Volatility 30 ETF",
+      "type": "etf",
+      "sector": "Smart Beta ETF (Low Volatility)",
+      "market_cap_rank": 0
+    },
+    "ALPHAETF": {
+      "symbol": "ALPHAETF",
+      "name": "ICICI Prudential Nifty Alpha 50 ETF",
+      "type": "etf",
+      "sector": "Smart Beta ETF (Alpha)",
+      "market_cap_rank": 0
+    },
+    "GOLDIETF": {
+      "symbol": "GOLDIETF",
+      "name": "ICICI Prudential Gold ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Gold)",
+      "market_cap_rank": 0
+    },
+    "SETFGOLD": {
+      "symbol": "SETFGOLD",
+      "name": "SBI Gold ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Gold)",
+      "market_cap_rank": 0
+    },
+    "HDFCGOLD": {
+      "symbol": "HDFCGOLD",
+      "name": "HDFC Gold ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Gold)",
+      "market_cap_rank": 0
+    },
+    "KOTAKGOLD": {
+      "symbol": "KOTAKGOLD",
+      "name": "Kotak Gold ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Gold)",
+      "market_cap_rank": 0
+    },
+    "AXISGOLD": {
+      "symbol": "AXISGOLD",
+      "name": "Axis Gold ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Gold)",
+      "market_cap_rank": 0
+    },
+    "SILVERIETF": {
+      "symbol": "SILVERIETF",
+      "name": "ICICI Prudential Silver ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Silver)",
+      "market_cap_rank": 0
+    },
+    "SETFSILVER": {
+      "symbol": "SETFSILVER",
+      "name": "SBI Silver ETF",
+      "type": "etf",
+      "sector": "Commodity ETF (Silver)",
+      "market_cap_rank": 0
+    },
+    "LIQUIDIETF": {
+      "symbol": "LIQUIDIETF",
+      "name": "ICICI Prudential Liquid ETF",
+      "type": "etf",
+      "sector": "Liquid ETF",
+      "market_cap_rank": 0
+    },
+    "SETFLIQUID": {
+      "symbol": "SETFLIQUID",
+      "name": "SBI Liquid ETF",
+      "type": "etf",
+      "sector": "Liquid ETF",
+      "market_cap_rank": 0
+    },
+    "GSEC10YEAR": {
+      "symbol": "GSEC10YEAR",
+      "name": "Nippon India ETF Nifty 10 yr Benchmark G-Sec",
+      "type": "etf",
+      "sector": "Debt ETF (G-Sec)",
+      "market_cap_rank": 0
+    },
+    "GSEC5IETF": {
+      "symbol": "GSEC5IETF",
+      "name": "ICICI Prudential Nifty 5 yr Benchmark G-SEC ETF",
+      "type": "etf",
+      "sector": "Debt ETF (G-Sec)",
+      "market_cap_rank": 0
+    },
+    "BBETF0423": {
+      "symbol": "BBETF0423",
+      "name": "Bharat Bond ETF - April 2023",
+      "type": "etf",
+      "sector": "Debt ETF (Corporate Bond)",
+      "market_cap_rank": 0
+    },
+    "BBETF0430": {
+      "symbol": "BBETF0430",
+      "name": "Bharat Bond ETF - April 2030",
+      "type": "etf",
+      "sector": "Debt ETF (Corporate Bond)",
+      "market_cap_rank": 0
+    },
+    "SDL24BGETF": {
+      "symbol": "SDL24BGETF",
+      "name": "Aditya Birla Sun Life Nifty SDL Sep 2024 ETF",
+      "type": "etf",
+      "sector": "Debt ETF (SDL)",
+      "market_cap_rank": 0
     }
   },
   "mutual_funds": {
@@ -3715,6 +3946,111 @@
       "amc": "UTI Mutual Fund",
       "category": "Index Fund",
       "sector": "Mutual Fund"
+    },
+    "PPFAS": {
+      "symbol": "PPFAS",
+      "name": "Parag Parikh Flexi Cap Fund",
+      "type": "mutual_fund",
+      "sector": "Flexi Cap Fund",
+      "market_cap_rank": 0
+    },
+    "HDFCSMALLCAP": {
+      "symbol": "HDFCSMALLCAP",
+      "name": "HDFC Small Cap Fund",
+      "type": "mutual_fund",
+      "sector": "Small Cap Fund",
+      "market_cap_rank": 0
+    },
+    "SBIBLUECHIP": {
+      "symbol": "SBIBLUECHIP",
+      "name": "SBI Bluechip Fund",
+      "type": "mutual_fund",
+      "sector": "Large Cap Fund",
+      "market_cap_rank": 0
+    },
+    "ICICIPRUVALUE": {
+      "symbol": "ICICIPRUVALUE",
+      "name": "ICICI Prudential Value Discovery Fund",
+      "type": "mutual_fund",
+      "sector": "Value Fund",
+      "market_cap_rank": 0
+    },
+    "AXISLONGTERM": {
+      "symbol": "AXISLONGTERM",
+      "name": "Axis Long Term Equity Fund",
+      "type": "mutual_fund",
+      "sector": "ELSS (Tax Saver)",
+      "market_cap_rank": 0
+    },
+    "MIRAEASSETELSS": {
+      "symbol": "MIRAEASSETELSS",
+      "name": "Mirae Asset Tax Saver Fund",
+      "type": "mutual_fund",
+      "sector": "ELSS (Tax Saver)",
+      "market_cap_rank": 0
+    },
+    "NIPPONSMALLCAP": {
+      "symbol": "NIPPONSMALLCAP",
+      "name": "Nippon India Small Cap Fund",
+      "type": "mutual_fund",
+      "sector": "Small Cap Fund",
+      "market_cap_rank": 0
+    },
+    "KOTAKEMERGING": {
+      "symbol": "KOTAKEMERGING",
+      "name": "Kotak Emerging Equity Fund",
+      "type": "mutual_fund",
+      "sector": "Mid Cap Fund",
+      "market_cap_rank": 0
+    },
+    "DSPMIDCAP": {
+      "symbol": "DSPMIDCAP",
+      "name": "DSP Midcap Fund",
+      "type": "mutual_fund",
+      "sector": "Mid Cap Fund",
+      "market_cap_rank": 0
+    },
+    "UTIFLEXICAP": {
+      "symbol": "UTIFLEXICAP",
+      "name": "UTI Flexi Cap Fund",
+      "type": "mutual_fund",
+      "sector": "Flexi Cap Fund",
+      "market_cap_rank": 0
+    },
+    "SBISUPER": {
+      "symbol": "SBISUPER",
+      "name": "SBI Magnum Midcap Fund",
+      "type": "mutual_fund",
+      "sector": "Mid Cap Fund",
+      "market_cap_rank": 0
+    },
+    "HDFCMIDCAP": {
+      "symbol": "HDFCMIDCAP",
+      "name": "HDFC Mid-Cap Opportunities Fund",
+      "type": "mutual_fund",
+      "sector": "Mid Cap Fund",
+      "market_cap_rank": 0
+    },
+    "ICICIPRUTECH": {
+      "symbol": "ICICIPRUTECH",
+      "name": "ICICI Prudential Technology Fund",
+      "type": "mutual_fund",
+      "sector": "Sectoral Fund (IT)",
+      "market_cap_rank": 0
+    },
+    "TATAETHICAL": {
+      "symbol": "TATAETHICAL",
+      "name": "Tata Ethical Fund",
+      "type": "mutual_fund",
+      "sector": "Thematic Fund (Ethical)",
+      "market_cap_rank": 0
+    },
+    "SBIHEALTHCARE": {
+      "symbol": "SBIHEALTHCARE",
+      "name": "SBI Healthcare Opportunities Fund",
+      "type": "mutual_fund",
+      "sector": "Sectoral Fund (Healthcare)",
+      "market_cap_rank": 0
     }
   }
 }

@@ -102,9 +102,15 @@ class PortfolioAgent:
         # 1. Fetch Market Quote (synchronous — no asyncio.run)
         try:
             raw_quote = self.market_service.repository.get_current_quote(ticker_symbol)
-            current_price = raw_quote.get("price") or h.avg_buy_price
+            
+            # Robust fallback for price missing/None
+            current_price = raw_quote.get("price")
+            if current_price is None or current_price == 0:
+                # Some ETFs return previous close in other fields, but we fall back to avg_buy_price
+                current_price = h.avg_buy_price
+                
             prev_close = raw_quote.get("price", current_price)
-            change_val = raw_quote.get("change", 0.0) or 0.0
+            change_val = raw_quote.get("change") or 0.0
             day_change = change_val
         except Exception:
             current_price = h.avg_buy_price
@@ -276,17 +282,22 @@ class PortfolioAgent:
             # Use repository directly (synchronous) to avoid asyncio.run() inside running loop
             raw_bars = self.market_service.repository.get_historical_data("^NSEI", period="1y", interval="1d")
             if raw_bars and len(raw_bars) > 0:
-                latest_close = raw_bars[-1].get("close", 0.0) or 0.0
-                idx_1m = max(0, len(raw_bars) - 21)
-                close_1m = raw_bars[idx_1m].get("close", latest_close) or latest_close
-                ret_1m = ((latest_close - close_1m) / close_1m * 100.0) if close_1m else 0.0
+                # Filter out active trading days where close is None
+                valid_bars = [b for b in raw_bars if b.get("close") is not None and b.get("close") > 0]
                 
-                idx_6m = max(0, len(raw_bars) - 126)
-                close_6m = raw_bars[idx_6m].get("close", latest_close) or latest_close
-                ret_6m = ((latest_close - close_6m) / close_6m * 100.0) if close_6m else 0.0
-                
-                close_1y = raw_bars[0].get("close", latest_close) or latest_close
-                ret_1y = ((latest_close - close_1y) / close_1y * 100.0) if close_1y else 0.0
+                if valid_bars:
+                    latest_close = valid_bars[-1].get("close")
+                    
+                    idx_1m = max(0, len(valid_bars) - 21)
+                    close_1m = valid_bars[idx_1m].get("close")
+                    ret_1m = ((latest_close - close_1m) / close_1m * 100.0) if close_1m else 0.0
+                    
+                    idx_6m = max(0, len(valid_bars) - 126)
+                    close_6m = valid_bars[idx_6m].get("close")
+                    ret_6m = ((latest_close - close_6m) / close_6m * 100.0) if close_6m else 0.0
+                    
+                    close_1y = valid_bars[0].get("close")
+                    ret_1y = ((latest_close - close_1y) / close_1y * 100.0) if close_1y else 0.0
                 
                 nifty_benchmarks = [
                     {"period": "1M", "nifty_return": round(ret_1m, 2)},
