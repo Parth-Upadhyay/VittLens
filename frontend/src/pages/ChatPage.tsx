@@ -146,17 +146,17 @@ export const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#060E0A] overflow-hidden font-sans min-w-0">
+    <div className="flex-1 flex flex-col h-full bg-bg-primary overflow-hidden font-sans min-w-0">
       {/* Scrollable Message List Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-w-0">
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 min-w-0 animate-page-in">
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 max-w-md mx-auto">
-            <div className="w-12 h-12 rounded-full bg-[#14251B] border border-hairline text-accent flex items-center justify-center">
-              <Sparkles className="w-6 h-6" />
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-5 max-w-lg mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-accent-light border border-accent/20 text-accent flex items-center justify-center shadow-sm">
+              <Sparkles className="w-8 h-8" />
             </div>
-            <div className="space-y-1">
-              <h1 className="text-xl font-medium text-cream tracking-tight">AI Financial Intelligence</h1>
-              <p className="text-xs text-cream-muted leading-relaxed">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">AI Financial Intelligence</h1>
+              <p className="text-sm text-tx-secondary leading-relaxed">
                 Ask multi-symbol financial questions, compare ratios, explore recent news, or search SEC filings.
               </p>
             </div>
@@ -178,26 +178,26 @@ export const ChatPage: React.FC = () => {
 
         {/* Live Processing Indicator Banner */}
         {isLoading && (
-          <div className="py-3 px-4 my-2 bg-[#0D1912] border border-hairline rounded-xl max-w-4xl mx-auto transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
+          <div className="py-4 px-5 my-4 surface-card max-w-4xl mx-auto transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2.5">
                 <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-xs font-medium text-cream">
+                <span className="text-sm font-semibold text-tx-primary font-heading tracking-wide">
                   {isColdStart 
                     ? `Waking up sleeping server (Render Free Tier)...` 
                     : `VittLens Multi-Agent System Processing...`}
                 </span>
               </div>
-              <span className="text-[10px] text-cream-muted font-mono tabular-nums bg-[#14251B] px-2.5 py-0.5 rounded border border-hairline">
+              <span className="text-xs text-tx-secondary font-mono tabular-nums bg-bg-tertiary px-3 py-1 rounded border border-border">
                 {isColdStart ? `${coldStartSeconds}s` : `Step ${processingStep + 1} of ${processingSteps.length}`}
               </span>
             </div>
-            <div className="flex items-center space-x-3 py-1">
-              <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0 animate-pulse" />
-              <span className="text-xs text-cream font-normal">{processingSteps[processingStep]}</span>
+            <div className="flex items-center space-x-3 py-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-accent flex-shrink-0 animate-pulse" />
+              <span className="text-[13px] text-tx-primary font-medium">{processingSteps[processingStep]}</span>
             </div>
             {/* Solid Progress Bar */}
-            <div className="w-full bg-[#14251B] h-1.5 rounded-full mt-2.5 overflow-hidden">
+            <div className="w-full bg-bg-tertiary h-2 rounded-full mt-3 overflow-hidden border border-border/50">
               <div
                 className="bg-accent h-full transition-all duration-500 rounded-full"
                 style={{ width: isColdStart ? `${((45 - coldStartSeconds) / 45) * 100}%` : `${((processingStep + 1) / processingSteps.length) * 100}%` }}

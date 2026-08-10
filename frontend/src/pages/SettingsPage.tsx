@@ -14,13 +14,13 @@ export const SettingsPage: React.FC = () => {
   const { preferences, fetchPreferences } = useAppStore();
   const [style, setStyle] = useState(preferences.answer_style || 'Detailed');
   const [symbols, setSymbols] = useState(preferences.default_symbols?.join(', ') || 'RELIANCE, TCS, INFY');
-  const [theme, setTheme] = useState(preferences.theme || 'Dark');
+  const [theme, setTheme] = useState(preferences.theme || 'Light');
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     setStyle(preferences.answer_style || 'Detailed');
     setSymbols(preferences.default_symbols?.join(', ') || 'RELIANCE, TCS, INFY');
-    setTheme(preferences.theme || 'Dark');
+    setTheme(preferences.theme || 'Light');
   }, [preferences]);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -42,48 +42,46 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
-      {/* Professional Title Bar without Emojis or Bounding Box */}
-      <div className="flex items-center space-x-2.5 pb-2">
+    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-8 font-sans bg-bg-primary animate-page-in">
+      {/* Title Bar */}
+      <div className="flex items-center space-x-3">
         <SettingsIcon className="w-5 h-5 text-accent" />
-        <h1 className="text-xl font-medium text-cream tracking-tight">Preferences & Configuration</h1>
+        <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Preferences & Configuration</h1>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
         {/* Answer Style Radio Cards */}
-        <div className="space-y-3">
-          <label className="text-xs font-medium text-cream-muted uppercase tracking-wider">AI Answer Persona Style</label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="space-y-4">
+          <label className="metric-label">AI Answer Persona Style</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {ANSWER_STYLES.map((st) => {
               const active = style === st.id;
               return (
                 <div
                   key={st.id}
                   onClick={() => setStyle(st.id as any)}
-                  className={`p-4 rounded-xl border cursor-pointer transition-colors space-y-1 ${
+                  className={`p-5 rounded-card border cursor-pointer nav-transition space-y-2 flex flex-col justify-between ${
                     active
-                      ? 'border-accent bg-[#14251B] text-cream font-medium shadow-sm'
-                      : 'border-hairline bg-[#0D1912] text-cream-muted hover:bg-[#14251B]/50'
+                      ? 'border-accent bg-accent-light text-tx-primary shadow-sm'
+                      : 'surface-card text-tx-secondary hover:bg-bg-hover'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-cream">{st.title}</span>
+                    <span className="text-[15px] font-semibold text-tx-primary">{st.title}</span>
                     {active && <Check className="w-4 h-4 text-accent" />}
                   </div>
-                  <p className="text-xs text-cream-muted leading-relaxed">{st.desc}</p>
+                  <p className="text-xs text-tx-secondary leading-relaxed">{st.desc}</p>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Quick Access Symbols with Clear Explanation */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-cream-muted uppercase tracking-wider">Quick-Access Symbol Chips</label>
-          </div>
-
-          <div className="flex items-start space-x-2 p-3 bg-[#0D1912] border border-hairline rounded-lg text-xs text-cream-muted">
+        {/* Quick Access Symbols */}
+        <div className="space-y-4">
+          <label className="metric-label">Quick-Access Symbol Chips</label>
+          
+          <div className="flex items-start space-x-3 p-4 bg-bg-tertiary border border-border rounded-lg text-xs text-tx-secondary font-sans">
             <Info className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
             <p className="leading-relaxed">
               These stock symbols appear as interactive one-click shortcut buttons directly above the chat composer input box (e.g. RELIANCE, TCS, INFY). Clicking any chip quickly inserts or compares that stock in your chat prompt.
@@ -95,23 +93,23 @@ export const SettingsPage: React.FC = () => {
             value={symbols}
             onChange={(e) => setSymbols(e.target.value)}
             placeholder="Comma separated symbols (e.g. RELIANCE, TCS, INFY, HDFCBANK)"
-            className="w-full bg-[#0D1912] border border-hairline text-xs text-cream placeholder-cream-dim rounded-lg px-3 py-2 focus:outline-none focus:border-accent font-sans"
+            className="w-full bg-bg-input border border-border text-sm text-tx-primary placeholder-tx-tertiary rounded-lg px-4 py-3 input-glow font-sans"
           />
         </div>
 
         {/* Theme Selector */}
-        <div className="space-y-2">
-          <label className="text-xs font-medium text-cream-muted uppercase tracking-wider">UI Appearance Theme</label>
+        <div className="space-y-4">
+          <label className="metric-label">UI Appearance Theme</label>
           <div className="flex space-x-3">
-            {['Dark', 'Light', 'System'].map((th) => (
+            {['Light', 'Dark', 'System'].map((th) => (
               <button
                 type="button"
                 key={th}
                 onClick={() => setTheme(th as any)}
-                className={`px-4 py-2 rounded-lg border text-xs font-medium transition-colors ${
+                className={`px-5 py-2.5 rounded-lg border text-sm font-medium nav-transition btn-press ${
                   theme === th
-                    ? 'border-accent bg-[#14251B] text-cream font-medium shadow-sm'
-                    : 'border-hairline bg-[#0D1912] text-cream-muted hover:text-cream'
+                    ? 'border-accent bg-accent-light text-accent shadow-sm'
+                    : 'border-border bg-bg-secondary text-tx-secondary hover:text-tx-primary hover:bg-bg-hover'
                 }`}
               >
                 {th}
@@ -121,14 +119,14 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Save Button */}
-        <div className="pt-4 flex items-center space-x-3">
+        <div className="pt-6 border-t border-border flex items-center space-x-4">
           <button
             type="submit"
-            className="bg-accent hover:bg-accent-hover text-cream text-xs font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm"
+            className="bg-accent hover:bg-accent-hover text-white text-sm font-medium px-6 py-2.5 rounded-lg nav-transition btn-press shadow-sm"
           >
             Save Settings
           </button>
-          {isSaved && <span className="text-xs text-semantic-green font-medium font-sans">Settings saved!</span>}
+          {isSaved && <span className="text-sm text-semantic-green font-medium font-sans">Settings saved successfully!</span>}
         </div>
       </form>
     </div>

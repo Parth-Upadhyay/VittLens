@@ -8,33 +8,87 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          bg: '#060E0A',        // Very dark forest green background
-          panel: '#0D1912',     // Dark olive panel
-          elevated: '#14251B',  // Dark olive elevated card surface
-          hover: '#1A2E22',     // Dark olive hover state
-          border: 'rgba(245, 239, 230, 0.12)', // Cream hairline border
+        // Warm Sophisticated Palette (Light Mode Default)
+        bg: {
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          tertiary: 'var(--bg-tertiary)',
+          hover: 'var(--bg-hover)',
+          input: 'var(--bg-input)',
+        },
+        tx: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
         },
         accent: {
-          DEFAULT: '#3D7A56',   // Olive emerald accent
-          hover: '#2E5E41',
-          light: 'rgba(61, 122, 86, 0.2)',
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+          light: 'var(--accent-light)',
+          muted: 'var(--accent-muted)',
         },
-        cream: {
-          DEFAULT: '#F5EFE6',   // Primary warm cream text
-          muted: '#C4BCAD',     // Secondary muted text
-          dim: '#9E9686',       // Dim helper labels
+        border: {
+          DEFAULT: 'var(--border)',
+          strong: 'var(--border-strong)',
         },
         semantic: {
-          green: '#4ADE80',     // Bright mint green for gain
-          red: '#F87171',       // Muted soft red for loss
-          amber: '#FBBF24',     // Muted warm amber for warning
+          green: 'var(--semantic-green)',
+          red: 'var(--semantic-red)',
+          amber: 'var(--semantic-amber)',
+          'green-bg': 'var(--semantic-green-bg)',
+          'red-bg': 'var(--semantic-red-bg)',
+          'amber-bg': 'var(--semantic-amber-bg)',
+        },
+
+        // Legacy aliases for backward compatibility during migration
+        cream: {
+          DEFAULT: 'var(--text-primary)',
+          muted: 'var(--text-secondary)',
+          dim: 'var(--text-tertiary)',
         },
       },
       fontFamily: {
-        sans: ['Söhne', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        mono: ['IBM Plex Mono', 'monospace'],
+        heading: ['Literata', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['Literata', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      fontSize: {
+        'metric': ['2rem', { lineHeight: '1.2', fontWeight: '600' }],       // 32px for big metric values
+        'metric-lg': ['2.5rem', { lineHeight: '1.1', fontWeight: '600' }],  // 40px for hero metrics
+      },
+      borderRadius: {
+        'card': '12px',
+      },
+      boxShadow: {
+        'card': '0 2px 8px rgba(0, 0, 0, 0.06)',
+        'card-hover': '0 4px 16px rgba(0, 0, 0, 0.10)',
+        'elevated': '0 8px 32px rgba(0, 0, 0, 0.12)',
+        'glow': 'inset 0 0 0 2px var(--accent)',
+        'glow-soft': '0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent)',
+      },
+      spacing: {
+        'card': '24px',
+        'card-gap': '20px',
+        'section': '32px',
+      },
+      transitionDuration: {
+        'micro': '150ms',
+        'smooth': '200ms',
+      },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'value-flash': {
+          '0%': { color: 'var(--accent)' },
+          '100%': { color: 'var(--text-primary)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.3s ease-out',
+        'value-flash': 'value-flash 0.2s ease-out',
       },
     },
   },

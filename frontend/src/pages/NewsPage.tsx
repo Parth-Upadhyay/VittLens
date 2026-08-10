@@ -29,17 +29,17 @@ export const NewsPage: React.FC = () => {
   const filteredSymbols = SYMBOLS.filter(s => s.toLowerCase().includes(searchInput.toLowerCase()));
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
-      {/* Header & Filter Bar without Emojis or Bounding Box */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
-        <div className="flex items-center space-x-2.5">
+    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-6 font-sans bg-bg-primary animate-page-in">
+      {/* Header & Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-3">
           <Newspaper className="w-5 h-5 text-accent" />
-          <h1 className="text-xl font-medium text-cream tracking-tight">Market Intelligence & News Feed</h1>
+          <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Market Intelligence</h1>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Filter className="w-4 h-4 text-cream-muted" />
-          <span className="text-xs text-cream-muted">Filter Company:</span>
+          <Filter className="w-4 h-4 text-tx-tertiary" />
+          <span className="text-xs text-tx-secondary">Filter:</span>
           <div className="relative">
             <input
               type="text"
@@ -57,10 +57,10 @@ export const NewsPage: React.FC = () => {
                 }
               }}
               placeholder="Search or add symbol..."
-              className="bg-[#0D1912] border border-hairline text-xs text-cream rounded-lg px-3 py-1.5 focus:outline-none focus:border-accent font-sans w-48"
+              className="bg-bg-input border border-border text-xs text-tx-primary rounded-lg px-3 py-1.5 input-glow font-sans w-48"
             />
             {showSuggestions && (
-              <div className="absolute z-50 top-full mt-1 w-full bg-[#0D1912] border border-hairline rounded-lg shadow-lg max-h-48 overflow-y-auto scrollbar-thin">
+              <div className="absolute z-50 top-full mt-1 w-full surface-elevated max-h-48 overflow-y-auto">
                 {filteredSymbols.length > 0 ? (
                   filteredSymbols.map((s) => (
                     <div
@@ -70,7 +70,7 @@ export const NewsPage: React.FC = () => {
                         setSearchInput(s);
                         setShowSuggestions(false);
                       }}
-                      className="px-3 py-2 text-xs text-cream hover:bg-accent/20 hover:text-cream cursor-pointer"
+                      className="px-3 py-2 text-xs text-tx-primary hover:bg-bg-hover cursor-pointer nav-transition"
                     >
                       {s}
                     </div>
@@ -83,7 +83,7 @@ export const NewsPage: React.FC = () => {
                         setShowSuggestions(false);
                       }
                     }}
-                    className="px-3 py-2 text-xs text-cream bg-accent/10 hover:bg-accent/20 cursor-pointer font-medium"
+                    className="px-3 py-2 text-xs text-accent bg-accent-light hover:bg-bg-hover cursor-pointer font-medium nav-transition"
                   >
                     + Search "{searchInput}"
                   </div>
@@ -96,39 +96,40 @@ export const NewsPage: React.FC = () => {
 
       {/* News Grid */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-cream-muted font-sans">Loading AI news articles...</div>
+        <div className="py-12 text-center text-sm text-tx-secondary font-sans">Loading news articles...</div>
       ) : articles.length === 0 ? (
-        <div className="py-12 text-center text-xs text-cream-muted font-sans">No news articles found.</div>
+        <div className="py-12 text-center text-sm text-tx-secondary font-sans">No news articles found.</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {articles.map((art) => (
             <div
               key={art.id}
-              className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-3 hover:border-accent/40 transition-colors flex flex-col justify-between shadow-sm"
+              className="surface-card p-6 space-y-3 card-interactive flex flex-col justify-between"
             >
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-cream-muted">
-                  <span className="font-mono bg-accent/20 text-accent px-1.5 py-0.5 rounded font-medium tabular-nums">${art.canonical_symbol || art.symbol}</span>
-                  <span className="font-mono tabular-nums">{art.published_time ? new Date(art.published_time).toLocaleDateString() : 'Recent'}</span>
+                <div className="flex items-center justify-between text-xs text-tx-secondary">
+                  <div className="flex items-center space-x-2">
+                    <span className="bg-accent text-white px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium">{art.source}</span>
+                    <span className="font-mono text-[10px] text-accent bg-accent-light px-1.5 py-0.5 rounded">${art.canonical_symbol || art.symbol}</span>
+                  </div>
+                  <span className="text-tx-tertiary font-mono text-[10px]">{art.published_time ? new Date(art.published_time).toLocaleDateString() : 'Recent'}</span>
                 </div>
 
-                <h3 className="text-sm font-medium text-cream leading-snug">{art.headline}</h3>
+                <h3 className="text-[15px] font-semibold text-tx-primary leading-snug">{art.headline}</h3>
 
-                {/* AI Summary in Serif */}
-                <p className="ai-answer-serif text-xs text-cream-muted line-clamp-3 leading-relaxed">
+                <p className="text-sm text-tx-secondary line-clamp-3 leading-relaxed">
                   {art.summary}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-hairline flex items-center justify-between text-xs text-cream-muted">
-                <span className="text-[11px] text-cream-dim">Source: {art.source}</span>
+              <div className="pt-3 border-t border-border flex items-center justify-end text-xs text-tx-secondary">
                 <a
                   href={art.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 text-accent hover:underline"
+                  className="flex items-center space-x-1 text-accent hover:underline nav-transition"
                 >
-                  <span>Original Article</span>
+                  <span>Read original</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>

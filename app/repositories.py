@@ -323,6 +323,18 @@ class MarketRepository:
                 info["volume"] = detail.get("volume")
                 info["currency"] = detail.get("currency")
                 
+            financial_data = getattr(t, 'financial_data', {}).get(ticker_symbol, {})
+            if isinstance(financial_data, dict):
+                info["financialCurrency"] = financial_data.get("financialCurrency")
+                info["returnOnEquity"] = financial_data.get("returnOnEquity")
+                info["debtToEquity"] = financial_data.get("debtToEquity")
+                info["currentRatio"] = financial_data.get("currentRatio")
+                info["profitMargins"] = financial_data.get("profitMargins")
+                info["grossMargins"] = financial_data.get("grossMargins")
+                info["ebitda"] = financial_data.get("ebitda")
+                info["totalRevenue"] = financial_data.get("totalRevenue")
+                info["targetMeanPrice"] = financial_data.get("targetMeanPrice")
+                
             return info
         except Exception as e:
             logger.error(f"yahooquery fallback failed for '{ticker_symbol}': {e}")

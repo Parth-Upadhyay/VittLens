@@ -116,22 +116,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/70 z-40 md:hidden"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 md:hidden"
           onClick={onClose}
         />
       )}
 
-      {/* Fixed Sidebar Container - Never scrolls down when main content scrolls */}
+      {/* Fixed Sidebar Container */}
       <aside
-        className={`fixed md:static top-14 bottom-0 left-0 z-40 w-64 bg-[#0D1912] border-r border-hairline flex flex-col h-[calc(100vh-3.5rem)] flex-shrink-0 transition-transform duration-200 ease-in-out ${
+        className={`fixed md:static top-14 bottom-0 left-0 z-40 w-64 bg-bg-secondary border-r border-border flex flex-col h-[calc(100vh-3.5rem)] flex-shrink-0 transition-transform duration-200 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Top App Navigation Menu */}
-        <div className="p-3 border-b border-hairline space-y-1">
+        <div className="p-3 border-b border-border space-y-1">
           <div className="flex items-center justify-between md:hidden mb-2">
-            <span className="text-xs font-medium text-cream uppercase tracking-wider">Navigation</span>
-            <button onClick={onClose} className="p-1 text-cream-muted hover:text-cream">
+            <span className="text-xs font-medium text-tx-secondary tracking-wider">Navigation</span>
+            <button onClick={onClose} className="p-1 text-tx-tertiary hover:text-tx-primary nav-transition">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -145,13 +145,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   key={item.path}
                   to={item.path}
                   onClick={onClose}
-                  className={`flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-sans transition-colors ${
+                  className={`flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-[13px] font-sans nav-transition ${
                     active
-                      ? 'bg-[#14251B] text-cream font-medium border border-hairline shadow-sm'
-                      : 'text-cream-muted hover:text-cream hover:bg-[#14251B]/50'
+                      ? 'bg-bg-hover text-accent font-medium'
+                      : 'text-tx-secondary hover:text-tx-primary hover:bg-bg-hover'
                   }`}
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="w-[18px] h-[18px] flex-shrink-0" />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -160,24 +160,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* New Chat & Search Header */}
-        <div className="p-3 border-b border-hairline space-y-2">
+        <div className="p-3 border-b border-border space-y-2">
           <button
             onClick={handleNewChat}
-            className="w-full flex items-center justify-center space-x-2 bg-[#14251B] hover:bg-[#1A2E22] border border-hairline text-cream text-xs font-sans font-medium py-2 px-3 rounded-lg transition-colors shadow-sm"
+            className="w-full flex items-center justify-center space-x-2 bg-accent hover:bg-accent-hover text-white text-xs font-sans font-medium py-2.5 px-3 rounded-lg nav-transition btn-press shadow-sm"
           >
-            <Plus className="w-4 h-4 text-accent" />
+            <Plus className="w-4 h-4" />
             <span>New Chat</span>
           </button>
 
           {/* Search Input */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-cream-muted absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-tx-tertiary absolute left-2.5 top-2.5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search chats..."
-              className="w-full bg-[#060E0A] border border-hairline rounded-md pl-8 pr-3 py-1.5 text-xs text-cream placeholder-cream-dim focus:outline-none focus:border-accent/60 transition-colors font-sans"
+              className="w-full bg-bg-primary border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-tx-primary placeholder-tx-tertiary input-glow font-sans"
             />
           </div>
         </div>
@@ -185,17 +185,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Thread History List with Internal Scroll */}
         <div className="flex-1 overflow-y-auto p-2 space-y-3 min-h-0">
           {threads.length === 0 ? (
-            <div className="px-3 py-8 text-center text-xs text-cream-muted font-sans">
+            <div className="px-3 py-8 text-center text-xs text-tx-secondary font-sans">
               No recent chats.
             </div>
           ) : filteredThreads.length === 0 ? (
-            <div className="px-3 py-6 text-center text-xs text-cream-muted font-sans">
+            <div className="px-3 py-6 text-center text-xs text-tx-secondary font-sans">
               No chats matching "{searchQuery}".
             </div>
           ) : (
             recencyGroups.map((group) => (
               <div key={group.label} className="space-y-1">
-                <div className="px-2 py-1 text-[10px] font-sans font-medium text-cream-dim uppercase tracking-wider">
+                <div className="px-2 py-1 text-[10px] font-sans font-medium text-tx-tertiary uppercase tracking-wider">
                   {group.label}
                 </div>
 
@@ -205,19 +205,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     <div
                       key={t.id}
                       onClick={() => handleSelectThread(t.id)}
-                      className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer text-xs transition-colors font-sans ${
+                      className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer text-xs nav-transition font-sans ${
                         active
-                          ? 'bg-[#14251B] text-cream font-medium border border-hairline shadow-sm'
-                          : 'text-cream-muted hover:text-cream hover:bg-[#14251B]/50'
+                          ? 'bg-bg-hover text-accent font-medium'
+                          : 'text-tx-secondary hover:text-tx-primary hover:bg-bg-hover'
                       }`}
                     >
                       <div className="flex items-center space-x-2 truncate pr-2">
-                        <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 text-cream-dim group-hover:text-accent" />
+                        <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 text-tx-tertiary group-hover:text-accent nav-transition" />
                         <span className="truncate">{t.title}</span>
                       </div>
                       <button
                         onClick={(e) => handleDeleteThread(e, t.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-cream-dim hover:text-semantic-red transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-tx-tertiary hover:text-semantic-red transition-opacity"
                         title="Delete thread"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -231,25 +231,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Pinned User Account Footer */}
-        <div className="p-3 border-t border-hairline bg-[#060E0A]/60 flex items-center justify-between flex-shrink-0">
+        <div className="p-3 border-t border-border bg-bg-primary/60 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center space-x-2.5 overflow-hidden">
             {user?.avatar_url ? (
               <img
                 src={user.avatar_url}
                 alt={user.name || 'User'}
-                className="w-7 h-7 rounded-full border border-hairline flex-shrink-0"
+                className="w-7 h-7 rounded-full border border-border flex-shrink-0"
               />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-[#14251B] border border-hairline flex items-center justify-center text-accent font-sans font-medium text-xs flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-accent-light border border-border flex items-center justify-center text-accent font-sans font-medium text-xs flex-shrink-0">
                 {getInitials()}
               </div>
             )}
 
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-sans font-medium text-cream truncate">
+              <div className="text-xs font-sans font-medium text-tx-primary truncate">
                 {user?.name || 'Guest User'}
               </div>
-              <div className="text-[10px] font-sans text-cream-muted truncate">
+              <div className="text-[10px] font-sans text-tx-tertiary truncate">
                 {user ? 'Pro Analyst' : 'Free Tier'}
               </div>
             </div>
@@ -257,7 +257,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {!user && (
             <button 
               onClick={() => navigate('/login')}
-              className="ml-2 px-3 py-1.5 bg-[#E5D5B5] hover:bg-[#D4C3A3] text-[#060E0A] rounded font-medium text-[10px] transition-colors shadow-sm whitespace-nowrap"
+              className="ml-2 px-3 py-1.5 bg-accent hover:bg-accent-hover text-white rounded font-medium text-[10px] nav-transition btn-press shadow-sm whitespace-nowrap"
             >
               Sign In
             </button>

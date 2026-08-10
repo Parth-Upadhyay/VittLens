@@ -7,8 +7,6 @@ import { MiniSparkline } from '../components/visual/MiniSparkline';
 import { SymbolSearch } from '../components/common/SymbolSearch';
 import { LayoutDashboard, Plus, Trash2, ExternalLink } from 'lucide-react';
 
-// Removed DEFAULT_DASHBOARD_SYMBOLS fallback to allow empty states
-
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { watchlist, fetchWatchlist } = useAppStore();
@@ -47,8 +45,6 @@ export const DashboardPage: React.FC = () => {
             if (hasSuccess) {
               combinedNews.sort((a, b) => new Date(b.published_time || 0).getTime() - new Date(a.published_time || 0).getTime());
               setNews(combinedNews.slice(0, 6));
-            } else if (newsPromises.length > 0 && combinedNews.length === 0) {
-              // Rate limited or all failed, keep old news to prevent disappearing
             }
           }
         } else {
@@ -69,7 +65,6 @@ export const DashboardPage: React.FC = () => {
           chartDict[sym] = chart;
         } catch (e) {
           console.error(`Failed to fetch data for ${sym}:`, e);
-          // Skip adding this symbol to dashboard
         }
       }
       
@@ -92,10 +87,8 @@ export const DashboardPage: React.FC = () => {
     setErrorMsg(null);
 
     try {
-      // Add symbol via watchlist API
       await WatchlistService.addSymbol(canonical);
 
-      // Immediately fetch quote for newly added symbol and insert into local state
       try {
         const [quote, chart] = await Promise.all([
           MarketService.getQuote(canonical),
@@ -105,7 +98,6 @@ export const DashboardPage: React.FC = () => {
         setCharts((prev) => ({ ...prev, [canonical]: chart }));
       } catch (qErr) {
         console.error('Failed to fetch quote for added symbol:', qErr);
-        // Skip adding this symbol to dashboard
       }
 
       await fetchWatchlist();
@@ -119,7 +111,6 @@ export const DashboardPage: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Optimistically update local quotes state for immediate visual removal
     setQuotes((prev) => {
       const copy = { ...prev };
       delete copy[symbol];
@@ -140,15 +131,14 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
-      {/* Professional Title Bar without Emojis or Bounding Box */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
-        <div className="flex items-center space-x-2.5">
+    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-8 font-sans bg-bg-primary animate-page-in">
+      {/* Title Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-3">
           <LayoutDashboard className="w-5 h-5 text-accent" />
-          <h1 className="text-xl font-medium text-cream tracking-tight">Market Watchlist & Overview</h1>
+          <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Market Watchlist</h1>
         </div>
 
-        {/* Add Symbol Search */}
         <div className="w-64">
           <SymbolSearch 
             onSelect={handleSelectSymbol} 
@@ -158,38 +148,38 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {errorMsg && (
-        <div className="p-2.5 rounded bg-semantic-red/10 border border-semantic-red/30 text-semantic-red text-xs font-sans">
+        <div className="alert-warm text-sm text-semantic-amber">
           {errorMsg}
         </div>
       )}
 
       {/* Watchlist Overview Grid */}
-      <div className="space-y-3">
-        <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Watchlist Overview</h2>
+      <div className="space-y-4">
+        <h2 className="metric-label">Watchlist Overview</h2>
 
         {isLoading ? (
-          <div className="py-12 text-center text-xs text-cream-muted font-sans">Loading market quotes...</div>
+          <div className="py-12 text-center text-sm text-tx-secondary font-sans">Loading market quotes...</div>
         ) : Object.keys(quotes).length === 0 ? (
-          <div className="py-12 text-center text-xs text-cream-muted font-sans">No symbols in watchlist. Add a symbol above.</div>
+          <div className="py-12 text-center text-sm text-tx-secondary font-sans">No symbols in watchlist. Add a symbol above.</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {Object.entries(quotes).map(([sym, quote]) => {
               const isGain = quote.change >= 0;
               return (
                 <div
                   key={sym}
                   onClick={() => navigate(`/company/${sym}`)}
-                  className="bg-[#0D1912] border border-hairline rounded-xl p-4 hover:border-accent/60 transition-colors cursor-pointer space-y-3 relative group shadow-sm"
+                  className="surface-card p-6 card-interactive cursor-pointer space-y-3 relative group"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-mono text-sm font-medium text-cream">{sym}</div>
-                      <div className="text-[11px] text-cream-muted">NSE • INR</div>
+                      <div className="font-mono text-sm font-medium text-tx-primary">{sym}</div>
+                      <div className="text-[11px] text-tx-tertiary">NSE • INR</div>
                     </div>
                     <button
                       type="button"
                       onClick={(e) => handleRemoveWatchlist(e, sym)}
-                      className="p-1.5 text-cream-dim hover:text-semantic-red transition-colors rounded hover:bg-[#14251B]"
+                      className="p-1.5 text-tx-tertiary hover:text-semantic-red nav-transition rounded hover:bg-bg-hover"
                       title={`Remove ${sym} from watchlist`}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -198,13 +188,12 @@ export const DashboardPage: React.FC = () => {
 
                   <div className="flex items-baseline justify-between">
                     <div>
-                      <span className="text-lg font-medium text-cream font-mono tabular-nums">₹{quote.price.toLocaleString()}</span>
-                      <div className={`text-xs font-mono tabular-nums ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
+                      <span className="text-xl font-semibold text-tx-primary font-mono">₹{quote.price.toLocaleString()}</span>
+                      <div className={`text-xs font-mono ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
                         {quote.change >= 0 ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
                       </div>
                     </div>
 
-                    {/* Single Accent Line Sparkline */}
                     <MiniSparkline data={charts[sym]?.series ? charts[sym].series.map(b => b.close) : []} />
                   </div>
                 </div>
@@ -215,37 +204,37 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Market News Section */}
-      <div className="space-y-3 pt-6 border-t border-hairline mt-6">
-        <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Market News</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="space-y-4 pt-8 border-t border-border">
+        <h2 className="metric-label">Market News</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {(news || []).map((art) => (
-            <div key={art.id} className="bg-[#0D1912] border border-hairline rounded-xl p-4 space-y-2 shadow-sm flex flex-col justify-between hover:border-accent/60 transition-colors">
+            <div key={art.id} className="surface-card p-6 space-y-3 flex flex-col justify-between card-interactive">
               <div>
-                <div className="text-[10px] text-cream-muted flex items-center justify-between font-mono tabular-nums mb-2">
+                <div className="text-[11px] text-tx-secondary flex items-center justify-between font-sans mb-3">
                   <div className="flex items-center space-x-2">
-                    <span>{art.source}</span>
-                    <span className="bg-accent/20 text-accent px-1.5 py-0.5 rounded text-[10px]">${art.canonical_symbol || 'MKT'}</span>
+                    <span className="bg-accent text-white px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium">{art.source}</span>
+                    <span className="font-mono text-[10px] text-accent bg-accent-light px-1.5 py-0.5 rounded">${art.canonical_symbol || 'MKT'}</span>
                   </div>
-                  <span>{art.published_time ? new Date(art.published_time).toLocaleDateString() : ''}</span>
+                  <span className="text-tx-tertiary">{art.published_time ? new Date(art.published_time).toLocaleDateString() : ''}</span>
                 </div>
-                <h3 className="text-sm font-medium text-cream line-clamp-2 leading-snug">{art.headline}</h3>
-                <p className="ai-answer-serif text-xs text-cream-muted line-clamp-3 mt-1.5">{art.summary}</p>
+                <h3 className="text-[15px] font-semibold text-tx-primary leading-snug">{art.headline}</h3>
+                <p className="text-sm text-tx-secondary line-clamp-2 mt-2 leading-relaxed">{art.summary}</p>
               </div>
-              <div className="pt-3 mt-3 border-t border-hairline flex justify-end">
+              <div className="pt-3 mt-3 border-t border-border flex justify-end">
                 <a
                   href={art.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 text-xs text-accent hover:underline"
+                  className="flex items-center space-x-1 text-xs text-accent hover:underline nav-transition"
                 >
-                  <span>Original Article</span>
+                  <span>Read original</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
             </div>
           ))}
           {(!news || news.length === 0) && !isLoading && (
-            <div className="col-span-full py-8 text-center text-xs text-cream-muted font-sans">No recent news available.</div>
+            <div className="col-span-full py-8 text-center text-sm text-tx-secondary font-sans">No recent news available.</div>
           )}
         </div>
       </div>

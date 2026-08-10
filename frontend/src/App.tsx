@@ -34,7 +34,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className="flex-1 flex overflow-hidden relative min-h-0">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto h-full bg-[#060E0A]">
+        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto h-full bg-bg-primary">
           {children}
         </main>
       </div>
@@ -70,19 +70,21 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Theme Sync Effect: Toggle light-mode class on body
+  // Theme Sync Effect: Toggle dark class on <html>
   useEffect(() => {
-    if (preferences.theme === 'Light') {
-      document.body.classList.add('light-mode');
+    if (preferences.theme === 'Dark') {
+      document.documentElement.classList.add('dark');
     } else {
-      document.body.classList.remove('light-mode');
+      document.documentElement.classList.remove('dark');
     }
+    // Clean up legacy light-mode class
+    document.body.classList.remove('light-mode');
   }, [preferences.theme]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="h-screen max-h-screen bg-[#060E0A] text-[#F5EFE6] flex flex-col font-sans overflow-hidden">
+        <div className="h-screen max-h-screen bg-bg-primary text-tx-primary flex flex-col font-sans overflow-hidden">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/*" element={

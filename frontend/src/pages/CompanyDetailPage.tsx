@@ -53,63 +53,63 @@ export const CompanyDetailPage: React.FC = () => {
   }, [targetSymbol, period]);
 
   if (isLoading || !detail) {
-    return <div className="p-12 text-center text-xs text-cream-muted font-sans bg-[#060E0A]">Loading {targetSymbol} details...</div>;
+    return <div className="p-16 text-center text-sm text-tx-secondary font-sans bg-bg-primary animate-page-in">Loading {targetSymbol} details...</div>;
   }
 
   const quote = detail.quote;
   const quant = detail.quant_snapshot;
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
+    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
 
       {/* Back + Header */}
-      <div className="space-y-3 pb-2">
+      <div className="space-y-4 pb-4 border-b border-border">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-1 text-xs text-cream-muted hover:text-cream transition-colors"
+          className="flex items-center space-x-1.5 text-sm font-medium text-tx-secondary hover:text-tx-primary nav-transition"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
         </button>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-medium text-cream">{detail.profile?.name || targetSymbol}</h1>
-              <span className="font-mono text-xs text-accent bg-[#0D1912] border border-hairline px-2 py-0.5 rounded tabular-nums">${targetSymbol}</span>
+            <div className="flex items-center space-x-3">
+              <h1 className="text-3xl font-heading font-semibold text-tx-primary tracking-tight">{detail.profile?.name || targetSymbol}</h1>
+              <span className="font-mono text-xs text-accent bg-accent-light border border-accent/20 px-2 py-0.5 rounded">${targetSymbol}</span>
             </div>
-            <div className="text-xs text-cream-muted mt-1">
+            <div className="text-sm text-tx-secondary mt-2 font-medium">
               Sector: {detail.profile?.sector || 'NIFTY'} • {detail.profile?.industry || 'Large-Cap'}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-5">
             {quote && (
               <div className="text-right">
-                <div className="text-2xl font-medium text-cream font-mono tabular-nums">₹{quote.price.toLocaleString()}</div>
-                <div className={`text-xs font-mono tabular-nums ${quote.change >= 0 ? 'text-semantic-green' : 'text-semantic-red'}`}>
+                <div className="text-3xl font-semibold text-tx-primary font-mono tabular-nums tracking-tight">₹{quote.price.toLocaleString()}</div>
+                <div className={`text-sm font-mono tabular-nums font-medium ${quote.change >= 0 ? 'text-semantic-green' : 'text-semantic-red'}`}>
                   {quote.change >= 0 ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
                 </div>
               </div>
             )}
             <button
               onClick={() => navigate(`/deep-analyze?symbol=${targetSymbol}`)}
-              className="flex items-center space-x-1.5 text-xs bg-[#0D1912] border border-hairline hover:border-accent/40 text-cream-muted hover:text-cream px-3 py-2 rounded-lg transition-colors"
+              className="flex items-center space-x-2 text-sm font-medium bg-bg-secondary border border-border hover:border-accent hover:bg-bg-hover text-tx-primary px-5 py-3 rounded-xl nav-transition btn-press shadow-sm"
             >
-              <Microscope className="w-3.5 h-3.5 text-accent" />
+              <Microscope className="w-4 h-4 text-accent" />
               <span>Deep Analyze</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="space-y-8 pb-12">
+      <div className="space-y-10 pb-16">
 
         {/* Section 1: Financial Ratio Metrics */}
         {quant && (
-          <div className="space-y-4">
-            <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Financial Ratio Metrics</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="space-y-5">
+            <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Financial Ratio Metrics</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
               <MetricCard label="Return on Equity (ROE)" value={quant.profitability.roe != null ? `${(quant.profitability.roe * 100).toFixed(2)}%` : 'N/A'} />
               <MetricCard label="P/E Ratio" value={quant.valuation.pe_ratio != null ? quant.valuation.pe_ratio.toFixed(2) : 'N/A'} />
               <MetricCard label="Net Profit Margin" value={quant.profitability.net_profit_margin != null ? `${(quant.profitability.net_profit_margin * 100).toFixed(2)}%` : 'N/A'} />
@@ -133,16 +133,16 @@ export const CompanyDetailPage: React.FC = () => {
 
         {/* Section 2: Price Chart */}
         {chartData && chartData.series && chartData.series.length > 0 && (
-          <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Historical Price Trend</h2>
-              <div className="flex space-x-1 text-xs">
+          <div className="surface-card p-6 space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Historical Price Trend</h2>
+              <div className="flex space-x-1.5 p-1 bg-bg-tertiary rounded-lg border border-border">
                 {['1mo', '3mo', '1y'].map((p) => (
                   <button
                     key={p}
                     onClick={() => setPeriod(p)}
-                    className={`px-2.5 py-1 rounded transition-colors ${
-                      period === p ? 'bg-[#14251B] text-cream font-medium border border-hairline' : 'text-cream-muted hover:text-cream'
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium nav-transition ${
+                      period === p ? 'bg-bg-secondary text-tx-primary shadow-sm border border-border' : 'text-tx-secondary hover:text-tx-primary'
                     }`}
                   >
                     {p.toUpperCase()}
@@ -150,13 +150,13 @@ export const CompanyDetailPage: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="h-80 w-full">
+            <div className="h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <ReLineChart data={chartData.series}>
-                  <XAxis dataKey="timestamp" stroke="#C4BCAD" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#C4BCAD" fontSize={10} domain={['auto', 'auto']} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0D1912', borderColor: 'rgba(245,239,230,0.12)', borderRadius: '8px', fontSize: '12px', color: '#F5EFE6' }} />
-                  <Line type="monotone" dataKey="close" stroke="#3D7A56" strokeWidth={2} dot={false} />
+                  <XAxis dataKey="timestamp" stroke="var(--text-tertiary)" fontSize={11} tickLine={false} tickMargin={10} />
+                  <YAxis stroke="var(--text-tertiary)" fontSize={11} domain={['auto', 'auto']} tickLine={false} tickMargin={10} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)' }} />
+                  <Line type="monotone" dataKey="close" stroke="var(--accent)" strokeWidth={2.5} dot={false} activeDot={{ r: 6, fill: 'var(--accent)' }} />
                 </ReLineChart>
               </ResponsiveContainer>
             </div>
@@ -165,24 +165,24 @@ export const CompanyDetailPage: React.FC = () => {
 
         {/* Section 3: News Feed */}
         {newsList && newsList.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Latest News</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-5">
+            <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Latest News</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {newsList.map((art) => (
-                <div key={art.id} className="bg-[#0D1912] border border-hairline rounded-xl p-4 space-y-2 shadow-sm">
-                  <div className="text-xs text-cream-muted flex items-center justify-between font-mono tabular-nums">
+                <div key={art.id} className="surface-card p-6 space-y-3 card-interactive flex flex-col justify-between">
+                  <div className="text-xs text-tx-secondary flex items-center justify-between font-sans mb-1">
                     <div className="flex items-center space-x-2">
-                      <span>{art.source}</span>
-                      <span className="bg-accent/20 text-accent px-1.5 py-0.5 rounded text-[10px]">${art.canonical_symbol || targetSymbol}</span>
+                      <span className="bg-accent text-white px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium">{art.source}</span>
+                      <span className="font-mono text-[10px] text-accent bg-accent-light px-1.5 py-0.5 rounded border border-accent/20">${art.canonical_symbol || targetSymbol}</span>
                     </div>
-                    <span>{art.published_time ? new Date(art.published_time).toLocaleDateString() : ''}</span>
+                    <span className="font-mono text-[10px]">{art.published_time ? new Date(art.published_time).toLocaleDateString() : ''}</span>
                   </div>
-                  <h3 className="text-sm font-medium text-cream">{art.headline}</h3>
-                  <p className="ai-answer-serif text-xs text-cream-muted line-clamp-2">{art.summary}</p>
-                  <div className="pt-2 mt-2 border-t border-hairline flex justify-end">
-                    <a href={art.url} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 text-xs text-accent hover:underline">
-                      <span>Original Article</span>
-                      <ExternalLink className="w-3 h-3" />
+                  <h3 className="text-[15px] font-semibold text-tx-primary leading-snug">{art.headline}</h3>
+                  <p className="ai-answer-serif text-sm text-tx-secondary line-clamp-3 leading-relaxed mt-2">{art.summary}</p>
+                  <div className="pt-4 mt-4 border-t border-border flex justify-end">
+                    <a href={art.url} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1.5 text-xs font-medium text-accent hover:underline nav-transition">
+                      <span>Read original article</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>
                 </div>

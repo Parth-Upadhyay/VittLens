@@ -56,38 +56,40 @@ export const FilingAgentPage: React.FC = () => {
   const isNifty20 = selectedSymbol && NIFTY20_SYMBOLS.includes(selectedSymbol.toUpperCase());
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
+    <div className="flex-1 p-8 w-full max-w-[1200px] mx-auto space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
 
       {/* Header */}
       <div className="flex items-center space-x-3 pb-2">
-        <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-lg bg-accent-light border border-accent/20 flex items-center justify-center">
           <FileText className="w-5 h-5 text-accent" />
         </div>
         <div>
-          <h1 className="text-xl font-medium text-cream tracking-tight">Filing Agent</h1>
-          <p className="text-xs text-cream-muted">AI-powered search across annual report filings</p>
+          <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Filing Agent</h1>
+          <p className="text-sm text-tx-secondary">AI-powered semantic search across corporate annual reports</p>
         </div>
       </div>
 
       {/* Free Tier Notice */}
-      <div className="bg-[#0D1912] border border-accent/20 rounded-xl p-4 flex items-start space-x-3">
-        <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <AlertCircle className="w-4 h-4 text-accent" />
-        </div>
-        <div className="space-y-1">
-          <div className="text-xs font-medium text-cream">We only have NIFTY 20 Annual Reports due to free tier limits and I'm a student :)</div>
-          <div className="text-xs text-cream-muted leading-relaxed">
-            Annual reports are stored in our Qdrant vector database. The Filing Agent can answer deep questions about revenue, segments, risks, debt, capex, and more — but only for the 20 companies below. Expanding coverage is on the roadmap!
+      <div className="alert-warm">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2 text-sm font-semibold text-semantic-amber font-heading">
+            <AlertCircle className="w-5 h-5" />
+            <span>NIFTY 20 Coverage Limit</span>
           </div>
-          <div className="flex flex-wrap gap-1.5 pt-2">
+        </div>
+        <div className="space-y-3">
+          <p className="text-sm text-tx-primary ai-answer-serif leading-relaxed">
+            Annual reports are stored in our Qdrant vector database. The Filing Agent can answer deep questions about revenue, segments, risks, debt, capex, and more — but only for the 20 companies below. Expanding coverage is on the roadmap!
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
             {NIFTY20_SYMBOLS.map(sym => (
               <button
                 key={sym}
                 onClick={() => setSelectedSymbol(sym)}
-                className={`text-[10px] font-mono px-2 py-0.5 rounded transition-colors border ${
+                className={`text-xs font-mono px-3 py-1 rounded transition-colors border nav-transition btn-press ${
                   selectedSymbol === sym
-                    ? 'bg-accent/20 text-cream border-accent/40'
-                    : 'bg-[#14251B]/50 text-cream-muted border-hairline hover:text-cream hover:border-accent/30'
+                    ? 'bg-accent text-white border-accent-hover'
+                    : 'bg-bg-secondary text-tx-secondary border-border hover:text-tx-primary hover:border-border-strong'
                 }`}
               >
                 {sym}
@@ -98,38 +100,38 @@ export const FilingAgentPage: React.FC = () => {
       </div>
 
       {/* Search Panel */}
-      <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm">
-        <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Query Annual Reports</h2>
+      <div className="surface-card p-6 space-y-6 shadow-sm">
+        <h2 className="metric-label">Query Annual Reports</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <label className="text-[10px] text-cream-muted uppercase tracking-wider">Company (optional)</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-[11px] text-tx-secondary uppercase tracking-wider font-semibold">Company (optional)</label>
             <SymbolSearch
               onSelect={setSelectedSymbol}
               placeholder="Filter by company..."
               clearOnSelect={false}
             />
             {selectedSymbol && !isNifty20 && (
-              <div className="text-[10px] text-amber-400 flex items-center space-x-1 pt-0.5">
-                <AlertCircle className="w-3 h-3 flex-shrink-0" />
+              <div className="text-xs text-semantic-amber flex items-center space-x-1.5 pt-1">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>No annual report for {selectedSymbol}. Search will scan all NIFTY 20 reports.</span>
               </div>
             )}
             {selectedSymbol && isNifty20 && (
-              <div className="text-[10px] text-semantic-green flex items-center space-x-1 pt-0.5">
+              <div className="text-xs text-semantic-green flex items-center space-x-1.5 pt-1">
                 <span>✓ Annual report available for {selectedSymbol}</span>
               </div>
             )}
           </div>
 
-          <div className="space-y-1">
-            <label className="text-[10px] text-cream-muted uppercase tracking-wider">Sample Questions</label>
-            <div className="flex flex-wrap gap-1.5">
+          <div className="space-y-2">
+            <label className="text-[11px] text-tx-secondary uppercase tracking-wider font-semibold">Sample Questions</label>
+            <div className="flex flex-wrap gap-2">
               {SAMPLE_QUERIES.map(q => (
                 <button
                   key={q}
                   onClick={() => setQuery(q)}
-                  className="text-[10px] bg-[#14251B]/60 border border-hairline text-cream-muted hover:text-cream hover:border-accent/30 px-2 py-1 rounded transition-colors"
+                  className="text-xs bg-bg-secondary border border-border text-tx-secondary hover:text-tx-primary hover:bg-bg-hover hover:border-border-strong px-3 py-1.5 rounded-lg nav-transition"
                 >
                   {q}
                 </button>
@@ -138,7 +140,7 @@ export const FilingAgentPage: React.FC = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSearch} className="flex items-start space-x-2 pt-2">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-3 pt-2">
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -150,14 +152,14 @@ export const FilingAgentPage: React.FC = () => {
             }}
             placeholder="Ask anything about the annual report — revenue drivers, risks, capex, segment performance, debt strategy..."
             rows={3}
-            className="flex-1 bg-[#14251B] border border-hairline text-xs text-cream placeholder-cream-dim rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent font-sans resize-none"
+            className="flex-1 w-full bg-bg-input border border-border text-sm text-tx-primary placeholder-tx-tertiary rounded-xl px-4 py-3 input-glow font-sans resize-none"
           />
           <button
             type="submit"
             disabled={isLoading || !query.trim()}
-            className="bg-accent hover:bg-accent-hover disabled:opacity-50 text-cream text-xs font-medium px-4 py-2.5 rounded-lg flex items-center space-x-1.5 shadow-sm transition-colors flex-shrink-0"
+            className="bg-accent hover:bg-accent-hover disabled:opacity-50 text-white text-sm font-medium px-6 py-3 rounded-xl flex items-center justify-center space-x-2 shadow-sm nav-transition btn-press sm:h-[82px]"
           >
-            <Send className="w-3.5 h-3.5" />
+            <Send className="w-4 h-4" />
             <span>{isLoading ? 'Searching...' : 'Search'}</span>
           </button>
         </form>
@@ -165,22 +167,22 @@ export const FilingAgentPage: React.FC = () => {
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex flex-col items-center py-12 space-y-3">
-          <Sparkles className="w-7 h-7 text-accent animate-pulse" />
-          <div className="text-xs text-cream-muted">Searching Qdrant vector database...</div>
+        <div className="flex flex-col items-center py-16 space-y-4">
+          <Sparkles className="w-8 h-8 text-accent animate-pulse" />
+          <div className="text-sm font-medium text-tx-primary">Searching Qdrant vector database...</div>
         </div>
       )}
 
       {/* Error */}
       {error && (
-        <div className="bg-[#1A0A0A] border border-semantic-red/30 rounded-xl p-4 text-xs text-semantic-red text-center">
+        <div className="alert-danger text-sm text-semantic-red">
           {error}
         </div>
       )}
 
       {/* Answer */}
       {answer && (
-        <div className="border border-hairline rounded-xl overflow-hidden shadow-sm">
+        <div className="surface-card overflow-hidden animate-page-in">
           <MessageItem 
             role="assistant" 
             content={answer} 
@@ -193,13 +195,13 @@ export const FilingAgentPage: React.FC = () => {
 
       {/* Empty state */}
       {!answer && !isLoading && !error && (
-        <div className="flex flex-col items-center py-20 space-y-4 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-accent/5 border border-accent/10 flex items-center justify-center">
-            <FileText className="w-8 h-8 text-accent/40" />
+        <div className="flex flex-col items-center py-24 space-y-4 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-accent-light border border-accent/20 flex items-center justify-center">
+            <FileText className="w-8 h-8 text-accent" />
           </div>
           <div>
-            <div className="text-sm font-medium text-cream-muted">Ask anything about annual reports</div>
-            <div className="text-xs text-cream-dim mt-1 max-w-sm">Type your question above. The Filing Agent searches through embedded annual report chunks using semantic vector search.</div>
+            <div className="text-lg font-heading font-semibold text-tx-primary">Ask anything about annual reports</div>
+            <div className="text-sm text-tx-secondary mt-1 max-w-md mx-auto">Type your question above. The Filing Agent searches through embedded annual report chunks using semantic vector search.</div>
           </div>
         </div>
       )}

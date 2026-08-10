@@ -9,7 +9,6 @@ export const LoginPage: React.FC = () => {
   const { user } = useAppStore();
 
   useEffect(() => {
-    // If user is already authenticated, redirect them away from the login page
     if (user) {
       const origin = (location.state as any)?.from?.pathname || '/chat';
       navigate(origin, { replace: true });
@@ -26,22 +25,22 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#060E0A] flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Background glowing orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] opacity-60 pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#2C6E49]/20 rounded-full blur-[120px] opacity-40 pointer-events-none" />
+    <div className="min-h-screen bg-bg-primary flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      {/* Background subtle warm orbs */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/8 rounded-full blur-[120px] opacity-60 pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-semantic-amber/8 rounded-full blur-[120px] opacity-40 pointer-events-none" />
 
-      {/* Main Glass Card */}
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-[#0D1912]/80 backdrop-blur-xl border border-hairline rounded-2xl p-8 shadow-2xl flex flex-col items-center text-center">
+      {/* Main Card */}
+      <div className="relative z-10 w-full max-w-md animate-page-in">
+        <div className="surface-elevated p-8 flex flex-col items-center text-center">
           
           {/* Logo area */}
-          <div className="w-16 h-16 bg-[#14251B] border border-hairline rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+          <div className="w-16 h-16 bg-accent-light border border-border rounded-2xl flex items-center justify-center mb-6">
             <LineChart className="w-8 h-8 text-accent" />
           </div>
 
-          <h1 className="text-3xl font-medium text-cream mb-2 tracking-tight">Welcome to VittLens</h1>
-          <p className="text-sm text-cream-muted mb-8 ai-answer-serif">
+          <h1 className="text-3xl font-heading font-semibold text-tx-primary mb-2 tracking-tight">Welcome to VittLens</h1>
+          <p className="text-sm text-tx-secondary mb-8 leading-relaxed">
             Advanced Financial Intelligence for the Indian Market.
           </p>
 
@@ -49,9 +48,9 @@ export const LoginPage: React.FC = () => {
           <div className="w-full space-y-4">
             <button
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center space-x-3 bg-[#E5D5B5] hover:bg-[#D4C3A3] text-[#060E0A] py-3 px-4 rounded-xl transition-all duration-200 shadow-[0_0_15px_rgba(229,213,181,0.15)] hover:shadow-[0_0_25px_rgba(229,213,181,0.25)] group"
+              className="w-full flex items-center justify-center space-x-3 bg-accent hover:bg-accent-hover text-white py-3 px-4 rounded-xl nav-transition btn-press shadow-card group"
             >
-              <svg className="w-5 h-5 text-[#060E0A]" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -74,26 +73,26 @@ export const LoginPage: React.FC = () => {
 
             <div className="relative flex items-center justify-center my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-hairline"></div>
+                <div className="w-full border-t border-border"></div>
               </div>
-              <span className="relative bg-[#0D1912] px-4 text-xs text-cream-dim uppercase tracking-wider font-medium">Or</span>
+              <span className="relative bg-bg-secondary px-4 text-xs text-tx-tertiary uppercase tracking-wider font-medium">Or</span>
             </div>
 
             <button
               onClick={handleGuestAccess}
-              className="w-full flex items-center justify-center space-x-2 bg-[#14251B] hover:bg-[#1A2E22] border border-hairline text-cream py-3 px-4 rounded-xl transition-colors group"
+              className="w-full flex items-center justify-center space-x-2 bg-bg-tertiary hover:bg-bg-hover border border-border text-tx-primary py-3 px-4 rounded-xl nav-transition btn-press group"
             >
-              <Lock className="w-4 h-4 text-cream-muted group-hover:text-cream transition-colors" />
+              <Lock className="w-4 h-4 text-tx-secondary group-hover:text-tx-primary nav-transition" />
               <span className="font-medium text-[14px]">Continue as Guest</span>
             </button>
-            <p className="text-[11px] text-cream-dim mt-2 text-center">
+            <p className="text-[11px] text-tx-tertiary mt-2 text-center">
               Guest access is limited to 15 queries per day.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-xs text-cream-dim">
+        <div className="mt-8 text-center text-xs text-tx-tertiary">
           <p>© 2026 VittLens Platform. All rights reserved.</p>
         </div>
       </div>
