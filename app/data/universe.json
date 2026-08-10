@@ -1,0 +1,3720 @@
+{
+  "stocks": {
+    "360ONE": {
+      "symbol": "360ONE",
+      "name": "360 ONE WAM Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 1
+    },
+    "3MINDIA": {
+      "symbol": "3MINDIA",
+      "name": "3M India Ltd.",
+      "type": "stock",
+      "sector": "Diversified",
+      "market_cap_rank": 2
+    },
+    "ABB": {
+      "symbol": "ABB",
+      "name": "ABB India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 3
+    },
+    "ACC": {
+      "symbol": "ACC",
+      "name": "ACC Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 4
+    },
+    "ACMESOLAR": {
+      "symbol": "ACMESOLAR",
+      "name": "ACME Solar Holdings Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 5
+    },
+    "AIAENG": {
+      "symbol": "AIAENG",
+      "name": "AIA Engineering Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 6
+    },
+    "APLAPOLLO": {
+      "symbol": "APLAPOLLO",
+      "name": "APL Apollo Tubes Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 7
+    },
+    "AUBANK": {
+      "symbol": "AUBANK",
+      "name": "AU Small Finance Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 8
+    },
+    "AWL": {
+      "symbol": "AWL",
+      "name": "AWL Agri Business Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 9
+    },
+    "AADHARHFC": {
+      "symbol": "AADHARHFC",
+      "name": "Aadhar Housing Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 10
+    },
+    "AARTIIND": {
+      "symbol": "AARTIIND",
+      "name": "Aarti Industries Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 11
+    },
+    "AAVAS": {
+      "symbol": "AAVAS",
+      "name": "Aavas Financiers Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 12
+    },
+    "ABBOTINDIA": {
+      "symbol": "ABBOTINDIA",
+      "name": "Abbott India Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 13
+    },
+    "ACE": {
+      "symbol": "ACE",
+      "name": "Action Construction Equipment Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 14
+    },
+    "ACUTAAS": {
+      "symbol": "ACUTAAS",
+      "name": "Acutaas Chemicals Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 15
+    },
+    "ADANIENSOL": {
+      "symbol": "ADANIENSOL",
+      "name": "Adani Energy Solutions Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 16
+    },
+    "ADANIENT": {
+      "symbol": "ADANIENT",
+      "name": "Adani Enterprises Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 17
+    },
+    "ADANIGREEN": {
+      "symbol": "ADANIGREEN",
+      "name": "Adani Green Energy Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 18
+    },
+    "ADANIPORTS": {
+      "symbol": "ADANIPORTS",
+      "name": "Adani Ports and Special Economic Zone Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 19
+    },
+    "ADANIPOWER": {
+      "symbol": "ADANIPOWER",
+      "name": "Adani Power Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 20
+    },
+    "ATGL": {
+      "symbol": "ATGL",
+      "name": "Adani Total Gas Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 21
+    },
+    "ABCAPITAL": {
+      "symbol": "ABCAPITAL",
+      "name": "Aditya Birla Capital Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 22
+    },
+    "ABFRL": {
+      "symbol": "ABFRL",
+      "name": "Aditya Birla Fashion and Retail Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 23
+    },
+    "ABLBL": {
+      "symbol": "ABLBL",
+      "name": "Aditya Birla Lifestyle Brands Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 24
+    },
+    "ABREL": {
+      "symbol": "ABREL",
+      "name": "Aditya Birla Real Estate Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 25
+    },
+    "ABSLAMC": {
+      "symbol": "ABSLAMC",
+      "name": "Aditya Birla Sun Life AMC Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 26
+    },
+    "CPPLUS": {
+      "symbol": "CPPLUS",
+      "name": "Aditya Infotech Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 27
+    },
+    "AEGISLOG": {
+      "symbol": "AEGISLOG",
+      "name": "Aegis Logistics Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 28
+    },
+    "AEGISVOPAK": {
+      "symbol": "AEGISVOPAK",
+      "name": "Aegis Vopak Terminals Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 29
+    },
+    "AFCONS": {
+      "symbol": "AFCONS",
+      "name": "Afcons Infrastructure Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 30
+    },
+    "AFFLE": {
+      "symbol": "AFFLE",
+      "name": "Affle 3i Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 31
+    },
+    "AJANTPHARM": {
+      "symbol": "AJANTPHARM",
+      "name": "Ajanta Pharmaceuticals Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 32
+    },
+    "ALKEM": {
+      "symbol": "ALKEM",
+      "name": "Alkem Laboratories Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 33
+    },
+    "ABDL": {
+      "symbol": "ABDL",
+      "name": "Allied Blenders and Distillers Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 34
+    },
+    "ARE&M": {
+      "symbol": "ARE&M",
+      "name": "Amara Raja Energy & Mobility Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 35
+    },
+    "AMBER": {
+      "symbol": "AMBER",
+      "name": "Amber Enterprises India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 36
+    },
+    "AMBUJACEM": {
+      "symbol": "AMBUJACEM",
+      "name": "Ambuja Cements Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 37
+    },
+    "ANANDRATHI": {
+      "symbol": "ANANDRATHI",
+      "name": "Anand Rathi Wealth Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 38
+    },
+    "ANANTRAJ": {
+      "symbol": "ANANTRAJ",
+      "name": "Anant Raj Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 39
+    },
+    "ANGELONE": {
+      "symbol": "ANGELONE",
+      "name": "Angel One Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 40
+    },
+    "ANTHEM": {
+      "symbol": "ANTHEM",
+      "name": "Anthem Biosciences Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 41
+    },
+    "ANURAS": {
+      "symbol": "ANURAS",
+      "name": "Anupam Rasayan India Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 42
+    },
+    "APARINDS": {
+      "symbol": "APARINDS",
+      "name": "Apar Industries Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 43
+    },
+    "APOLLOHOSP": {
+      "symbol": "APOLLOHOSP",
+      "name": "Apollo Hospitals Enterprise Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 44
+    },
+    "APOLLOTYRE": {
+      "symbol": "APOLLOTYRE",
+      "name": "Apollo Tyres Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 45
+    },
+    "APTUS": {
+      "symbol": "APTUS",
+      "name": "Aptus Value Housing Finance India Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 46
+    },
+    "ASAHIINDIA": {
+      "symbol": "ASAHIINDIA",
+      "name": "Asahi India Glass Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 47
+    },
+    "ASHOKLEY": {
+      "symbol": "ASHOKLEY",
+      "name": "Ashok Leyland Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 48
+    },
+    "ASIANPAINT": {
+      "symbol": "ASIANPAINT",
+      "name": "Asian Paints Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 49
+    },
+    "ASTERDM": {
+      "symbol": "ASTERDM",
+      "name": "Aster DM Quality Care Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 50
+    },
+    "ASTRAL": {
+      "symbol": "ASTRAL",
+      "name": "Astral Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 51
+    },
+    "ATHERENERG": {
+      "symbol": "ATHERENERG",
+      "name": "Ather Energy Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 52
+    },
+    "ATUL": {
+      "symbol": "ATUL",
+      "name": "Atul Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 53
+    },
+    "AUROPHARMA": {
+      "symbol": "AUROPHARMA",
+      "name": "Aurobindo Pharma Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 54
+    },
+    "AIIL": {
+      "symbol": "AIIL",
+      "name": "Authum Investment & Infrastructure Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 55
+    },
+    "DMART": {
+      "symbol": "DMART",
+      "name": "Avenue Supermarts Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 56
+    },
+    "AXISBANK": {
+      "symbol": "AXISBANK",
+      "name": "Axis Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 57
+    },
+    "BEML": {
+      "symbol": "BEML",
+      "name": "BEML Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 58
+    },
+    "BLS": {
+      "symbol": "BLS",
+      "name": "BLS International Services Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 59
+    },
+    "BSE": {
+      "symbol": "BSE",
+      "name": "BSE Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 60
+    },
+    "BAJAJ-AUTO": {
+      "symbol": "BAJAJ-AUTO",
+      "name": "Bajaj Auto Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 61
+    },
+    "BAJFINANCE": {
+      "symbol": "BAJFINANCE",
+      "name": "Bajaj Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 62
+    },
+    "BAJAJFINSV": {
+      "symbol": "BAJAJFINSV",
+      "name": "Bajaj Finserv Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 63
+    },
+    "BAJAJHLDNG": {
+      "symbol": "BAJAJHLDNG",
+      "name": "Bajaj Holdings & Investment Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 64
+    },
+    "BAJAJHFL": {
+      "symbol": "BAJAJHFL",
+      "name": "Bajaj Housing Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 65
+    },
+    "BALKRISIND": {
+      "symbol": "BALKRISIND",
+      "name": "Balkrishna Industries Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 66
+    },
+    "BALRAMCHIN": {
+      "symbol": "BALRAMCHIN",
+      "name": "Balrampur Chini Mills Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 67
+    },
+    "BANDHANBNK": {
+      "symbol": "BANDHANBNK",
+      "name": "Bandhan Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 68
+    },
+    "BANKBARODA": {
+      "symbol": "BANKBARODA",
+      "name": "Bank of Baroda",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 69
+    },
+    "BANKINDIA": {
+      "symbol": "BANKINDIA",
+      "name": "Bank of India",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 70
+    },
+    "MAHABANK": {
+      "symbol": "MAHABANK",
+      "name": "Bank of Maharashtra",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 71
+    },
+    "BATAINDIA": {
+      "symbol": "BATAINDIA",
+      "name": "Bata India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 72
+    },
+    "BAYERCROP": {
+      "symbol": "BAYERCROP",
+      "name": "Bayer Cropscience Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 73
+    },
+    "BELRISE": {
+      "symbol": "BELRISE",
+      "name": "Belrise Industries Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 74
+    },
+    "BERGEPAINT": {
+      "symbol": "BERGEPAINT",
+      "name": "Berger Paints India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 75
+    },
+    "BDL": {
+      "symbol": "BDL",
+      "name": "Bharat Dynamics Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 76
+    },
+    "BEL": {
+      "symbol": "BEL",
+      "name": "Bharat Electronics Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 77
+    },
+    "BHARATFORG": {
+      "symbol": "BHARATFORG",
+      "name": "Bharat Forge Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 78
+    },
+    "BHEL": {
+      "symbol": "BHEL",
+      "name": "Bharat Heavy Electricals Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 79
+    },
+    "BPCL": {
+      "symbol": "BPCL",
+      "name": "Bharat Petroleum Corporation Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 80
+    },
+    "BHARTIARTL": {
+      "symbol": "BHARTIARTL",
+      "name": "Bharti Airtel Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 81
+    },
+    "BHARTIHEXA": {
+      "symbol": "BHARTIHEXA",
+      "name": "Bharti Hexacom Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 82
+    },
+    "BIKAJI": {
+      "symbol": "BIKAJI",
+      "name": "Bikaji Foods International Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 83
+    },
+    "GROWW": {
+      "symbol": "GROWW",
+      "name": "Billionbrains Garage Ventures Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 84
+    },
+    "BIOCON": {
+      "symbol": "BIOCON",
+      "name": "Biocon Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 85
+    },
+    "BSOFT": {
+      "symbol": "BSOFT",
+      "name": "Birlasoft Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 86
+    },
+    "BLUEDART": {
+      "symbol": "BLUEDART",
+      "name": "Blue Dart Express Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 87
+    },
+    "BLUEJET": {
+      "symbol": "BLUEJET",
+      "name": "Blue Jet Healthcare Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 88
+    },
+    "BLUESTARCO": {
+      "symbol": "BLUESTARCO",
+      "name": "Blue Star Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 89
+    },
+    "BBTC": {
+      "symbol": "BBTC",
+      "name": "Bombay Burmah Trading Corporation Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 90
+    },
+    "BOSCHLTD": {
+      "symbol": "BOSCHLTD",
+      "name": "Bosch Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 91
+    },
+    "FIRSTCRY": {
+      "symbol": "FIRSTCRY",
+      "name": "Brainbees Solutions Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 92
+    },
+    "BRIGADE": {
+      "symbol": "BRIGADE",
+      "name": "Brigade Enterprises Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 93
+    },
+    "BRITANNIA": {
+      "symbol": "BRITANNIA",
+      "name": "Britannia Industries Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 94
+    },
+    "MAPMYINDIA": {
+      "symbol": "MAPMYINDIA",
+      "name": "C.E. Info Systems Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 95
+    },
+    "CCL": {
+      "symbol": "CCL",
+      "name": "CCL Products (I) Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 96
+    },
+    "CESC": {
+      "symbol": "CESC",
+      "name": "CESC Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 97
+    },
+    "CGPOWER": {
+      "symbol": "CGPOWER",
+      "name": "CG Power and Industrial Solutions Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 98
+    },
+    "CIEINDIA": {
+      "symbol": "CIEINDIA",
+      "name": "CIE Automotive India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 99
+    },
+    "CRISIL": {
+      "symbol": "CRISIL",
+      "name": "CRISIL Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 100
+    },
+    "CANFINHOME": {
+      "symbol": "CANFINHOME",
+      "name": "Can Fin Homes Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 101
+    },
+    "CANBK": {
+      "symbol": "CANBK",
+      "name": "Canara Bank",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 102
+    },
+    "CANHLIFE": {
+      "symbol": "CANHLIFE",
+      "name": "Canara HSBC Life Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 103
+    },
+    "CAPLIPOINT": {
+      "symbol": "CAPLIPOINT",
+      "name": "Caplin Point Laboratories Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 104
+    },
+    "CGCL": {
+      "symbol": "CGCL",
+      "name": "Capri Global Capital Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 105
+    },
+    "CARBORUNIV": {
+      "symbol": "CARBORUNIV",
+      "name": "Carborundum Universal Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 106
+    },
+    "CARTRADE": {
+      "symbol": "CARTRADE",
+      "name": "Cartrade Tech Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 107
+    },
+    "CASTROLIND": {
+      "symbol": "CASTROLIND",
+      "name": "Castrol India Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 108
+    },
+    "CEATLTD": {
+      "symbol": "CEATLTD",
+      "name": "Ceat Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 109
+    },
+    "CEMPRO": {
+      "symbol": "CEMPRO",
+      "name": "Cemindia Projects Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 110
+    },
+    "CENTRALBK": {
+      "symbol": "CENTRALBK",
+      "name": "Central Bank of India",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 111
+    },
+    "CDSL": {
+      "symbol": "CDSL",
+      "name": "Central Depository Services (India) Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 112
+    },
+    "CHALET": {
+      "symbol": "CHALET",
+      "name": "Chalet Hotels Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 113
+    },
+    "CHAMBLFERT": {
+      "symbol": "CHAMBLFERT",
+      "name": "Chambal Fertilizers & Chemicals Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 114
+    },
+    "CHENNPETRO": {
+      "symbol": "CHENNPETRO",
+      "name": "Chennai Petroleum Corporation Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 115
+    },
+    "CHOICEIN": {
+      "symbol": "CHOICEIN",
+      "name": "Choice International Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 116
+    },
+    "CHOLAHLDNG": {
+      "symbol": "CHOLAHLDNG",
+      "name": "Cholamandalam Financial Holdings Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 117
+    },
+    "CHOLAFIN": {
+      "symbol": "CHOLAFIN",
+      "name": "Cholamandalam Investment and Finance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 118
+    },
+    "CIPLA": {
+      "symbol": "CIPLA",
+      "name": "Cipla Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 119
+    },
+    "CUB": {
+      "symbol": "CUB",
+      "name": "City Union Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 120
+    },
+    "CLEAN": {
+      "symbol": "CLEAN",
+      "name": "Clean Science and Technology Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 121
+    },
+    "COALINDIA": {
+      "symbol": "COALINDIA",
+      "name": "Coal India Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 122
+    },
+    "COCHINSHIP": {
+      "symbol": "COCHINSHIP",
+      "name": "Cochin Shipyard Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 123
+    },
+    "COFORGE": {
+      "symbol": "COFORGE",
+      "name": "Coforge Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 124
+    },
+    "COHANCE": {
+      "symbol": "COHANCE",
+      "name": "Cohance Lifesciences Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 125
+    },
+    "COLPAL": {
+      "symbol": "COLPAL",
+      "name": "Colgate Palmolive (India) Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 126
+    },
+    "CAMS": {
+      "symbol": "CAMS",
+      "name": "Computer Age Management Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 127
+    },
+    "CONCORDBIO": {
+      "symbol": "CONCORDBIO",
+      "name": "Concord Biotech Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 128
+    },
+    "CONCOR": {
+      "symbol": "CONCOR",
+      "name": "Container Corporation of India Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 129
+    },
+    "COROMANDEL": {
+      "symbol": "COROMANDEL",
+      "name": "Coromandel International Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 130
+    },
+    "CRAFTSMAN": {
+      "symbol": "CRAFTSMAN",
+      "name": "Craftsman Automation Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 131
+    },
+    "CREDITACC": {
+      "symbol": "CREDITACC",
+      "name": "CreditAccess Grameen Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 132
+    },
+    "CROMPTON": {
+      "symbol": "CROMPTON",
+      "name": "Crompton Greaves Consumer Electricals Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 133
+    },
+    "CUMMINSIND": {
+      "symbol": "CUMMINSIND",
+      "name": "Cummins India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 134
+    },
+    "CYIENT": {
+      "symbol": "CYIENT",
+      "name": "Cyient Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 135
+    },
+    "DCMSHRIRAM": {
+      "symbol": "DCMSHRIRAM",
+      "name": "DCM Shriram Ltd.",
+      "type": "stock",
+      "sector": "Diversified",
+      "market_cap_rank": 136
+    },
+    "DLF": {
+      "symbol": "DLF",
+      "name": "DLF Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 137
+    },
+    "DOMS": {
+      "symbol": "DOMS",
+      "name": "DOMS Industries Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 138
+    },
+    "DABUR": {
+      "symbol": "DABUR",
+      "name": "Dabur India Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 139
+    },
+    "DALBHARAT": {
+      "symbol": "DALBHARAT",
+      "name": "Dalmia Bharat Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 140
+    },
+    "DATAPATTNS": {
+      "symbol": "DATAPATTNS",
+      "name": "Data Patterns (India) Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 141
+    },
+    "DEEPAKFERT": {
+      "symbol": "DEEPAKFERT",
+      "name": "Deepak Fertilisers & Petrochemicals Corp. Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 142
+    },
+    "DEEPAKNTR": {
+      "symbol": "DEEPAKNTR",
+      "name": "Deepak Nitrite Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 143
+    },
+    "DELHIVERY": {
+      "symbol": "DELHIVERY",
+      "name": "Delhivery Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 144
+    },
+    "DEVYANI": {
+      "symbol": "DEVYANI",
+      "name": "Devyani International Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 145
+    },
+    "DIVISLAB": {
+      "symbol": "DIVISLAB",
+      "name": "Divi's Laboratories Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 146
+    },
+    "DIXON": {
+      "symbol": "DIXON",
+      "name": "Dixon Technologies (India) Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 147
+    },
+    "LALPATHLAB": {
+      "symbol": "LALPATHLAB",
+      "name": "Dr. Lal Path Labs Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 148
+    },
+    "DRREDDY": {
+      "symbol": "DRREDDY",
+      "name": "Dr. Reddy's Laboratories Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 149
+    },
+    "EIDPARRY": {
+      "symbol": "EIDPARRY",
+      "name": "E.I.D. Parry (India) Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 150
+    },
+    "EIHOTEL": {
+      "symbol": "EIHOTEL",
+      "name": "EIH Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 151
+    },
+    "EICHERMOT": {
+      "symbol": "EICHERMOT",
+      "name": "Eicher Motors Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 152
+    },
+    "ELECON": {
+      "symbol": "ELECON",
+      "name": "Elecon Engineering Co. Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 153
+    },
+    "ELGIEQUIP": {
+      "symbol": "ELGIEQUIP",
+      "name": "Elgi Equipments Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 154
+    },
+    "EMAMILTD": {
+      "symbol": "EMAMILTD",
+      "name": "Emami Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 155
+    },
+    "EMCURE": {
+      "symbol": "EMCURE",
+      "name": "Emcure Pharmaceuticals Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 156
+    },
+    "EMMVEE": {
+      "symbol": "EMMVEE",
+      "name": "Emmvee Photovoltaic Power Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 157
+    },
+    "ENDURANCE": {
+      "symbol": "ENDURANCE",
+      "name": "Endurance Technologies Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 158
+    },
+    "ENGINERSIN": {
+      "symbol": "ENGINERSIN",
+      "name": "Engineers India Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 159
+    },
+    "ERIS": {
+      "symbol": "ERIS",
+      "name": "Eris Lifesciences Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 160
+    },
+    "ESCORTS": {
+      "symbol": "ESCORTS",
+      "name": "Escorts Kubota Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 161
+    },
+    "ETERNAL": {
+      "symbol": "ETERNAL",
+      "name": "Eternal Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 162
+    },
+    "EXIDEIND": {
+      "symbol": "EXIDEIND",
+      "name": "Exide Industries Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 163
+    },
+    "NYKAA": {
+      "symbol": "NYKAA",
+      "name": "FSN E-Commerce Ventures Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 164
+    },
+    "FEDERALBNK": {
+      "symbol": "FEDERALBNK",
+      "name": "Federal Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 165
+    },
+    "FACT": {
+      "symbol": "FACT",
+      "name": "Fertilisers and Chemicals Travancore Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 166
+    },
+    "FINCABLES": {
+      "symbol": "FINCABLES",
+      "name": "Finolex Cables Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 167
+    },
+    "FSL": {
+      "symbol": "FSL",
+      "name": "Firstsource Solutions Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 168
+    },
+    "FIVESTAR": {
+      "symbol": "FIVESTAR",
+      "name": "Five-Star Business Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 169
+    },
+    "FORCEMOT": {
+      "symbol": "FORCEMOT",
+      "name": "Force Motors Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 170
+    },
+    "FORTIS": {
+      "symbol": "FORTIS",
+      "name": "Fortis Healthcare Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 171
+    },
+    "GAIL": {
+      "symbol": "GAIL",
+      "name": "GAIL (India) Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 172
+    },
+    "GVT&D": {
+      "symbol": "GVT&D",
+      "name": "GE Vernova T&D India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 173
+    },
+    "GMRAIRPORT": {
+      "symbol": "GMRAIRPORT",
+      "name": "GMR Airports Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 174
+    },
+    "GABRIEL": {
+      "symbol": "GABRIEL",
+      "name": "Gabriel India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 175
+    },
+    "GALLANTT": {
+      "symbol": "GALLANTT",
+      "name": "Gallantt Ispat Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 176
+    },
+    "GRSE": {
+      "symbol": "GRSE",
+      "name": "Garden Reach Shipbuilders & Engineers Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 177
+    },
+    "GICRE": {
+      "symbol": "GICRE",
+      "name": "General Insurance Corporation of India",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 178
+    },
+    "GILLETTE": {
+      "symbol": "GILLETTE",
+      "name": "Gillette India Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 179
+    },
+    "GLAND": {
+      "symbol": "GLAND",
+      "name": "Gland Pharma Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 180
+    },
+    "GLAXO": {
+      "symbol": "GLAXO",
+      "name": "Glaxosmithkline Pharmaceuticals Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 181
+    },
+    "GLENMARK": {
+      "symbol": "GLENMARK",
+      "name": "Glenmark Pharmaceuticals Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 182
+    },
+    "MEDANTA": {
+      "symbol": "MEDANTA",
+      "name": "Global Health Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 183
+    },
+    "GODIGIT": {
+      "symbol": "GODIGIT",
+      "name": "Go Digit General Insurance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 184
+    },
+    "GPIL": {
+      "symbol": "GPIL",
+      "name": "Godawari Power & Ispat Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 185
+    },
+    "GODFRYPHLP": {
+      "symbol": "GODFRYPHLP",
+      "name": "Godfrey Phillips India Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 186
+    },
+    "GODREJCP": {
+      "symbol": "GODREJCP",
+      "name": "Godrej Consumer Products Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 187
+    },
+    "GODREJIND": {
+      "symbol": "GODREJIND",
+      "name": "Godrej Industries Ltd.",
+      "type": "stock",
+      "sector": "Diversified",
+      "market_cap_rank": 188
+    },
+    "GODREJPROP": {
+      "symbol": "GODREJPROP",
+      "name": "Godrej Properties Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 189
+    },
+    "GRANULES": {
+      "symbol": "GRANULES",
+      "name": "Granules India Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 190
+    },
+    "GRAPHITE": {
+      "symbol": "GRAPHITE",
+      "name": "Graphite India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 191
+    },
+    "GRASIM": {
+      "symbol": "GRASIM",
+      "name": "Grasim Industries Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 192
+    },
+    "GRAVITA": {
+      "symbol": "GRAVITA",
+      "name": "Gravita India Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 193
+    },
+    "GESHIP": {
+      "symbol": "GESHIP",
+      "name": "Great Eastern Shipping Co. Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 194
+    },
+    "FLUOROCHEM": {
+      "symbol": "FLUOROCHEM",
+      "name": "Gujarat Fluorochemicals Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 195
+    },
+    "GMDCLTD": {
+      "symbol": "GMDCLTD",
+      "name": "Gujarat Mineral Development Corporation Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 196
+    },
+    "HEG": {
+      "symbol": "HEG",
+      "name": "H.E.G. Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 197
+    },
+    "HBLENGINE": {
+      "symbol": "HBLENGINE",
+      "name": "HBL Engineering Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 198
+    },
+    "HCLTECH": {
+      "symbol": "HCLTECH",
+      "name": "HCL Technologies Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 199
+    },
+    "HDBFS": {
+      "symbol": "HDBFS",
+      "name": "HDB Financial Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 200
+    },
+    "HDFCAMC": {
+      "symbol": "HDFCAMC",
+      "name": "HDFC Asset Management Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 201
+    },
+    "HDFCBANK": {
+      "symbol": "HDFCBANK",
+      "name": "HDFC Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 202
+    },
+    "HDFCLIFE": {
+      "symbol": "HDFCLIFE",
+      "name": "HDFC Life Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 203
+    },
+    "HFCL": {
+      "symbol": "HFCL",
+      "name": "HFCL Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 204
+    },
+    "HAVELLS": {
+      "symbol": "HAVELLS",
+      "name": "Havells India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 205
+    },
+    "HEROMOTOCO": {
+      "symbol": "HEROMOTOCO",
+      "name": "Hero MotoCorp Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 206
+    },
+    "HEXT": {
+      "symbol": "HEXT",
+      "name": "Hexaware Technologies Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 207
+    },
+    "HSCL": {
+      "symbol": "HSCL",
+      "name": "Himadri Speciality Chemical Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 208
+    },
+    "HINDALCO": {
+      "symbol": "HINDALCO",
+      "name": "Hindalco Industries Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 209
+    },
+    "HAL": {
+      "symbol": "HAL",
+      "name": "Hindustan Aeronautics Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 210
+    },
+    "HINDCOPPER": {
+      "symbol": "HINDCOPPER",
+      "name": "Hindustan Copper Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 211
+    },
+    "HINDPETRO": {
+      "symbol": "HINDPETRO",
+      "name": "Hindustan Petroleum Corporation Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 212
+    },
+    "HINDUNILVR": {
+      "symbol": "HINDUNILVR",
+      "name": "Hindustan Unilever Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 213
+    },
+    "HINDZINC": {
+      "symbol": "HINDZINC",
+      "name": "Hindustan Zinc Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 214
+    },
+    "POWERINDIA": {
+      "symbol": "POWERINDIA",
+      "name": "Hitachi Energy India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 215
+    },
+    "HOMEFIRST": {
+      "symbol": "HOMEFIRST",
+      "name": "Home First Finance Company India Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 216
+    },
+    "HONASA": {
+      "symbol": "HONASA",
+      "name": "Honasa Consumer Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 217
+    },
+    "HONAUT": {
+      "symbol": "HONAUT",
+      "name": "Honeywell Automation India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 218
+    },
+    "HUDCO": {
+      "symbol": "HUDCO",
+      "name": "Housing & Urban Development Corporation Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 219
+    },
+    "HYUNDAI": {
+      "symbol": "HYUNDAI",
+      "name": "Hyundai Motor India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 220
+    },
+    "ICICIBANK": {
+      "symbol": "ICICIBANK",
+      "name": "ICICI Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 221
+    },
+    "ICICIGI": {
+      "symbol": "ICICIGI",
+      "name": "ICICI Lombard General Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 222
+    },
+    "ICICIAMC": {
+      "symbol": "ICICIAMC",
+      "name": "ICICI Prudential Asset Management Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 223
+    },
+    "ICICIPRULI": {
+      "symbol": "ICICIPRULI",
+      "name": "ICICI Prudential Life Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 224
+    },
+    "IDBI": {
+      "symbol": "IDBI",
+      "name": "IDBI Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 225
+    },
+    "IDFCFIRSTB": {
+      "symbol": "IDFCFIRSTB",
+      "name": "IDFC First Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 226
+    },
+    "IFCI": {
+      "symbol": "IFCI",
+      "name": "IFCI Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 227
+    },
+    "IIFL": {
+      "symbol": "IIFL",
+      "name": "IIFL Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 228
+    },
+    "IRB": {
+      "symbol": "IRB",
+      "name": "IRB Infrastructure Developers Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 229
+    },
+    "IRCON": {
+      "symbol": "IRCON",
+      "name": "IRCON International Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 230
+    },
+    "ITCHOTELS": {
+      "symbol": "ITCHOTELS",
+      "name": "ITC Hotels Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 231
+    },
+    "ITC": {
+      "symbol": "ITC",
+      "name": "ITC Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 232
+    },
+    "ITI": {
+      "symbol": "ITI",
+      "name": "ITI Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 233
+    },
+    "INDGN": {
+      "symbol": "INDGN",
+      "name": "Indegene Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 234
+    },
+    "INDIACEM": {
+      "symbol": "INDIACEM",
+      "name": "India Cements Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 235
+    },
+    "INDIAMART": {
+      "symbol": "INDIAMART",
+      "name": "Indiamart Intermesh Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 236
+    },
+    "INDIANB": {
+      "symbol": "INDIANB",
+      "name": "Indian Bank",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 237
+    },
+    "IEX": {
+      "symbol": "IEX",
+      "name": "Indian Energy Exchange Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 238
+    },
+    "INDHOTEL": {
+      "symbol": "INDHOTEL",
+      "name": "Indian Hotels Co. Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 239
+    },
+    "IOC": {
+      "symbol": "IOC",
+      "name": "Indian Oil Corporation Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 240
+    },
+    "IOB": {
+      "symbol": "IOB",
+      "name": "Indian Overseas Bank",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 241
+    },
+    "IRCTC": {
+      "symbol": "IRCTC",
+      "name": "Indian Railway Catering And Tourism Corporation Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 242
+    },
+    "IRFC": {
+      "symbol": "IRFC",
+      "name": "Indian Railway Finance Corporation Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 243
+    },
+    "IREDA": {
+      "symbol": "IREDA",
+      "name": "Indian Renewable Energy Development Agency Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 244
+    },
+    "IGL": {
+      "symbol": "IGL",
+      "name": "Indraprastha Gas Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 245
+    },
+    "INDUSTOWER": {
+      "symbol": "INDUSTOWER",
+      "name": "Indus Towers Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 246
+    },
+    "INDUSINDBK": {
+      "symbol": "INDUSINDBK",
+      "name": "IndusInd Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 247
+    },
+    "NAUKRI": {
+      "symbol": "NAUKRI",
+      "name": "Info Edge (India) Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 248
+    },
+    "INFY": {
+      "symbol": "INFY",
+      "name": "Infosys Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 249
+    },
+    "INOXWIND": {
+      "symbol": "INOXWIND",
+      "name": "Inox Wind Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 250
+    },
+    "INTELLECT": {
+      "symbol": "INTELLECT",
+      "name": "Intellect Design Arena Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 251
+    },
+    "INDIGO": {
+      "symbol": "INDIGO",
+      "name": "InterGlobe Aviation Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 252
+    },
+    "IGIL": {
+      "symbol": "IGIL",
+      "name": "International Gemological Institute Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 253
+    },
+    "IKS": {
+      "symbol": "IKS",
+      "name": "Inventurus Knowledge Solutions Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 254
+    },
+    "IPCALAB": {
+      "symbol": "IPCALAB",
+      "name": "Ipca Laboratories Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 255
+    },
+    "JKCEMENT": {
+      "symbol": "JKCEMENT",
+      "name": "J.K. Cement Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 256
+    },
+    "JBMA": {
+      "symbol": "JBMA",
+      "name": "JBM Auto Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 257
+    },
+    "JKTYRE": {
+      "symbol": "JKTYRE",
+      "name": "JK Tyre & Industries Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 258
+    },
+    "JMFINANCIL": {
+      "symbol": "JMFINANCIL",
+      "name": "JM Financial Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 259
+    },
+    "JSWCEMENT": {
+      "symbol": "JSWCEMENT",
+      "name": "JSW Cement Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 260
+    },
+    "JSWDULUX": {
+      "symbol": "JSWDULUX",
+      "name": "JSW Dulux Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 261
+    },
+    "JSWENERGY": {
+      "symbol": "JSWENERGY",
+      "name": "JSW Energy Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 262
+    },
+    "JSWINFRA": {
+      "symbol": "JSWINFRA",
+      "name": "JSW Infrastructure Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 263
+    },
+    "JSWSTEEL": {
+      "symbol": "JSWSTEEL",
+      "name": "JSW Steel Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 264
+    },
+    "JAINREC": {
+      "symbol": "JAINREC",
+      "name": "Jain Resource Recycling Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 265
+    },
+    "JPPOWER": {
+      "symbol": "JPPOWER",
+      "name": "Jaiprakash Power Ventures Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 266
+    },
+    "J&KBANK": {
+      "symbol": "J&KBANK",
+      "name": "Jammu & Kashmir Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 267
+    },
+    "JINDALSAW": {
+      "symbol": "JINDALSAW",
+      "name": "Jindal Saw Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 268
+    },
+    "JSL": {
+      "symbol": "JSL",
+      "name": "Jindal Stainless Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 269
+    },
+    "JINDALSTEL": {
+      "symbol": "JINDALSTEL",
+      "name": "Jindal Steel Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 270
+    },
+    "JIOFIN": {
+      "symbol": "JIOFIN",
+      "name": "Jio Financial Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 271
+    },
+    "JUBLFOOD": {
+      "symbol": "JUBLFOOD",
+      "name": "Jubilant Foodworks Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 272
+    },
+    "JUBLINGREA": {
+      "symbol": "JUBLINGREA",
+      "name": "Jubilant Ingrevia Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 273
+    },
+    "JUBLPHARMA": {
+      "symbol": "JUBLPHARMA",
+      "name": "Jubilant Pharmova Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 274
+    },
+    "JWL": {
+      "symbol": "JWL",
+      "name": "Jupiter Wagons Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 275
+    },
+    "JYOTICNC": {
+      "symbol": "JYOTICNC",
+      "name": "Jyoti CNC Automation Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 276
+    },
+    "KPRMILL": {
+      "symbol": "KPRMILL",
+      "name": "K.P.R. Mill Ltd.",
+      "type": "stock",
+      "sector": "Textiles",
+      "market_cap_rank": 277
+    },
+    "KEI": {
+      "symbol": "KEI",
+      "name": "KEI Industries Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 278
+    },
+    "KPITTECH": {
+      "symbol": "KPITTECH",
+      "name": "KPIT Technologies Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 279
+    },
+    "KAJARIACER": {
+      "symbol": "KAJARIACER",
+      "name": "Kajaria Ceramics Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 280
+    },
+    "KPIL": {
+      "symbol": "KPIL",
+      "name": "Kalpataru Projects International Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 281
+    },
+    "KALYANKJIL": {
+      "symbol": "KALYANKJIL",
+      "name": "Kalyan Jewellers India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 282
+    },
+    "KARURVYSYA": {
+      "symbol": "KARURVYSYA",
+      "name": "Karur Vysya Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 283
+    },
+    "KAYNES": {
+      "symbol": "KAYNES",
+      "name": "Kaynes Technology India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 284
+    },
+    "KEC": {
+      "symbol": "KEC",
+      "name": "Kec International Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 285
+    },
+    "KFINTECH": {
+      "symbol": "KFINTECH",
+      "name": "Kfin Technologies Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 286
+    },
+    "KIRLOSENG": {
+      "symbol": "KIRLOSENG",
+      "name": "Kirloskar Oil Eng Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 287
+    },
+    "KOTAKBANK": {
+      "symbol": "KOTAKBANK",
+      "name": "Kotak Mahindra Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 288
+    },
+    "KIMS": {
+      "symbol": "KIMS",
+      "name": "Krishna Institute of Medical Sciences Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 289
+    },
+    "LTF": {
+      "symbol": "LTF",
+      "name": "L&T Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 290
+    },
+    "LTTS": {
+      "symbol": "LTTS",
+      "name": "L&T Technology Services Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 291
+    },
+    "LGEINDIA": {
+      "symbol": "LGEINDIA",
+      "name": "LG Electronics India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 292
+    },
+    "LICHSGFIN": {
+      "symbol": "LICHSGFIN",
+      "name": "LIC Housing Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 293
+    },
+    "LTFOODS": {
+      "symbol": "LTFOODS",
+      "name": "LT Foods Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 294
+    },
+    "LTM": {
+      "symbol": "LTM",
+      "name": "LTM Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 295
+    },
+    "LT": {
+      "symbol": "LT",
+      "name": "Larsen & Toubro Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 296
+    },
+    "LATENTVIEW": {
+      "symbol": "LATENTVIEW",
+      "name": "Latent View Analytics Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 297
+    },
+    "LAURUSLABS": {
+      "symbol": "LAURUSLABS",
+      "name": "Laurus Labs Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 298
+    },
+    "THELEELA": {
+      "symbol": "THELEELA",
+      "name": "Leela Palaces Hotels & Resorts Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 299
+    },
+    "LEMONTREE": {
+      "symbol": "LEMONTREE",
+      "name": "Lemon Tree Hotels Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 300
+    },
+    "LENSKART": {
+      "symbol": "LENSKART",
+      "name": "Lenskart Solutions Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 301
+    },
+    "LICI": {
+      "symbol": "LICI",
+      "name": "Life Insurance Corporation of India",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 302
+    },
+    "LINDEINDIA": {
+      "symbol": "LINDEINDIA",
+      "name": "Linde India Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 303
+    },
+    "LLOYDSME": {
+      "symbol": "LLOYDSME",
+      "name": "Lloyds Metals And Energy Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 304
+    },
+    "LODHA": {
+      "symbol": "LODHA",
+      "name": "Lodha Developers Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 305
+    },
+    "LUPIN": {
+      "symbol": "LUPIN",
+      "name": "Lupin Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 306
+    },
+    "MMTC": {
+      "symbol": "MMTC",
+      "name": "MMTC Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 307
+    },
+    "MRF": {
+      "symbol": "MRF",
+      "name": "MRF Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 308
+    },
+    "MGL": {
+      "symbol": "MGL",
+      "name": "Mahanagar Gas Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 309
+    },
+    "M&MFIN": {
+      "symbol": "M&MFIN",
+      "name": "Mahindra & Mahindra Financial Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 310
+    },
+    "M&M": {
+      "symbol": "M&M",
+      "name": "Mahindra & Mahindra Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 311
+    },
+    "MANAPPURAM": {
+      "symbol": "MANAPPURAM",
+      "name": "Manappuram Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 312
+    },
+    "MRPL": {
+      "symbol": "MRPL",
+      "name": "Mangalore Refinery & Petrochemicals Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 313
+    },
+    "MANKIND": {
+      "symbol": "MANKIND",
+      "name": "Mankind Pharma Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 314
+    },
+    "MARICO": {
+      "symbol": "MARICO",
+      "name": "Marico Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 315
+    },
+    "MARUTI": {
+      "symbol": "MARUTI",
+      "name": "Maruti Suzuki India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 316
+    },
+    "MFSL": {
+      "symbol": "MFSL",
+      "name": "Max Financial Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 317
+    },
+    "MAXHEALTH": {
+      "symbol": "MAXHEALTH",
+      "name": "Max Healthcare Institute Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 318
+    },
+    "MAZDOCK": {
+      "symbol": "MAZDOCK",
+      "name": "Mazagoan Dock Shipbuilders Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 319
+    },
+    "MEESHO": {
+      "symbol": "MEESHO",
+      "name": "Meesho Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 320
+    },
+    "MINDACORP": {
+      "symbol": "MINDACORP",
+      "name": "Minda Corporation Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 321
+    },
+    "MSUMI": {
+      "symbol": "MSUMI",
+      "name": "Motherson Sumi Wiring India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 322
+    },
+    "MOTILALOFS": {
+      "symbol": "MOTILALOFS",
+      "name": "Motilal Oswal Financial Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 323
+    },
+    "MPHASIS": {
+      "symbol": "MPHASIS",
+      "name": "MphasiS Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 324
+    },
+    "MCX": {
+      "symbol": "MCX",
+      "name": "Multi Commodity Exchange of India Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 325
+    },
+    "MUTHOOTFIN": {
+      "symbol": "MUTHOOTFIN",
+      "name": "Muthoot Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 326
+    },
+    "NATCOPHARM": {
+      "symbol": "NATCOPHARM",
+      "name": "NATCO Pharma Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 327
+    },
+    "NBCC": {
+      "symbol": "NBCC",
+      "name": "NBCC (India) Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 328
+    },
+    "NCC": {
+      "symbol": "NCC",
+      "name": "NCC Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 329
+    },
+    "NHPC": {
+      "symbol": "NHPC",
+      "name": "NHPC Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 330
+    },
+    "NLCINDIA": {
+      "symbol": "NLCINDIA",
+      "name": "NLC India Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 331
+    },
+    "NMDC": {
+      "symbol": "NMDC",
+      "name": "NMDC Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 332
+    },
+    "NSLNISP": {
+      "symbol": "NSLNISP",
+      "name": "NMDC Steel Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 333
+    },
+    "NTPCGREEN": {
+      "symbol": "NTPCGREEN",
+      "name": "NTPC Green Energy Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 334
+    },
+    "NTPC": {
+      "symbol": "NTPC",
+      "name": "NTPC Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 335
+    },
+    "NH": {
+      "symbol": "NH",
+      "name": "Narayana Hrudayalaya Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 336
+    },
+    "NATIONALUM": {
+      "symbol": "NATIONALUM",
+      "name": "National Aluminium Co. Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 337
+    },
+    "NAVA": {
+      "symbol": "NAVA",
+      "name": "Nava Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 338
+    },
+    "NAVINFLUOR": {
+      "symbol": "NAVINFLUOR",
+      "name": "Navin Fluorine International Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 339
+    },
+    "NESTLEIND": {
+      "symbol": "NESTLEIND",
+      "name": "Nestle India Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 340
+    },
+    "NETWEB": {
+      "symbol": "NETWEB",
+      "name": "Netweb Technologies India Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 341
+    },
+    "NEULANDLAB": {
+      "symbol": "NEULANDLAB",
+      "name": "Neuland Laboratories Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 342
+    },
+    "NEWGEN": {
+      "symbol": "NEWGEN",
+      "name": "Newgen Software Technologies Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 343
+    },
+    "NAM-INDIA": {
+      "symbol": "NAM-INDIA",
+      "name": "Nippon Life India Asset Management Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 344
+    },
+    "NIVABUPA": {
+      "symbol": "NIVABUPA",
+      "name": "Niva Bupa Health Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 345
+    },
+    "NUVAMA": {
+      "symbol": "NUVAMA",
+      "name": "Nuvama Wealth Management Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 346
+    },
+    "NUVOCO": {
+      "symbol": "NUVOCO",
+      "name": "Nuvoco Vistas Corporation Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 347
+    },
+    "OBEROIRLTY": {
+      "symbol": "OBEROIRLTY",
+      "name": "Oberoi Realty Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 348
+    },
+    "ONGC": {
+      "symbol": "ONGC",
+      "name": "Oil & Natural Gas Corporation Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 349
+    },
+    "OIL": {
+      "symbol": "OIL",
+      "name": "Oil India Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 350
+    },
+    "OLAELEC": {
+      "symbol": "OLAELEC",
+      "name": "Ola Electric Mobility Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 351
+    },
+    "OLECTRA": {
+      "symbol": "OLECTRA",
+      "name": "Olectra Greentech Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 352
+    },
+    "PAYTM": {
+      "symbol": "PAYTM",
+      "name": "One 97 Communications Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 353
+    },
+    "ONESOURCE": {
+      "symbol": "ONESOURCE",
+      "name": "Onesource Specialty Pharma Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 354
+    },
+    "OFSS": {
+      "symbol": "OFSS",
+      "name": "Oracle Financial Services Software Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 355
+    },
+    "POLICYBZR": {
+      "symbol": "POLICYBZR",
+      "name": "PB Fintech Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 356
+    },
+    "PCBL": {
+      "symbol": "PCBL",
+      "name": "PCBL Chemical Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 357
+    },
+    "PGEL": {
+      "symbol": "PGEL",
+      "name": "PG Electroplast Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 358
+    },
+    "PIIND": {
+      "symbol": "PIIND",
+      "name": "PI Industries Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 359
+    },
+    "PNBHOUSING": {
+      "symbol": "PNBHOUSING",
+      "name": "PNB Housing Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 360
+    },
+    "PTCIL": {
+      "symbol": "PTCIL",
+      "name": "PTC Industries Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 361
+    },
+    "PVRINOX": {
+      "symbol": "PVRINOX",
+      "name": "PVR INOX Ltd.",
+      "type": "stock",
+      "sector": "Media Entertainment & Publication",
+      "market_cap_rank": 362
+    },
+    "PAGEIND": {
+      "symbol": "PAGEIND",
+      "name": "Page Industries Ltd.",
+      "type": "stock",
+      "sector": "Textiles",
+      "market_cap_rank": 363
+    },
+    "PARADEEP": {
+      "symbol": "PARADEEP",
+      "name": "Paradeep Phosphates Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 364
+    },
+    "PATANJALI": {
+      "symbol": "PATANJALI",
+      "name": "Patanjali Foods Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 365
+    },
+    "PERSISTENT": {
+      "symbol": "PERSISTENT",
+      "name": "Persistent Systems Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 366
+    },
+    "PETRONET": {
+      "symbol": "PETRONET",
+      "name": "Petronet LNG Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 367
+    },
+    "PFIZER": {
+      "symbol": "PFIZER",
+      "name": "Pfizer Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 368
+    },
+    "PHOENIXLTD": {
+      "symbol": "PHOENIXLTD",
+      "name": "Phoenix Mills Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 369
+    },
+    "PWL": {
+      "symbol": "PWL",
+      "name": "Physicswallah Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 370
+    },
+    "PIDILITIND": {
+      "symbol": "PIDILITIND",
+      "name": "Pidilite Industries Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 371
+    },
+    "PINELABS": {
+      "symbol": "PINELABS",
+      "name": "Pine Labs Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 372
+    },
+    "PIRAMALFIN": {
+      "symbol": "PIRAMALFIN",
+      "name": "Piramal Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 373
+    },
+    "PPLPHARMA": {
+      "symbol": "PPLPHARMA",
+      "name": "Piramal Pharma Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 374
+    },
+    "POLYMED": {
+      "symbol": "POLYMED",
+      "name": "Poly Medicure Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 375
+    },
+    "POLYCAB": {
+      "symbol": "POLYCAB",
+      "name": "Polycab India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 376
+    },
+    "POONAWALLA": {
+      "symbol": "POONAWALLA",
+      "name": "Poonawalla Fincorp Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 377
+    },
+    "PFC": {
+      "symbol": "PFC",
+      "name": "Power Finance Corporation Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 378
+    },
+    "POWERGRID": {
+      "symbol": "POWERGRID",
+      "name": "Power Grid Corporation of India Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 379
+    },
+    "PREMIERENE": {
+      "symbol": "PREMIERENE",
+      "name": "Premier Energies Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 380
+    },
+    "PRESTIGE": {
+      "symbol": "PRESTIGE",
+      "name": "Prestige Estates Projects Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 381
+    },
+    "PFOCUS": {
+      "symbol": "PFOCUS",
+      "name": "Prime Focus Ltd.",
+      "type": "stock",
+      "sector": "Media Entertainment & Publication",
+      "market_cap_rank": 382
+    },
+    "PNB": {
+      "symbol": "PNB",
+      "name": "Punjab National Bank",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 383
+    },
+    "RRKABEL": {
+      "symbol": "RRKABEL",
+      "name": "R R Kabel Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 384
+    },
+    "RBLBANK": {
+      "symbol": "RBLBANK",
+      "name": "RBL Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 385
+    },
+    "RECLTD": {
+      "symbol": "RECLTD",
+      "name": "REC Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 386
+    },
+    "RHIM": {
+      "symbol": "RHIM",
+      "name": "RHI MAGNESITA INDIA LTD.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 387
+    },
+    "RITES": {
+      "symbol": "RITES",
+      "name": "RITES Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 388
+    },
+    "RADICO": {
+      "symbol": "RADICO",
+      "name": "Radico Khaitan Ltd",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 389
+    },
+    "RVNL": {
+      "symbol": "RVNL",
+      "name": "Rail Vikas Nigam Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 390
+    },
+    "RAILTEL": {
+      "symbol": "RAILTEL",
+      "name": "Railtel Corporation Of India Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 391
+    },
+    "RAINBOW": {
+      "symbol": "RAINBOW",
+      "name": "Rainbow Childrens Medicare Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 392
+    },
+    "RKFORGE": {
+      "symbol": "RKFORGE",
+      "name": "Ramkrishna Forgings Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 393
+    },
+    "REDINGTON": {
+      "symbol": "REDINGTON",
+      "name": "Redington Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 394
+    },
+    "RELIANCE": {
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries Ltd.",
+      "type": "stock",
+      "sector": "Oil Gas & Consumable Fuels",
+      "market_cap_rank": 395
+    },
+    "RPOWER": {
+      "symbol": "RPOWER",
+      "name": "Reliance Power Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 396
+    },
+    "SBFC": {
+      "symbol": "SBFC",
+      "name": "SBFC Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 397
+    },
+    "SBICARD": {
+      "symbol": "SBICARD",
+      "name": "SBI Cards and Payment Services Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 398
+    },
+    "SBILIFE": {
+      "symbol": "SBILIFE",
+      "name": "SBI Life Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 399
+    },
+    "SJVN": {
+      "symbol": "SJVN",
+      "name": "SJVN Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 400
+    },
+    "SRF": {
+      "symbol": "SRF",
+      "name": "SRF Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 401
+    },
+    "SAGILITY": {
+      "symbol": "SAGILITY",
+      "name": "Sagility Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 402
+    },
+    "SAILIFE": {
+      "symbol": "SAILIFE",
+      "name": "Sai Life Sciences Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 403
+    },
+    "SAMMAANCAP": {
+      "symbol": "SAMMAANCAP",
+      "name": "Sammaan Capital Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 404
+    },
+    "MOTHERSON": {
+      "symbol": "MOTHERSON",
+      "name": "Samvardhana Motherson International Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 405
+    },
+    "SAPPHIRE": {
+      "symbol": "SAPPHIRE",
+      "name": "Sapphire Foods India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 406
+    },
+    "SARDAEN": {
+      "symbol": "SARDAEN",
+      "name": "Sarda Energy and Minerals Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 407
+    },
+    "SAREGAMA": {
+      "symbol": "SAREGAMA",
+      "name": "Saregama India Ltd",
+      "type": "stock",
+      "sector": "Media Entertainment & Publication",
+      "market_cap_rank": 408
+    },
+    "SCHAEFFLER": {
+      "symbol": "SCHAEFFLER",
+      "name": "Schaeffler India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 409
+    },
+    "SCHNEIDER": {
+      "symbol": "SCHNEIDER",
+      "name": "Schneider Electric Infrastructure Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 410
+    },
+    "SCI": {
+      "symbol": "SCI",
+      "name": "Shipping Corporation of India Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 411
+    },
+    "SHREECEM": {
+      "symbol": "SHREECEM",
+      "name": "Shree Cement Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 412
+    },
+    "SHRIRAMFIN": {
+      "symbol": "SHRIRAMFIN",
+      "name": "Shriram Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 413
+    },
+    "SHYAMMETL": {
+      "symbol": "SHYAMMETL",
+      "name": "Shyam Metalics and Energy Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 414
+    },
+    "ENRIN": {
+      "symbol": "ENRIN",
+      "name": "Siemens Energy India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 415
+    },
+    "SIEMENS": {
+      "symbol": "SIEMENS",
+      "name": "Siemens Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 416
+    },
+    "SIGNATURE": {
+      "symbol": "SIGNATURE",
+      "name": "Signatureglobal (India) Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 417
+    },
+    "SOBHA": {
+      "symbol": "SOBHA",
+      "name": "Sobha Ltd.",
+      "type": "stock",
+      "sector": "Realty",
+      "market_cap_rank": 418
+    },
+    "SOLARINDS": {
+      "symbol": "SOLARINDS",
+      "name": "Solar Industries India Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 419
+    },
+    "SONACOMS": {
+      "symbol": "SONACOMS",
+      "name": "Sona BLW Precision Forgings Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 420
+    },
+    "SONATSOFTW": {
+      "symbol": "SONATSOFTW",
+      "name": "Sonata Software Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 421
+    },
+    "STARHEALTH": {
+      "symbol": "STARHEALTH",
+      "name": "Star Health and Allied Insurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 422
+    },
+    "SBIN": {
+      "symbol": "SBIN",
+      "name": "State Bank of India",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 423
+    },
+    "SAIL": {
+      "symbol": "SAIL",
+      "name": "Steel Authority of India Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 424
+    },
+    "SUMICHEM": {
+      "symbol": "SUMICHEM",
+      "name": "Sumitomo Chemical India Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 425
+    },
+    "SUNPHARMA": {
+      "symbol": "SUNPHARMA",
+      "name": "Sun Pharmaceutical Industries Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 426
+    },
+    "SUNTV": {
+      "symbol": "SUNTV",
+      "name": "Sun TV Network Ltd.",
+      "type": "stock",
+      "sector": "Media Entertainment & Publication",
+      "market_cap_rank": 427
+    },
+    "SUNDARMFIN": {
+      "symbol": "SUNDARMFIN",
+      "name": "Sundaram Finance Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 428
+    },
+    "SUPREMEIND": {
+      "symbol": "SUPREMEIND",
+      "name": "Supreme Industries Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 429
+    },
+    "SPLPETRO": {
+      "symbol": "SPLPETRO",
+      "name": "Supreme Petrochem Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 430
+    },
+    "SUZLON": {
+      "symbol": "SUZLON",
+      "name": "Suzlon Energy Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 431
+    },
+    "SWANCORP": {
+      "symbol": "SWANCORP",
+      "name": "Swan Corp Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 432
+    },
+    "SWIGGY": {
+      "symbol": "SWIGGY",
+      "name": "Swiggy Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 433
+    },
+    "SYNGENE": {
+      "symbol": "SYNGENE",
+      "name": "Syngene International Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 434
+    },
+    "SYRMA": {
+      "symbol": "SYRMA",
+      "name": "Syrma SGS Technology Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 435
+    },
+    "TBOTEK": {
+      "symbol": "TBOTEK",
+      "name": "TBO Tek Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 436
+    },
+    "TVSMOTOR": {
+      "symbol": "TVSMOTOR",
+      "name": "TVS Motor Company Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 437
+    },
+    "TATACAP": {
+      "symbol": "TATACAP",
+      "name": "Tata Capital Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 438
+    },
+    "TATACHEM": {
+      "symbol": "TATACHEM",
+      "name": "Tata Chemicals Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 439
+    },
+    "TATACOMM": {
+      "symbol": "TATACOMM",
+      "name": "Tata Communications Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 440
+    },
+    "TCS": {
+      "symbol": "TCS",
+      "name": "Tata Consultancy Services Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 441
+    },
+    "TATACONSUM": {
+      "symbol": "TATACONSUM",
+      "name": "Tata Consumer Products Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 442
+    },
+    "TATAELXSI": {
+      "symbol": "TATAELXSI",
+      "name": "Tata Elxsi Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 443
+    },
+    "TATAINVEST": {
+      "symbol": "TATAINVEST",
+      "name": "Tata Investment Corporation Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 444
+    },
+    "TMCV": {
+      "symbol": "TMCV",
+      "name": "Tata Motors Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 445
+    },
+    "TMPV": {
+      "symbol": "TMPV",
+      "name": "Tata Motors Passenger Vehicles Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 446
+    },
+    "TATAPOWER": {
+      "symbol": "TATAPOWER",
+      "name": "Tata Power Co. Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 447
+    },
+    "TATASTEEL": {
+      "symbol": "TATASTEEL",
+      "name": "Tata Steel Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 448
+    },
+    "TATATECH": {
+      "symbol": "TATATECH",
+      "name": "Tata Technologies Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 449
+    },
+    "TTML": {
+      "symbol": "TTML",
+      "name": "Tata Teleservices (Maharashtra) Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 450
+    },
+    "TECHM": {
+      "symbol": "TECHM",
+      "name": "Tech Mahindra Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 451
+    },
+    "TECHNOE": {
+      "symbol": "TECHNOE",
+      "name": "Techno Electric & Engineering Company Ltd.",
+      "type": "stock",
+      "sector": "Construction",
+      "market_cap_rank": 452
+    },
+    "TEGA": {
+      "symbol": "TEGA",
+      "name": "Tega Industries Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 453
+    },
+    "TEJASNET": {
+      "symbol": "TEJASNET",
+      "name": "Tejas Networks Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 454
+    },
+    "TENNIND": {
+      "symbol": "TENNIND",
+      "name": "Tenneco Clean Air India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 455
+    },
+    "NIACL": {
+      "symbol": "NIACL",
+      "name": "The New India Assurance Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 456
+    },
+    "RAMCOCEM": {
+      "symbol": "RAMCOCEM",
+      "name": "The Ramco Cements Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 457
+    },
+    "THERMAX": {
+      "symbol": "THERMAX",
+      "name": "Thermax Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 458
+    },
+    "TIMKEN": {
+      "symbol": "TIMKEN",
+      "name": "Timken India Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 459
+    },
+    "TITAGARH": {
+      "symbol": "TITAGARH",
+      "name": "Titagarh Rail Systems Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 460
+    },
+    "TITAN": {
+      "symbol": "TITAN",
+      "name": "Titan Company Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 461
+    },
+    "TORNTPHARM": {
+      "symbol": "TORNTPHARM",
+      "name": "Torrent Pharmaceuticals Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 462
+    },
+    "TORNTPOWER": {
+      "symbol": "TORNTPOWER",
+      "name": "Torrent Power Ltd.",
+      "type": "stock",
+      "sector": "Power",
+      "market_cap_rank": 463
+    },
+    "TARIL": {
+      "symbol": "TARIL",
+      "name": "Transformers And Rectifiers (India) Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 464
+    },
+    "TRAVELFOOD": {
+      "symbol": "TRAVELFOOD",
+      "name": "Travel Food Services Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 465
+    },
+    "TRENT": {
+      "symbol": "TRENT",
+      "name": "Trent Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 466
+    },
+    "TRIDENT": {
+      "symbol": "TRIDENT",
+      "name": "Trident Ltd.",
+      "type": "stock",
+      "sector": "Textiles",
+      "market_cap_rank": 467
+    },
+    "TRITURBINE": {
+      "symbol": "TRITURBINE",
+      "name": "Triveni Turbine Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 468
+    },
+    "TIINDIA": {
+      "symbol": "TIINDIA",
+      "name": "Tube Investments of India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 469
+    },
+    "UCOBANK": {
+      "symbol": "UCOBANK",
+      "name": "UCO Bank",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 470
+    },
+    "UNOMINDA": {
+      "symbol": "UNOMINDA",
+      "name": "UNO Minda Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 471
+    },
+    "UPL": {
+      "symbol": "UPL",
+      "name": "UPL Ltd.",
+      "type": "stock",
+      "sector": "Chemicals",
+      "market_cap_rank": 472
+    },
+    "UTIAMC": {
+      "symbol": "UTIAMC",
+      "name": "UTI Asset Management Company Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 473
+    },
+    "ULTRACEMCO": {
+      "symbol": "ULTRACEMCO",
+      "name": "UltraTech Cement Ltd.",
+      "type": "stock",
+      "sector": "Construction Materials",
+      "market_cap_rank": 474
+    },
+    "UNIONBANK": {
+      "symbol": "UNIONBANK",
+      "name": "Union Bank of India",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 475
+    },
+    "UBL": {
+      "symbol": "UBL",
+      "name": "United Breweries Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 476
+    },
+    "UNITDSPR": {
+      "symbol": "UNITDSPR",
+      "name": "United Spirits Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 477
+    },
+    "URBANCO": {
+      "symbol": "URBANCO",
+      "name": "Urban Company Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 478
+    },
+    "USHAMART": {
+      "symbol": "USHAMART",
+      "name": "Usha Martin Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 479
+    },
+    "VTL": {
+      "symbol": "VTL",
+      "name": "Vardhman Textiles Ltd.",
+      "type": "stock",
+      "sector": "Textiles",
+      "market_cap_rank": 480
+    },
+    "VBL": {
+      "symbol": "VBL",
+      "name": "Varun Beverages Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 481
+    },
+    "VEDL": {
+      "symbol": "VEDL",
+      "name": "Vedanta Ltd.",
+      "type": "stock",
+      "sector": "Metals & Mining",
+      "market_cap_rank": 482
+    },
+    "VIJAYA": {
+      "symbol": "VIJAYA",
+      "name": "Vijaya Diagnostic Centre Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 483
+    },
+    "VMM": {
+      "symbol": "VMM",
+      "name": "Vishal Mega Mart Ltd.",
+      "type": "stock",
+      "sector": "Consumer Services",
+      "market_cap_rank": 484
+    },
+    "IDEA": {
+      "symbol": "IDEA",
+      "name": "Vodafone Idea Ltd.",
+      "type": "stock",
+      "sector": "Telecommunication",
+      "market_cap_rank": 485
+    },
+    "VOLTAS": {
+      "symbol": "VOLTAS",
+      "name": "Voltas Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 486
+    },
+    "WAAREEENER": {
+      "symbol": "WAAREEENER",
+      "name": "Waaree Energies Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 487
+    },
+    "WELCORP": {
+      "symbol": "WELCORP",
+      "name": "Welspun Corp Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 488
+    },
+    "WELSPUNLIV": {
+      "symbol": "WELSPUNLIV",
+      "name": "Welspun Living Ltd.",
+      "type": "stock",
+      "sector": "Textiles",
+      "market_cap_rank": 489
+    },
+    "WHIRLPOOL": {
+      "symbol": "WHIRLPOOL",
+      "name": "Whirlpool of India Ltd.",
+      "type": "stock",
+      "sector": "Consumer Durables",
+      "market_cap_rank": 490
+    },
+    "WIPRO": {
+      "symbol": "WIPRO",
+      "name": "Wipro Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 491
+    },
+    "WOCKPHARMA": {
+      "symbol": "WOCKPHARMA",
+      "name": "Wockhardt Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 492
+    },
+    "YESBANK": {
+      "symbol": "YESBANK",
+      "name": "Yes Bank Ltd.",
+      "type": "stock",
+      "sector": "Financial Services",
+      "market_cap_rank": 493
+    },
+    "ZFCVINDIA": {
+      "symbol": "ZFCVINDIA",
+      "name": "ZF Commercial Vehicle Control Systems India Ltd.",
+      "type": "stock",
+      "sector": "Automobile and Auto Components",
+      "market_cap_rank": 494
+    },
+    "ZEEL": {
+      "symbol": "ZEEL",
+      "name": "Zee Entertainment Enterprises Ltd.",
+      "type": "stock",
+      "sector": "Media Entertainment & Publication",
+      "market_cap_rank": 495
+    },
+    "ZENTEC": {
+      "symbol": "ZENTEC",
+      "name": "Zen Technologies Ltd.",
+      "type": "stock",
+      "sector": "Capital Goods",
+      "market_cap_rank": 496
+    },
+    "ZENSARTECH": {
+      "symbol": "ZENSARTECH",
+      "name": "Zensar Technolgies Ltd.",
+      "type": "stock",
+      "sector": "Information Technology",
+      "market_cap_rank": 497
+    },
+    "ZYDUSLIFE": {
+      "symbol": "ZYDUSLIFE",
+      "name": "Zydus Lifesciences Ltd.",
+      "type": "stock",
+      "sector": "Healthcare",
+      "market_cap_rank": 498
+    },
+    "ZYDUSWELL": {
+      "symbol": "ZYDUSWELL",
+      "name": "Zydus Wellness Ltd.",
+      "type": "stock",
+      "sector": "Fast Moving Consumer Goods",
+      "market_cap_rank": 499
+    },
+    "ECLERX": {
+      "symbol": "ECLERX",
+      "name": "eClerx Services Ltd.",
+      "type": "stock",
+      "sector": "Services",
+      "market_cap_rank": 500
+    },
+    "TATAMOTORS": {
+      "symbol": "TATAMOTORS",
+      "name": "Tata Motors Ltd",
+      "type": "stock",
+      "sector": "Automobile & Auto Components",
+      "market_cap_rank": 999
+    },
+    "ZOMATO": {
+      "symbol": "ZOMATO",
+      "name": "Zomato Ltd / Eternal",
+      "type": "stock",
+      "sector": "Services & Retail",
+      "market_cap_rank": 999
+    }
+  },
+  "etfs": {
+    "NIFTYBEES": {
+      "symbol": "NIFTYBEES",
+      "name": "Nippon India ETF Nifty 50 BeES",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "BANKBEES": {
+      "symbol": "BANKBEES",
+      "name": "Nippon India ETF Bank BeES",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "GOLDBEES": {
+      "symbol": "GOLDBEES",
+      "name": "Nippon India ETF Gold BeES",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "SILVERBEES": {
+      "symbol": "SILVERBEES",
+      "name": "Nippon India ETF Silver BeES",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "JUNIORBEES": {
+      "symbol": "JUNIORBEES",
+      "name": "Nippon India ETF Nifty Next 50",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "MON100": {
+      "symbol": "MON100",
+      "name": "Motilal Oswal Nasdaq 100 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "ITBEES": {
+      "symbol": "ITBEES",
+      "name": "Nippon India ETF Nifty IT",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "PHARMABEES": {
+      "symbol": "PHARMABEES",
+      "name": "Nippon India ETF Nifty Pharma",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "AUTOBEES": {
+      "symbol": "AUTOBEES",
+      "name": "Nippon India ETF Nifty Auto",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "MID150BEES": {
+      "symbol": "MID150BEES",
+      "name": "Nippon India ETF Nifty Midcap 150",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "LIQUIDBEES": {
+      "symbol": "LIQUIDBEES",
+      "name": "Nippon India ETF Liquid BeES",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "CPSEETF": {
+      "symbol": "CPSEETF",
+      "name": "CPSE ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "BHARAT22": {
+      "symbol": "BHARAT22",
+      "name": "Bharat 22 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "MAFANG": {
+      "symbol": "MAFANG",
+      "name": "Mirae Asset NYSE FANG+ ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "MASPTOP50": {
+      "symbol": "MASPTOP50",
+      "name": "Mirae Asset S&P 500 Top 50 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "HDFCNIFTY": {
+      "symbol": "HDFCNIFTY",
+      "name": "HDFC Nifty 50 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "ICICINIFTY": {
+      "symbol": "ICICINIFTY",
+      "name": "ICICI Prudential Nifty 50 ETF",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    },
+    "SETFNIF50": {
+      "symbol": "SETFNIF50",
+      "name": "SBI ETF Nifty 50",
+      "type": "etf",
+      "sector": "Broad Market ETF",
+      "category": "Exchange Traded Fund"
+    }
+  },
+  "mutual_funds": {
+    "PPFCF": {
+      "symbol": "PPFCF",
+      "name": "Parag Parikh Flexi Cap Fund",
+      "type": "mf",
+      "amc": "PPFAS Mutual Fund",
+      "category": "Flexi Cap",
+      "sector": "Mutual Fund"
+    },
+    "SBICAP": {
+      "symbol": "SBICAP",
+      "name": "SBI Bluechip Fund",
+      "type": "mf",
+      "amc": "SBI Mutual Fund",
+      "category": "Large Cap",
+      "sector": "Mutual Fund"
+    },
+    "AXISMID": {
+      "symbol": "AXISMID",
+      "name": "Axis Midcap Fund",
+      "type": "mf",
+      "amc": "Axis Mutual Fund",
+      "category": "Mid Cap",
+      "sector": "Mutual Fund"
+    },
+    "HDFCTOP": {
+      "symbol": "HDFCTOP",
+      "name": "HDFC Top 100 Fund",
+      "type": "mf",
+      "amc": "HDFC Mutual Fund",
+      "category": "Large Cap",
+      "sector": "Mutual Fund"
+    },
+    "ICICIPRU": {
+      "symbol": "ICICIPRU",
+      "name": "ICICI Prudential Bluechip Fund",
+      "type": "mf",
+      "amc": "ICICI Prudential Mutual Fund",
+      "category": "Large Cap",
+      "sector": "Mutual Fund"
+    },
+    "MIRAEASSET": {
+      "symbol": "MIRAEASSET",
+      "name": "Mirae Asset Large Cap Fund",
+      "type": "mf",
+      "amc": "Mirae Asset Mutual Fund",
+      "category": "Large Cap",
+      "sector": "Mutual Fund"
+    },
+    "NIPPONSMALL": {
+      "symbol": "NIPPONSMALL",
+      "name": "Nippon India Small Cap Fund",
+      "type": "mf",
+      "amc": "Nippon India Mutual Fund",
+      "category": "Small Cap",
+      "sector": "Mutual Fund"
+    },
+    "QUANTLONG": {
+      "symbol": "QUANTLONG",
+      "name": "Quant Active Fund",
+      "type": "mf",
+      "amc": "Quant Mutual Fund",
+      "category": "Multi Cap",
+      "sector": "Mutual Fund"
+    },
+    "UTINIFTY": {
+      "symbol": "UTINIFTY",
+      "name": "UTI Nifty 50 Index Fund",
+      "type": "mf",
+      "amc": "UTI Mutual Fund",
+      "category": "Index Fund",
+      "sector": "Mutual Fund"
+    }
+  }
+}
