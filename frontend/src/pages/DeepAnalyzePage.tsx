@@ -201,6 +201,12 @@ export const DeepAnalyzePage: React.FC = () => {
             <div className="flex items-center space-x-3">
               <h2 className="text-3xl font-heading font-semibold text-tx-primary tracking-tight">{metricsData.symbol.toUpperCase()}</h2>
               <span className="font-mono text-xs text-accent bg-accent-light border border-accent/20 px-2 py-0.5 rounded">{metricsData.ticker}</span>
+              {metricsData.agent_data?.current?.price && (
+                <div className="ml-auto text-2xl font-mono font-medium text-tx-primary tabular-nums">
+                  {metricsData.agent_data.current.currency === 'INR' ? '₹' : '$'}
+                  {metricsData.agent_data.current.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              )}
             </div>
             {synthesisData && (
               <p className="text-lg text-semantic-green font-medium">Overall Assessment: {synthesisData.overall_assessment || 'N/A'}</p>
