@@ -88,11 +88,11 @@ async def get_key_statistics(
         ) from e
 
 
-@router.get("/deep-analyze/{symbol}", summary="Get all available yfinance data for a company")
-async def get_deep_analyze(
+@router.get("/deep-analyze/{symbol}/metrics", summary="Get all available raw metrics and agent data")
+async def get_deep_analyze_metrics(
     symbol: str, service: MarketService = Depends(get_market_service)
 ) -> dict:
-    """Return all available financial data for deep analysis display."""
+    """Return all available financial metrics for deep analysis display."""
     import asyncio
     try:
         ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
@@ -185,12 +185,10 @@ async def get_deep_analyze(
                 
             fi_service = FinancialIntelligenceService()
             metrics = fi_service.normalize_metrics(ticker_symbol, fast_info_obj, fin, bs, info)
-            report = fi_service.generate_intelligence_report(ticker_symbol, metrics)
             agent_data = fi_service.extract_agent_data(ticker_symbol, fast_info_obj, fin, bs)
             
             return {
                 "metrics": metrics,
-                **report,
                 "agent_data": agent_data,
             }
         
@@ -199,7 +197,92 @@ async def get_deep_analyze(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Deep analyze data unavailable for '{symbol}'. Reason: {str(e)}",
+            detail=f"Deep analyze metrics unavailable for '{symbol}'. Reason: {str(e)}",
+        ) from e
+
+
+@router.get("/deep-analyze/{symbol}/synthesis", summary="Get LLM synthesis report for a company")
+async def get_deep_analyze_synthesis(
+    symbol: str, service: MarketService = Depends(get_market_service)
+) -> dict:
+    """Return the LLM generated deep analysis report."""
+    import asyncio
+    try:
+        ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
+        
+        def _fetch_synthesis():
+            import pandas as pd
+            from app.services.financial_intelligence import FinancialIntelligenceService
+            
+            fin = None
+            bs = None
+            fast_info_obj = None
+            info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
+            
+            try:
+                from yahooquery import Ticker as YQTicker
+                yq = YQTicker(ticker_symbol)
+                inc = yq.income_statement(frequency="a")
+                bsheet = yq.balance_sheet(frequency="a")
+                
+                def _format_yq_statement(df):
+                    if not isinstance(df, pd.DataFrame) or df.empty: return None
+                    if isinstance(df.index, pd.MultiIndex): df = df.droplevel(0)
+                    elif getattr(df.index, 'name', None) == 'symbol': df = df.reset_index(drop=True)
+                    if 'periodType' in df.columns: df = df[df['periodType'] == '12M']
+                    if 'asOfDate' in df.columns:
+                        df = df.sort_values('asOfDate', ascending=False)
+                        df = df.set_index('asOfDate')
+                    return df.T
+                
+                fin = _format_yq_statement(inc)
+                bs = _format_yq_statement(bsheet)
+                
+                price_data = yq.price.get(ticker_symbol, {})
+                stats = yq.key_stats.get(ticker_symbol, {})
+                class FastInfoProxy: pass
+                fast_info_obj = FastInfoProxy()
+                if isinstance(price_data, dict):
+                    fast_info_obj.last_price = price_data.get("regularMarketPrice")
+                    fast_info_obj.market_cap = price_data.get("marketCap")
+                    fast_info_obj.currency = price_data.get("currency", "INR")
+                if isinstance(stats, dict): fast_info_obj.shares = stats.get("sharesOutstanding")
+                detail = yq.summary_detail.get(ticker_symbol, {})
+                if isinstance(detail, dict):
+                    fast_info_obj.year_high = detail.get("fiftyTwoWeekHigh")
+                    fast_info_obj.year_low = detail.get("fiftyTwoWeekLow")
+                    fast_info_obj.last_volume = detail.get("volume")
+                    if not hasattr(fast_info_obj, 'last_price') or not fast_info_obj.last_price:
+                        fast_info_obj.last_price = detail.get("regularMarketPrice")
+            except Exception as e:
+                from app.utils import get_logger
+                get_logger("finnai.market_synthesis").warning(f"yahooquery failed for {ticker_symbol}: {e}. Trying yfinance...")
+                try:
+                    import yfinance as yf
+                    t = yf.Ticker(ticker_symbol, session=service.repository.session)
+                    fin = t.financials
+                    bs = t.balance_sheet
+                    fast_info_obj = getattr(t, "fast_info", {})
+                    try:
+                        yf_info = t.info
+                        if isinstance(yf_info, dict):
+                            for k, v in yf_info.items():
+                                if k not in info or info[k] is None: info[k] = v
+                    except Exception: pass
+                except Exception as e2:
+                    get_logger("finnai.market_synthesis").warning(f"yfinance failed for {ticker_symbol}: {e2}")
+                
+            fi_service = FinancialIntelligenceService()
+            metrics = fi_service.normalize_metrics(ticker_symbol, fast_info_obj, fin, bs, info)
+            report = fi_service.generate_intelligence_report(ticker_symbol, metrics)
+            return report
+        
+        report_data = await asyncio.to_thread(_fetch_synthesis)
+        return {"symbol": symbol, "ticker": ticker_symbol, **report_data}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Synthesis unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
 
 
@@ -219,12 +302,12 @@ def _calculate_avg_growth(values: list) -> float:
 @router.get("/deep-analyze/{symbol}/all", summary="Get all agent structured data")
 async def get_agent_all(symbol: str, service: MarketService = Depends(get_market_service)):
     import datetime
-    res = await get_deep_analyze(symbol, service)
+    res = await get_deep_analyze_metrics(symbol, service)
     return {"status": "ok", "data": res.get("agent_data"), "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()}
 
 @router.get("/deep-analyze/{symbol}/valuation", summary="Get agent valuation data")
 async def get_agent_valuation(symbol: str, service: MarketService = Depends(get_market_service)):
-    res = await get_deep_analyze(symbol, service)
+    res = await get_deep_analyze_metrics(symbol, service)
     ad = res.get("agent_data", {})
     return {
         "status": "ok",
@@ -244,7 +327,7 @@ async def get_agent_valuation(symbol: str, service: MarketService = Depends(get_
 
 @router.get("/deep-analyze/{symbol}/growth", summary="Get agent growth data")
 async def get_agent_growth(symbol: str, service: MarketService = Depends(get_market_service)):
-    res = await get_deep_analyze(symbol, service)
+    res = await get_deep_analyze_metrics(symbol, service)
     ad = res.get("agent_data", {})
     fins = ad.get("financials", [])
     
@@ -288,7 +371,7 @@ async def get_agent_growth(symbol: str, service: MarketService = Depends(get_mar
 
 @router.get("/deep-analyze/{symbol}/health", summary="Get agent health data")
 async def get_agent_health(symbol: str, service: MarketService = Depends(get_market_service)):
-    res = await get_deep_analyze(symbol, service)
+    res = await get_deep_analyze_metrics(symbol, service)
     ad = res.get("agent_data", {})
     health = ad.get("health", {})
     fins = ad.get("financials", [])
@@ -335,7 +418,7 @@ async def get_agent_health(symbol: str, service: MarketService = Depends(get_mar
 
 @router.get("/deep-analyze/{symbol}/summary", summary="Get agent summary data")
 async def get_agent_summary(symbol: str, service: MarketService = Depends(get_market_service)):
-    res = await get_deep_analyze(symbol, service)
+    res = await get_deep_analyze_metrics(symbol, service)
     ad = res.get("agent_data", {})
     health = ad.get("health", {})
     fins = ad.get("financials", [])

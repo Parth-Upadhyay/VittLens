@@ -51,8 +51,8 @@ class MarketAgent(BaseAgent):
             stats = await self.market_service.get_key_stats(symbol)
             
             try:
-                from app.api.v1.endpoints.market import get_deep_analyze
-                deep = await get_deep_analyze(symbol, self.market_service)
+                from app.api.v1.endpoints.market import get_deep_analyze_metrics
+                deep = await get_deep_analyze_metrics(symbol, self.market_service)
                 deep_metrics = deep.get("metrics", [])
             except Exception as e:
                 logger.warning(f"Failed to fetch deep analyze data for {symbol}: {e}")
