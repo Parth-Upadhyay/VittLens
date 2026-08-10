@@ -46,17 +46,17 @@ class FinancialIntelligenceService:
         is_currency_mismatch = currency and financial_currency and currency != financial_currency
 
         # Current values
-        net_income = self._get_val(financials, "Net Income")
-        total_revenue = self._get_val(financials, "Total Revenue")
-        operating_income = self._get_val(financials, "Operating Income")
-        ebitda = self._get_val(financials, "EBITDA") or self._get_val(financials, "Normalized EBITDA")
+        net_income = self._get_val(financials, "Net Income") or self._get_val(financials, "NetIncome")
+        total_revenue = self._get_val(financials, "Total Revenue") or self._get_val(financials, "TotalRevenue")
+        operating_income = self._get_val(financials, "Operating Income") or self._get_val(financials, "OperatingIncome")
+        ebitda = self._get_val(financials, "EBITDA") or self._get_val(financials, "Normalized EBITDA") or self._get_val(financials, "NormalizedEBITDA")
         ebit = self._get_val(financials, "EBIT") or operating_income
 
-        equity = self._get_val(balance_sheet, "Stockholders Equity") or self._get_val(balance_sheet, "Total Equity Gross Minority Interest")
-        total_assets = self._get_val(balance_sheet, "Total Assets")
-        current_liabilities = self._get_val(balance_sheet, "Current Liabilities")
-        total_debt = self._get_val(balance_sheet, "Total Debt")
-        total_cash = self._get_val(balance_sheet, "Cash And Cash Equivalents") or self._get_val(balance_sheet, "Cash Cash Equivalents And Short Term Investments")
+        equity = self._get_val(balance_sheet, "Stockholders Equity") or self._get_val(balance_sheet, "StockholdersEquity") or self._get_val(balance_sheet, "Total Equity Gross Minority Interest") or self._get_val(balance_sheet, "TotalEquityGrossMinorityInterest")
+        total_assets = self._get_val(balance_sheet, "Total Assets") or self._get_val(balance_sheet, "TotalAssets")
+        current_liabilities = self._get_val(balance_sheet, "Current Liabilities") or self._get_val(balance_sheet, "CurrentLiabilities")
+        total_debt = self._get_val(balance_sheet, "Total Debt") or self._get_val(balance_sheet, "TotalDebt")
+        total_cash = self._get_val(balance_sheet, "Cash And Cash Equivalents") or self._get_val(balance_sheet, "CashAndCashEquivalents") or self._get_val(balance_sheet, "Cash Cash Equivalents And Short Term Investments") or self._get_val(balance_sheet, "CashCashEquivalentsAndShortTermInvestments")
 
         price = getattr(fast_info, "last_price", None)
         market_cap = getattr(fast_info, "market_cap", None)

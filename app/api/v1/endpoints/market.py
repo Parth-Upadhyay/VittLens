@@ -114,16 +114,29 @@ async def get_deep_analyze(
                 inc = yq.income_statement(frequency="a")
                 bsheet = yq.balance_sheet(frequency="a")
                 
-                if isinstance(inc, pd.DataFrame) and not inc.empty:
-                    if isinstance(inc.index, pd.MultiIndex):
-                        inc = inc.droplevel(0)
-                    # Transpose so yahooquery matches yfinance's (row=metric, col=date) layout
-                    fin = inc.T
+                def _format_yq_statement(df):
+                    if not isinstance(df, pd.DataFrame) or df.empty:
+                        return None
+                    # Drop symbol index if it exists
+                    if isinstance(df.index, pd.MultiIndex):
+                        df = df.droplevel(0)
+                    elif getattr(df.index, 'name', None) == 'symbol':
+                        df = df.reset_index(drop=True)
+                        
+                    if 'periodType' in df.columns:
+                        df = df[df['periodType'] == '12M']
+                        
+                    if 'asOfDate' in df.columns:
+                        # Sort by date descending (newest first)
+                        df = df.sort_values('asOfDate', ascending=False)
+                        # Set asOfDate as the index
+                        df = df.set_index('asOfDate')
                     
-                if isinstance(bsheet, pd.DataFrame) and not bsheet.empty:
-                    if isinstance(bsheet.index, pd.MultiIndex):
-                        bsheet = bsheet.droplevel(0)
-                    bs = bsheet.T
+                    # Transpose so metrics are rows, dates are columns
+                    return df.T
+                
+                fin = _format_yq_statement(inc)
+                bs = _format_yq_statement(bsheet)
                     
                 # Build a minimal fast_info-like object from yahooquery
                 price_data = yq.price.get(ticker_symbol, {})
