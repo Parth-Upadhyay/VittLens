@@ -11,7 +11,6 @@ from app.config.settings import Settings
 from app.schemas import AgentContext, MarketAgentResult
 from app.schemas import CompanyInfo, HistoricalData, KeyStatistics, StockQuote
 from app.services.market_service import MarketService
-from app.api.v1.endpoints.market import get_deep_analyze
 from app.utils import get_logger
 
 logger = get_logger("finnai.agents.market")
@@ -52,6 +51,7 @@ class MarketAgent(BaseAgent):
             stats = await self.market_service.get_key_stats(symbol)
             
             try:
+                from app.api.v1.endpoints.market import get_deep_analyze
                 deep = await get_deep_analyze(symbol, self.market_service)
                 deep_metrics = deep.get("metrics", [])
             except Exception as e:
