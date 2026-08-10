@@ -360,7 +360,7 @@ export const DeepAnalyzePage: React.FC = () => {
                     {deepData.agent_data.financials.slice().reverse().slice(-3).reverse().map(yr => (
                       <div key={yr.year} className="flex justify-between items-center text-sm pt-1">
                         <span className="text-tx-secondary w-10 font-medium">{yr.year}</span>
-                        <span className="text-tx-primary font-mono text-right flex-1">{formatValue(yr.revenue, 'large_currency', deepData.agent_data.current.currency === 'INR' ? '₹' : '$')}</span>
+                        <span className="text-tx-primary font-mono text-right flex-1">{formatValue(yr.revenue, 'large_currency', deepData.agent_data?.current.currency === 'INR' ? '₹' : '$')}</span>
                         <span className="text-semantic-green font-mono text-right w-16">{yr.operatingMargin ? (yr.operatingMargin * 100).toFixed(1) + '%' : 'N/A'}</span>
                       </div>
                     ))}
