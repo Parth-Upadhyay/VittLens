@@ -94,7 +94,7 @@ export const DeepAnalyzePage: React.FC = () => {
       const result = await MarketService.deepAnalyze(sym);
       setDeepData(result);
     } catch {
-      toast.error('[Beta] Yahoo query finance doesn\\'t have this data at the moment.', {
+      toast.error("[Beta] Yahoo query finance doesn't have this data at the moment.", {
         style: {
           background: 'var(--bg-secondary)',
           color: 'var(--tx-primary)',

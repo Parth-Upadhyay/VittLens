@@ -84,12 +84,16 @@ export const CompanyDetailPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-5">
-            {quote && (
+            {quote && quote.price > 0 ? (
               <div className="text-right">
                 <div className="text-3xl font-semibold text-tx-primary font-mono tabular-nums tracking-tight">₹{quote.price.toLocaleString()}</div>
                 <div className={`text-sm font-mono tabular-nums font-medium ${quote.change >= 0 ? 'text-semantic-green' : 'text-semantic-red'}`}>
                   {quote.change >= 0 ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
                 </div>
+              </div>
+            ) : (
+              <div className="text-right max-w-[200px] text-xs text-tx-tertiary bg-bg-tertiary px-3 py-1.5 rounded-lg border border-border">
+                Stock data not available on data provider platform
               </div>
             )}
             <button
