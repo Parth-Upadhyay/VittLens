@@ -106,13 +106,14 @@ async def get_deep_analyze(
                 fin = t.financials
                 bs = t.balance_sheet
                 fast_info = getattr(t, "fast_info", {})
+                info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
             except Exception as e:
                 from app.utils import get_logger
                 get_logger("finnai.market_deep_analyze").warning(f"Failed to fetch statements for {ticker_symbol}: {e}")
-                fin, bs, fast_info = None, None, {}
+                fin, bs, fast_info, info = None, None, {}, {}
                 
             fi_service = FinancialIntelligenceService()
-            metrics = fi_service.normalize_metrics(ticker_symbol, fast_info, fin, bs)
+            metrics = fi_service.normalize_metrics(ticker_symbol, fast_info, fin, bs, info)
             report = fi_service.generate_intelligence_report(ticker_symbol, metrics)
             
             return {

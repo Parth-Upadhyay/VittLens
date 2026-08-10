@@ -36,8 +36,14 @@ class FinancialIntelligenceService:
             return None
         return ((current_val / past_val) ** (1 / years)) - 1
 
-    def normalize_metrics(self, ticker_symbol: str, fast_info: Any, financials: Any, balance_sheet: Any) -> List[Dict[str, Any]]:
+    def normalize_metrics(self, ticker_symbol: str, fast_info: Any, financials: Any, balance_sheet: Any, info: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         metrics = []
+        info = info or {}
+
+        # Currency mismatch check
+        currency = info.get("currency") or getattr(fast_info, "currency", None)
+        financial_currency = info.get("financialCurrency")
+        is_currency_mismatch = currency and financial_currency and currency != financial_currency
 
         # Current values
         net_income = self._get_val(financials, "Net Income")
@@ -83,18 +89,35 @@ class FinancialIntelligenceService:
             add_metric("Market Snapshot", "52WPosition", "52W Position", position, "%", "percent")
 
         # Valuation
-        eps = None
-        if net_income and shares and shares != 0:
-            eps = net_income / shares
-            if price and eps > 0:
-                pe = price / eps
-                add_metric("Valuation", "peRatio", "P/E Ratio", pe, "x", "multiple")
+        pe = info.get("trailingPE")
+        pb = info.get("priceToBook")
+        peg = info.get("pegRatio")
+        dividend_yield = info.get("dividendYield")
+        eps = info.get("trailingEps")
+
+        if eps is None and net_income and shares and shares != 0:
+            if not is_currency_mismatch:
+                eps = net_income / shares
         
-        if market_cap and equity and equity > 0:
+        if pe is not None:
+            add_metric("Valuation", "peRatio", "P/E Ratio", pe, "x", "multiple")
+        elif not is_currency_mismatch and price and eps and eps > 0:
+            pe = price / eps
+            add_metric("Valuation", "peRatio", "P/E Ratio", pe, "x", "multiple")
+        
+        if pb is not None:
+            add_metric("Valuation", "priceToBook", "Price to Book", pb, "x", "multiple")
+        elif not is_currency_mismatch and market_cap and equity and equity > 0:
             add_metric("Valuation", "priceToBook", "Price to Book", market_cap / equity, "x", "multiple")
+
+        if peg is not None:
+            add_metric("Valuation", "pegRatio", "PEG Ratio", peg, "x", "multiple")
+        
+        if dividend_yield is not None:
+            add_metric("Valuation", "dividendYield", "Dividend Yield", dividend_yield, "%", "percent")
             
         ev = None
-        if market_cap and total_debt is not None and total_cash is not None:
+        if not is_currency_mismatch and market_cap and total_debt is not None and total_cash is not None:
             ev = market_cap + total_debt - total_cash
             add_metric("Valuation", "enterpriseValue", "Enterprise Value", ev, "₹", "large_currency")
             if total_revenue and total_revenue > 0:
@@ -105,7 +128,7 @@ class FinancialIntelligenceService:
         # Growth
         if financials is not None and len(financials.columns) >= 2:
             prev_revenue = self._get_val(financials, "Total Revenue", 1)
-            prev_eps = (self._get_val(financials, "Net Income", 1) / shares) if (self._get_val(financials, "Net Income", 1) and shares) else None
+            prev_eps = (self._get_val(financials, "Net Income", 1) / shares) if (self._get_val(financials, "Net Income", 1) and shares and not is_currency_mismatch) else None
             
             if total_revenue and prev_revenue and prev_revenue > 0:
                 add_metric("Growth", "revenueGrowth", "Revenue Growth (YoY)", (total_revenue - prev_revenue) / prev_revenue, "%", "percent")

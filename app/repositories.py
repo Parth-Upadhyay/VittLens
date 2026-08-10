@@ -547,16 +547,20 @@ class MarketRepository:
                 cap_emp = total_assets - current_liabilities
                 if cap_emp != 0: roce = ebit / cap_emp
 
+            currency = info.get("currency") or getattr(fast_info, "currency", None)
+            financial_currency = info.get("financialCurrency")
+            is_currency_mismatch = currency and financial_currency and currency != financial_currency
+
             pb_ratio = info.get("priceToBook")
-            if pb_ratio is None and market_cap is not None and equity is not None and equity != 0:
+            if pb_ratio is None and not is_currency_mismatch and market_cap is not None and equity is not None and equity != 0:
                 pb_ratio = market_cap / equity
                 
             eps = info.get("trailingEps")
-            if eps is None and net_income is not None and shares and shares != 0:
+            if eps is None and not is_currency_mismatch and net_income is not None and shares and shares != 0:
                 eps = net_income / shares
                 
             pe = info.get("trailingPE")
-            if pe is None and price is not None and eps is not None and eps != 0:
+            if pe is None and not is_currency_mismatch and price is not None and eps is not None and eps != 0:
                 pe = price / eps
                 
             profit_margins = info.get("profitMargins")
