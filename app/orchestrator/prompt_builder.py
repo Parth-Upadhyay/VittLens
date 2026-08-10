@@ -105,7 +105,10 @@ class OrchestratorPromptBuilder:
 
         # Inject queried symbols banner at the very top so the LLM knows what the user asked about
         if queried_symbols:
-            sym_list = ", ".join(queried_symbols)
+            from app.utils import CompanyNormalizer
+            normalizer = CompanyNormalizer()
+            named_symbols = [f"{sym} ({normalizer.get_primary_name(sym)})" for sym in queried_symbols]
+            sym_list = ", ".join(named_symbols)
             is_multi = len(queried_symbols) > 1
             table_hint = (
                 f"Output a side-by-side comparison table for these {len(queried_symbols)} stocks."
@@ -258,8 +261,8 @@ class OrchestratorPromptBuilder:
         is_multi = queried_symbols and len(queried_symbols) > 1
         table_rule = (
             "Output ONE side-by-side Markdown table comparing prices, market caps, P/E, ROE, and margins "
-            f"for ONLY these stocks: {', '.join(queried_symbols or [])}." if is_multi
-            else f"Output ONE single-stock factsheet table for ONLY {(queried_symbols or ['the queried stock'])[0]}. "
+            f"for ONLY these stocks: {sym_list if queried_symbols else ''}." if is_multi
+            else f"Output ONE single-stock factsheet table for ONLY {sym_list if queried_symbols else 'the queried stock'}. "
                  "Do NOT add rows for other companies."
         )
         prompt_parts.append(
@@ -274,7 +277,8 @@ class OrchestratorPromptBuilder:
             "Reference specific event titles and their sector impacts when discussing the queried stock's outlook. "
             "Other macro events (background context) should inform the broader market environment section only. "
             "Do NOT let background macro watchlist companies become the primary subject — focus stays on the queried stock(s).\n"
-            "7. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below."
+            "7. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"
+            "8. USE REAL NAMES: Always refer to the company by its real descriptive name (e.g. Hindustan Unilever) in your text instead of its raw ticker symbol. Do NOT invent parent companies."
         )
 
         return "\n".join(prompt_parts)
