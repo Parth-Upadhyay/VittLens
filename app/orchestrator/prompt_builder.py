@@ -49,7 +49,7 @@ class OrchestratorPromptBuilder:
             return "N/A"
 
         cap_in_crores = raw_cap / 10_000_000.0
-        cap_in_lakh_crores = raw_cap / 1_0_000_000_000_000.0
+        cap_in_lakh_crores = raw_cap / 1_000_000_000_000.0
 
         if cap_in_lakh_crores >= 1.0:
             return f"₹{cap_in_lakh_crores:.2f} Lakh Crores (₹{cap_in_crores:,.0f} Crores)"
@@ -271,14 +271,15 @@ class OrchestratorPromptBuilder:
             f"2. TABLE: {table_rule}\n"
             "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or '[Evidence Chunk...' tags. Extract clear factual points as narrative.\n"
             "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
-            "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
-            "6. MACRO & NEWS WEIGHTAGE (CRITICAL): "
+            "5. STRICT NO HALLUCINATION: You MUST NOT invent, guess, or use external knowledge for any numbers (Price, Market Cap, P/E, Margins). Use ONLY the exact numbers provided in this prompt under 'REAL-TIME MARKET DATA' and 'FINANCIAL RATIOS'. If a metric is missing or 'N/A', state 'N/A'. DO NOT fill in gaps with pre-trained knowledge.\n"
+            "6. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
+            "7. MACRO & NEWS WEIGHTAGE (CRITICAL): "
             "Any macro events marked ⚡ DIRECTLY RELEVANT carry EQUAL weight to real-time market data — treat them as primary inputs in your analysis, not footnotes. "
             "Reference specific event titles and their sector impacts when discussing the queried stock's outlook. "
             "Other macro events (background context) should inform the broader market environment section only. "
             "Do NOT let background macro watchlist companies become the primary subject — focus stays on the queried stock(s).\n"
-            "7. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"
-            "8. USE REAL NAMES: Always refer to the company by its real descriptive name (e.g. Hindustan Unilever) in your text instead of its raw ticker symbol. Do NOT invent parent companies."
+            "8. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"
+            "9. USE REAL NAMES: Always refer to the company by its real descriptive name (e.g. Hindustan Unilever) in your text instead of its raw ticker symbol. Do NOT invent parent companies."
         )
 
         return "\n".join(prompt_parts)
