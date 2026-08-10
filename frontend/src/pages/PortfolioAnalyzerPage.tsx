@@ -196,6 +196,9 @@ export const PortfolioAnalyzerPage: React.FC = () => {
           <div className="flex items-center space-x-3">
             <PieIcon className="w-6 h-6 text-accent" />
             <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Portfolio Analyzer</h1>
+            <span className="text-xs font-mono bg-bg-tertiary text-tx-tertiary px-2 py-1 rounded-md border border-border">
+              In Progress
+            </span>
           </div>
           <p className="text-sm text-tx-secondary mt-2 max-w-2xl">
             Production-Grade Risk, NIFTY 50 Benchmark, Tax Loss Harvesting & Allocation Engine for NIFTY 500, ETFs & Mutual Funds

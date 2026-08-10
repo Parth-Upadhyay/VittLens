@@ -140,19 +140,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             {navLinks.map((item) => {
               const Icon = item.icon;
               const active = location.pathname.startsWith(item.path);
+              const badge = item.path === '/portfolio-analyzer' ? 'In Progress' : null;
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={onClose}
-                  className={`flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-[13px] font-sans nav-transition ${
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-[13px] font-sans nav-transition ${
                     active
                       ? 'bg-bg-hover text-accent font-medium'
                       : 'text-tx-secondary hover:text-tx-primary hover:bg-bg-hover'
                   }`}
                 >
-                  <Icon className="w-[18px] h-[18px] flex-shrink-0" />
-                  <span>{item.label}</span>
+                  <div className="flex items-center space-x-2.5">
+                    <Icon className="w-[18px] h-[18px] flex-shrink-0" />
+                    <span>{item.label}</span>
+                  </div>
+                  {badge && (
+                    <span className="text-[10px] font-mono bg-bg-tertiary text-tx-tertiary px-1.5 py-0.5 rounded border border-border leading-none">
+                      {badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
