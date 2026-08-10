@@ -158,7 +158,7 @@ class FinancialIntelligenceService:
 
         # Financial Health
         if total_debt is not None and equity and equity > 0:
-            add_metric("Financial Health", "debtToEquity", "Debt / Equity", total_debt / equity, "%", "percent")
+            add_metric("Financial Health", "debtToEquity", "Debt / Equity", total_debt / equity, "x", "multiple")
         if total_debt is not None and total_cash is not None:
             add_metric("Financial Health", "netDebt", "Net Debt", total_debt - total_cash, "₹", "large_currency")
 
@@ -196,6 +196,11 @@ class FinancialIntelligenceService:
             "    \"health_observation\": \"string\"\n"
             "  }\n"
             "}\n"
+            "CRITICAL GUIDELINES:\n"
+            "1. Do NOT equate EBITDA directly to free cash flow. EBITDA represents operating profitability before interest, taxes, depreciation, and amortization.\n"
+            "2. Do NOT evaluate margins (like Net Margin) in a vacuum. A 10% margin might be perfectly healthy depending on the industry.\n"
+            "3. Do NOT definitively label a company as 'Undervalued' or 'Overvalued' without examining multiples like P/E, P/B, or EV/EBITDA. If valuation metrics are missing, state that valuation cannot be conclusively determined.\n"
+            "4. Debt/Equity ratios under 1.0x (and especially under 0.5x) generally indicate low leverage or a net cash position. Do NOT label them as 'High Debt'.\n"
             "Provide insightful interpretations for metrics. Make your insights extremely analytical, referencing specific numbers. "
             "Do NOT output markdown code blocks. Output ONLY raw parseable JSON."
         )
