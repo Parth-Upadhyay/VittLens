@@ -171,6 +171,15 @@ async def get_deep_analyze(
                     fin = t.financials
                     bs = t.balance_sheet
                     fast_info_obj = getattr(t, "fast_info", {})
+                    # Pull missing valuation metrics from yfinance fallback
+                    try:
+                        yf_info = t.info
+                        if isinstance(yf_info, dict):
+                            for k, v in yf_info.items():
+                                if k not in info or info[k] is None:
+                                    info[k] = v
+                    except Exception:
+                        pass
                 except Exception as e2:
                     get_logger("finnai.market_deep_analyze").warning(f"yfinance also failed for {ticker_symbol}: {e2}")
                 

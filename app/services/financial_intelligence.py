@@ -73,11 +73,12 @@ class FinancialIntelligenceService:
 
         def add_metric(category, key, label, value, unit="", format_rule="standard"):
             if value is not None:
+                final_val = value * 100.0 if format_rule == "percent" else value
                 metrics.append({
                     "category": category,
                     "key": key,
                     "label": label,
-                    "value": round(value, 4) if isinstance(value, float) else value,
+                    "value": round(final_val, 4) if isinstance(final_val, float) else final_val,
                     "unit": unit,
                     "format_rule": format_rule,
                     "source": "calculated"
@@ -245,7 +246,8 @@ class FinancialIntelligenceService:
             "3. Do NOT evaluate margins (like Net Margin) in a vacuum. A 10% margin might be perfectly healthy depending on the industry.\n"
             "4. Do NOT definitively label a company as 'Undervalued' or 'Overvalued' without examining multiples like P/E, P/B, or EV/EBITDA. If valuation metrics are missing, omit the valuation category.\n"
             "5. Debt/Equity ratios under 1.0x (and especially under 0.5x) generally indicate low leverage or a net cash position. Do NOT label them as 'High Debt'.\n"
-            "Provide insightful interpretations for metrics. Make your insights extremely analytical, referencing specific numbers. "
+            "6. **STRICTLY USE ONLY THE METRICS PROVIDED IN THE PROMPT.** Do NOT use outside knowledge, pre-trained facts, or hallucinate financial figures. If a data point is not in the 'Metrics Data', you must not mention it.\n"
+            "Provide insightful interpretations for metrics using ONLY the numbers given. Make your insights extremely analytical. "
             "Do NOT output markdown code blocks. Output ONLY raw parseable JSON."
         )
         

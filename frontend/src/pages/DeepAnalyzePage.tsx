@@ -54,7 +54,7 @@ function formatValue(value: any, rule: string, unit: string): string {
   if (value === null || value === undefined) return 'N/A';
   
   if (rule === 'percent') {
-    return `${(Number(value) * 100).toFixed(2)}%`;
+    return `${Number(value).toFixed(2)}%`;
   }
   if (rule === 'large_currency' || rule === 'large_number') {
     const num = Number(value);
