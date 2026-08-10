@@ -169,9 +169,16 @@ export const DashboardPage: React.FC = () => {
 
               if (!quote) {
                 return (
-                  <div key={sym} className="surface-card p-6 flex flex-col justify-center items-center h-full min-h-[140px]">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent mb-3"></div>
-                    <span className="text-xs text-tx-secondary font-mono tracking-wide animate-pulse">Loading {sym}</span>
+                  <div key={sym} className="surface-card p-6 flex flex-col justify-center items-center h-full min-h-[140px] relative group">
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemoveWatchlist(e, sym)}
+                      className="absolute top-4 right-4 p-1.5 text-tx-tertiary hover:text-semantic-red nav-transition rounded hover:bg-bg-hover"
+                      title={`Remove ${sym} from watchlist`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <span className="text-xs text-tx-secondary font-mono tracking-wide">Data Unavailable for {sym}</span>
                   </div>
                 );
               }
