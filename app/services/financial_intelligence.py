@@ -154,23 +154,26 @@ class FinancialIntelligenceService:
             "and output a strictly valid JSON object representing a 'Financial Intelligence Report'. "
             "Follow this JSON schema EXACTLY:\n"
             "{\n"
-            "  \"snapshots\": {\n"
-            "    \"quality\": \"Strong\" | \"Moderate\" | \"Weak\" | \"Unknown\",\n"
-            "    \"growth\": \"Strong\" | \"Moderate\" | \"Weak\" | \"Unknown\",\n"
-            "    \"profitability\": \"Excellent\" | \"Good\" | \"Average\" | \"Poor\" | \"Unknown\",\n"
-            "    \"balance_sheet\": \"Strong\" | \"Moderate\" | \"Weak\" | \"Unknown\",\n"
-            "    \"valuation\": \"Overvalued\" | \"Reasonable\" | \"Undervalued\" | \"Unknown\",\n"
-            "    \"momentum\": \"Strong\" | \"Moderate\" | \"Weak\" | \"Unknown\"\n"
+            "  \"overall_assessment\": \"string (e.g. 'Strong Business / Reasonable Valuation / Moderate Growth')\",\n"
+            "  \"deep_analysis\": {\n"
+            "    \"business_quality\": [\n"
+            "        {\"metric\": \"string (e.g. 'ROE')\", \"value\": \"string (e.g. '45.9%')\", \"interpretation\": \"string (e.g. 'Excellent profitability')\"}\n"
+            "    ],\n"
+            "    \"valuation\": [\n"
+            "        {\"metric\": \"string\", \"value\": \"string\", \"interpretation\": \"string\"}\n"
+            "    ],\n"
+            "    \"financial_strength\": [\"string\", \"string\"],\n"
+            "    \"growth\": [\"string\", \"string\"],\n"
+            "    \"risks\": [\"string\", \"string\"]\n"
             "  },\n"
-            "  \"key_insights\": [\n"
-            "    { \"title\": \"string\", \"description\": \"string\", \"type\": \"positive|neutral|negative\" }\n"
-            "  ],\n"
-            "  \"red_flags\": [\n"
-            "    { \"title\": \"string\", \"description\": \"string\", \"type\": \"negative\" }\n"
-            "  ]\n"
+            "  \"key_findings\": {\n"
+            "    \"biggest_positive\": \"string\",\n"
+            "    \"biggest_negative\": \"string\",\n"
+            "    \"valuation_observation\": \"string\",\n"
+            "    \"health_observation\": \"string\"\n"
+            "  }\n"
             "}\n"
-            "Provide exactly 4-5 key insights and 2-4 red flags based ONLY on the numbers provided. "
-            "Make your insights extremely analytical, referencing specific numbers. "
+            "Provide insightful interpretations for metrics. Make your insights extremely analytical, referencing specific numbers. "
             "Do NOT output markdown code blocks. Output ONLY raw parseable JSON."
         )
         
@@ -192,7 +195,18 @@ class FinancialIntelligenceService:
         except Exception as e:
             logger.error(f"Failed to generate LLM intelligence report for {ticker_symbol}: {e}")
             return {
-                "snapshots": {},
-                "key_insights": [{"title": "Analysis Unavailable", "description": "Could not generate insights at this time.", "type": "neutral"}],
-                "red_flags": []
+                "overall_assessment": "Analysis Unavailable",
+                "deep_analysis": {
+                    "business_quality": [],
+                    "valuation": [],
+                    "financial_strength": [],
+                    "growth": [],
+                    "risks": []
+                },
+                "key_findings": {
+                    "biggest_positive": "N/A",
+                    "biggest_negative": "N/A",
+                    "valuation_observation": "N/A",
+                    "health_observation": "N/A"
+                }
             }
