@@ -87,6 +87,9 @@ class PortfolioAgent:
             data = self.universe["mutual_funds"][canonical]
             return {"type": "mf", "sector": "Mutual Fund", "name": data.get("name", symbol)}
 
+        if "BEES" in canonical or "ETF" in canonical:
+            return {"type": "etf", "sector": "Broad Market ETF", "name": symbol}
+            
         return {"type": "stock", "sector": "Other", "name": symbol}
 
     def _analyze_single_holding(self, h: HoldingInput, news_service: Optional[NewsService]) -> HoldingAnalysis:
@@ -153,19 +156,9 @@ class PortfolioAgent:
         holdings = state["holdings_input"]
         errors = []
         for h in holdings:
-            raw_sym = h.symbol.upper().strip()
-            canonical = self.normalizer.normalize(raw_sym) or raw_sym
-            is_valid = (
-                canonical in self.universe.get("stocks", {})
-                or canonical in self.universe.get("etfs", {})
-                or canonical in self.universe.get("mutual_funds", {})
-                or raw_sym in self.universe.get("stocks", {})
-                or raw_sym in self.universe.get("etfs", {})
-                or raw_sym in self.universe.get("mutual_funds", {})
-            )
-            if not is_valid:
-                errors.append(f"Unrecognized symbol '{h.symbol}'. Symbol is not present in static Universe.")
-
+            if not h.symbol or h.symbol.strip() == "":
+                errors.append(f"Holding with empty symbol found. Please provide a valid ticker.")
+                
         if errors:
             raise ValueError(" | ".join(errors))
             
