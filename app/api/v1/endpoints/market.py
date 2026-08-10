@@ -11,6 +11,7 @@ from app.config.settings import Settings
 from app.dependencies import get_settings
 from app.schemas import CompanyInfo, HistoricalData, KeyStatistics, StockQuote
 from app.services.market_service import MarketService
+from app.cache import CacheService
 
 router = APIRouter(prefix="/market", tags=["Market Data"])
 
@@ -96,6 +97,11 @@ async def get_deep_analyze_metrics(
     import asyncio
     try:
         ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
+        
+        cache_key = f"market:deep_metrics:{ticker_symbol}"
+        cached = await CacheService.get(cache_key)
+        if cached:
+            return {"symbol": symbol, "ticker": ticker_symbol, **cached}
         
         def _fetch_all():
             import pandas as pd
@@ -193,6 +199,7 @@ async def get_deep_analyze_metrics(
             }
         
         data = await asyncio.to_thread(_fetch_all)
+        await CacheService.set(cache_key, data, ttl=43200)  # 12 hours
         return {"symbol": symbol, "ticker": ticker_symbol, **data}
     except Exception as e:
         raise HTTPException(
@@ -209,6 +216,11 @@ async def get_deep_analyze_synthesis(
     import asyncio
     try:
         ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
+        
+        cache_key = f"market:deep_synthesis:{ticker_symbol}"
+        cached = await CacheService.get(cache_key)
+        if cached:
+            return {"symbol": symbol, "ticker": ticker_symbol, **cached}
         
         def _fetch_synthesis():
             import pandas as pd
@@ -278,6 +290,7 @@ async def get_deep_analyze_synthesis(
             return report
         
         report_data = await asyncio.to_thread(_fetch_synthesis)
+        await CacheService.set(cache_key, report_data, ttl=43200)  # 12 hours
         return {"symbol": symbol, "ticker": ticker_symbol, **report_data}
     except Exception as e:
         raise HTTPException(
