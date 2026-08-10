@@ -153,18 +153,19 @@ async def enforce_rate_limit(
         client_ip = request.client.host if request.client else "127.0.0.1"
         ip_key = f"rate_limit:ip:{client_ip}"
         
-        redis = await RedisClient.get_connection()
-        current_count = await redis.incr(ip_key)
-        
-        if current_count == 1:
-            await redis.expire(ip_key, 3600)  # 1 hour
+        redis = await RedisClient.get_client()
+        if redis:
+            current_count = await redis.incr(ip_key)
             
-        if current_count > 20:
-            logger.warning(f"IP {client_ip} exceeded 20 queries/hr limit.")
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Too many requests from this IP. Please wait an hour or sign in to continue."
-            )
+            if current_count == 1:
+                await redis.expire(ip_key, 3600)  # 1 hour
+                
+            if current_count > 20:
+                logger.warning(f"IP {client_ip} exceeded 20 queries/hr limit.")
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Too many requests from this IP. Please wait an hour or sign in to continue."
+                )
 
     if guest:
         if guest.queries_used > 15:
