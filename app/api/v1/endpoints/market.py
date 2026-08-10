@@ -39,7 +39,7 @@ async def get_stock_quote(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Stock quote data unavailable for '{symbol}'. Symbol may be delisted or invalid.",
+            detail=f"Stock quote data unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
 
 
@@ -56,7 +56,7 @@ async def get_chart_data(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Chart data unavailable for '{symbol}'. Symbol may be delisted or invalid.",
+            detail=f"Chart data unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
 
 
@@ -70,7 +70,7 @@ async def get_company_profile(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Company profile unavailable for '{symbol}'.",
+            detail=f"Company profile unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
 
 
@@ -84,7 +84,7 @@ async def get_key_statistics(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Key statistics unavailable for '{symbol}'.",
+            detail=f"Key statistics unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
 
 
@@ -162,5 +162,5 @@ async def get_deep_analyze(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Deep analyze data unavailable for '{symbol}'.",
+            detail=f"Deep analyze data unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
