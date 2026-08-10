@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Microscope, Search, ChevronDown, ChevronUp, AlertTriangle, Lightbulb, Activity, TrendingUp, Shield, BarChart3, Briefcase } from 'lucide-react';
 import { MarketService } from '../services/api';
 import { SymbolSearch } from '../components/common/SymbolSearch';
+import { toast } from 'react-hot-toast';
 
 interface Metric {
   category: string;
@@ -93,6 +94,13 @@ export const DeepAnalyzePage: React.FC = () => {
       const result = await MarketService.deepAnalyze(sym);
       setDeepData(result);
     } catch {
+      toast.error('[Beta] Yahoo query finance doesn\\'t have this data at the moment.', {
+        style: {
+          background: 'var(--bg-secondary)',
+          color: 'var(--tx-primary)',
+          border: '1px solid var(--border)',
+        }
+      });
       setError('Could not fetch data. This company may not have active data on Yahoo Finance.');
     } finally {
       setIsLoading(false);

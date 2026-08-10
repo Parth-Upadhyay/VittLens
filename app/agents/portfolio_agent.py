@@ -336,6 +336,7 @@ class PortfolioAgent:
 
         instructions = """\
 Analyze the portfolio metrics and holdings data.
+CRITICAL: ALL values in the metrics evidence are in RAW Indian Rupees (₹) (e.g. 9830 means ₹9,830). Do NOT append "Crores" or "Lakhs" to these portfolio values. Do NOT say ₹9,830 Crores!
 Output ONLY a raw JSON object (no markdown, no extra text) matching this schema:
 {
   "summary": "Professional executive summary of portfolio health, valuation, and performance",
