@@ -18,6 +18,7 @@ import datetime
 import math
 import os
 import time
+import pandas as pd
 import yfinance as yf
 
 
@@ -398,21 +399,22 @@ class MarketRepository:
     def get_current_quote(self, ticker_symbol: str) -> Dict[str, Any]:
         """
         Retrieve current trade price quote and 24h market metrics.
-        Tries yfinance fast_info first; falls back to yahooquery if rate-limited.
+        Uses yahooquery (curl-cffi, bypasses Cloudflare) as primary source.
+        Falls back to yfinance only if yahooquery fails.
         """
-        # Attempt 1: yfinance (fast_info)
+        # Attempt 1: yahooquery (primary — no rate-limit issues)
         try:
-            result = self._execute_with_retry("get_current_quote", ticker_symbol, lambda: self._yf_quote(ticker_symbol))
+            result = self._yahooquery_quote(ticker_symbol)
             if result and result.get("price"):
                 return result
         except Exception as e:
-            logger.warning(f"yfinance quote failed for '{ticker_symbol}': {e}. Trying yahooquery fallback...")
+            logger.warning(f"yahooquery quote failed for '{ticker_symbol}': {e}. Trying yfinance fallback...")
 
-        # Attempt 2: yahooquery fallback
+        # Attempt 2: yfinance fallback
         try:
-            return self._yahooquery_quote(ticker_symbol)
+            return self._execute_with_retry("get_current_quote", ticker_symbol, lambda: self._yf_quote(ticker_symbol))
         except Exception as e2:
-            logger.error(f"yahooquery quote fallback also failed for '{ticker_symbol}': {e2}")
+            logger.error(f"Both yahooquery and yfinance failed for '{ticker_symbol}': {e2}")
             return {
                 "symbol": ticker_symbol, "price": None, "change": 0.0,
                 "change_percent": 0.0, "volume": 0, "market_cap": None,
@@ -486,37 +488,50 @@ class MarketRepository:
         self, ticker_symbol: str, period: str = "1mo", interval: str = "1d"
     ) -> List[Dict[str, Any]]:
         """
-        Retrieve historical OHLCV time-series data from yfinance.
-
-        Args:
-            ticker_symbol: Full yfinance ticker (e.g. 'RELIANCE.NS').
-            period: Time period (e.g. '1d', '5d', '1mo', '3mo', '1y', '5y').
-            interval: Bar interval (e.g. '1m', '5m', '1h', '1d', '1wk').
-
-        Returns:
-            List of dictionaries representing OHLCV bars.
+        Retrieve historical OHLCV time-series data.
+        Uses yahooquery as primary source; falls back to yfinance.
         """
-        def _fetch():
-            ticker = yf.Ticker(ticker_symbol, session=self.session)
-            df = ticker.history(period=period, interval=interval)
-            if df.empty:
-                logger.warning(f"yfinance returned empty historical dataframe for '{ticker_symbol}' (period={period}).")
+        def _parse_df(df) -> List[Dict[str, Any]]:
+            if df is None or df.empty:
                 return []
-
             bars: List[Dict[str, Any]] = []
             for idx, row in df.iterrows():
                 ts_str = idx.isoformat() if hasattr(idx, "isoformat") else str(idx)
                 bars.append({
                     "timestamp": ts_str,
-                    "open": self._sanitize_val(float(row.get("Open", 0.0))),
-                    "high": self._sanitize_val(float(row.get("High", 0.0))),
-                    "low": self._sanitize_val(float(row.get("Low", 0.0))),
-                    "close": self._sanitize_val(float(row.get("Close", 0.0))),
-                    "volume": int(row.get("Volume", 0)),
+                    "open": self._sanitize_val(float(row.get("open", row.get("Open", 0.0)))),
+                    "high": self._sanitize_val(float(row.get("high", row.get("High", 0.0)))),
+                    "low": self._sanitize_val(float(row.get("low", row.get("Low", 0.0)))),
+                    "close": self._sanitize_val(float(row.get("close", row.get("Close", 0.0)))),
+                    "volume": int(row.get("volume", row.get("Volume", 0))),
                 })
             return bars
 
-        return self._execute_with_retry("get_historical_data", ticker_symbol, _fetch)
+        # Attempt 1: yahooquery (primary)
+        try:
+            from yahooquery import Ticker as YQTicker
+            t = YQTicker(ticker_symbol)
+            df = t.history(period=period, interval=interval)
+            # yahooquery returns a multi-index DataFrame with (symbol, date)
+            if df is not None and not df.empty:
+                if isinstance(df.index, pd.MultiIndex):
+                    df = df.droplevel(0)
+                bars = _parse_df(df)
+                if bars:
+                    return bars
+        except Exception as e:
+            logger.warning(f"yahooquery history failed for '{ticker_symbol}': {e}. Trying yfinance...")
+
+        # Attempt 2: yfinance fallback
+        def _yf_fetch():
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
+            df = ticker.history(period=period, interval=interval)
+            if df.empty:
+                logger.warning(f"yfinance returned empty historical dataframe for '{ticker_symbol}' (period={period}).")
+                return []
+            return _parse_df(df)
+
+        return self._execute_with_retry("get_historical_data", ticker_symbol, _yf_fetch)
 
     def get_company_info(self, ticker_symbol: str) -> Dict[str, Any]:
         """
@@ -541,52 +556,98 @@ class MarketRepository:
 
     def get_key_statistics(self, ticker_symbol: str) -> Dict[str, Any]:
         """
-        Retrieve financial ratios, valuation metrics, and balance sheet statistics from yfinance.
+        Retrieve financial ratios, valuation metrics, and balance sheet statistics.
+        Uses yahooquery as primary data source for all metrics.
         """
         def _fetch():
-            # info might be empty if Cloudflare blocked it, we'll try to get what we can
             info = self._fetch_info_with_yahooquery(ticker_symbol)
-            ticker = yf.Ticker(ticker_symbol, session=self.session)
-            fast_info = getattr(ticker, "fast_info", {})
+            
+            # Try yahooquery for financial statements first
+            financials = None
+            balance_sheet = None
+            price = None
+            market_cap = None
+            shares = None
             
             try:
-                financials = ticker.financials
-                balance_sheet = ticker.balance_sheet
+                from yahooquery import Ticker as YQTicker
+                yq = YQTicker(ticker_symbol)
+                
+                # Financial statements from yahooquery
+                inc = yq.income_statement(frequency="a")
+                bs = yq.balance_sheet(frequency="a")
+                
+                if isinstance(inc, pd.DataFrame) and not inc.empty:
+                    if isinstance(inc.index, pd.MultiIndex):
+                        inc = inc.droplevel(0)
+                    financials = inc
+                    
+                if isinstance(bs, pd.DataFrame) and not bs.empty:
+                    if isinstance(bs.index, pd.MultiIndex):
+                        bs = bs.droplevel(0)
+                    balance_sheet = bs
+                    
+                # Price from yahooquery
+                price_data = yq.price.get(ticker_symbol, {})
+                if isinstance(price_data, dict):
+                    price = price_data.get("regularMarketPrice")
+                    market_cap = price_data.get("marketCap")
+                    
+                # Shares from yahooquery key_stats
+                stats = yq.key_stats.get(ticker_symbol, {})
+                if isinstance(stats, dict):
+                    shares = stats.get("sharesOutstanding")
+                    
             except Exception as e:
-                logger.warning(f"Failed to fetch financials for {ticker_symbol}: {e}")
-                financials = None
-                balance_sheet = None
+                logger.warning(f"yahooquery financial statements failed for '{ticker_symbol}': {e}. Trying yfinance...")
+                # Fallback to yfinance for statements
+                try:
+                    ticker = yf.Ticker(ticker_symbol, session=self.session)
+                    fast_info = getattr(ticker, "fast_info", {})
+                    financials = ticker.financials
+                    balance_sheet = ticker.balance_sheet
+                    price = getattr(fast_info, "last_price", None)
+                    market_cap = getattr(fast_info, "market_cap", None)
+                    shares = getattr(fast_info, "shares", None)
+                except Exception as e2:
+                    logger.warning(f"yfinance financial statements also failed for '{ticker_symbol}': {e2}")
 
             def get_series_val(df, *keys):
-                import math as _math
                 if df is None or df.empty: return None
                 for key in keys:
+                    # yahooquery uses camelCase column names; yfinance uses Title Case index names
+                    # Check columns first (yahooquery DataFrame), then index (yfinance DataFrame)
+                    if key in df.columns:
+                        try:
+                            val = df[key].iloc[0]
+                            if val is None: continue
+                            fval = float(val)
+                            if math.isnan(fval) or math.isinf(fval): continue
+                            return fval
+                        except Exception: continue
                     if key in df.index:
                         try:
                             val = df.loc[key].iloc[0]
                             if val is None: continue
                             fval = float(val)
-                            if _math.isnan(fval) or _math.isinf(fval): continue
+                            if math.isnan(fval) or math.isinf(fval): continue
                             return fval
                         except Exception: continue
                 return None
 
-            net_income = get_series_val(financials, "Net Income", "Net Income Common Stockholders")
-            total_revenue = get_series_val(financials, "Total Revenue")
-            gross_profit = get_series_val(financials, "Gross Profit")
-            operating_income = get_series_val(financials, "Operating Income")
-            ebitda = get_series_val(financials, "EBITDA", "Normalized EBITDA")
+            # yahooquery column names (camelCase) and yfinance index names (Title Case)
+            net_income = get_series_val(financials, "NetIncome", "Net Income", "Net Income Common Stockholders")
+            total_revenue = get_series_val(financials, "TotalRevenue", "Total Revenue")
+            gross_profit = get_series_val(financials, "GrossProfit", "Gross Profit")
+            operating_income = get_series_val(financials, "OperatingIncome", "Operating Income")
+            ebitda = get_series_val(financials, "EBITDA", "NormalizedEBITDA", "Normalized EBITDA")
             ebit = get_series_val(financials, "EBIT") or operating_income
 
-            equity = get_series_val(balance_sheet, "Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest")
-            total_assets = get_series_val(balance_sheet, "Total Assets")
-            current_liabilities = get_series_val(balance_sheet, "Current Liabilities")
-            current_assets = get_series_val(balance_sheet, "Current Assets")
-            total_debt = get_series_val(balance_sheet, "Total Debt")
-
-            price = getattr(fast_info, "last_price", None)
-            market_cap = getattr(fast_info, "market_cap", None)
-            shares = getattr(fast_info, "shares", None)
+            equity = get_series_val(balance_sheet, "StockholdersEquity", "Stockholders Equity", "CommonStockEquity", "Common Stock Equity", "TotalEquityGrossMinorityInterest", "Total Equity Gross Minority Interest")
+            total_assets = get_series_val(balance_sheet, "TotalAssets", "Total Assets")
+            current_liabilities = get_series_val(balance_sheet, "CurrentLiabilities", "Current Liabilities")
+            current_assets = get_series_val(balance_sheet, "CurrentAssets", "Current Assets")
+            total_debt = get_series_val(balance_sheet, "TotalDebt", "Total Debt")
 
             roe = info.get("returnOnEquity")
             if roe is None and net_income is not None and equity is not None and equity != 0:
@@ -597,7 +658,7 @@ class MarketRepository:
                 cap_emp = total_assets - current_liabilities
                 if cap_emp != 0: roce = ebit / cap_emp
 
-            currency = info.get("currency") or getattr(fast_info, "currency", None)
+            currency = info.get("currency")
             financial_currency = info.get("financialCurrency")
             is_currency_mismatch = currency and financial_currency and currency != financial_currency
 
@@ -623,7 +684,7 @@ class MarketRepository:
                 
             debt_to_equity = info.get("debtToEquity")
             if debt_to_equity is None and total_debt is not None and equity is not None and equity != 0:
-                debt_to_equity = (total_debt / equity) * 100 # usually presented as percentage in yf
+                debt_to_equity = (total_debt / equity) * 100
                 
             current_ratio = info.get("currentRatio")
             if current_ratio is None and current_assets is not None and current_liabilities is not None and current_liabilities != 0:
@@ -649,6 +710,7 @@ class MarketRepository:
             }
 
         return self._execute_with_retry("get_key_statistics", ticker_symbol, _fetch)
+
 
 """
 Repository Pattern implementation for NewsArticle and CompanyAlias ORM operations.

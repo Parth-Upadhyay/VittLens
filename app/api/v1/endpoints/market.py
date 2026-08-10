@@ -92,35 +92,82 @@ async def get_key_statistics(
 async def get_deep_analyze(
     symbol: str, service: MarketService = Depends(get_market_service)
 ) -> dict:
-    """Return all available raw yfinance info fields for deep analysis display."""
+    """Return all available financial data for deep analysis display."""
     import asyncio
-    import yfinance as yf
     try:
         ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
         
         def _fetch_all():
+            import pandas as pd
             from app.services.financial_intelligence import FinancialIntelligenceService
-            t = yf.Ticker(ticker_symbol, session=service.repository.session)
             
+            fin = None
+            bs = None
+            fast_info_obj = None
+            info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
+            
+            # Primary: yahooquery for financial statements
             try:
-                fin = t.financials
-                bs = t.balance_sheet
-                fast_info = getattr(t, "fast_info", {})
-                info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
+                from yahooquery import Ticker as YQTicker
+                yq = YQTicker(ticker_symbol)
+                
+                inc = yq.income_statement(frequency="a")
+                bsheet = yq.balance_sheet(frequency="a")
+                
+                if isinstance(inc, pd.DataFrame) and not inc.empty:
+                    if isinstance(inc.index, pd.MultiIndex):
+                        inc = inc.droplevel(0)
+                    # Transpose so yahooquery matches yfinance's (row=metric, col=date) layout
+                    fin = inc.T
+                    
+                if isinstance(bsheet, pd.DataFrame) and not bsheet.empty:
+                    if isinstance(bsheet.index, pd.MultiIndex):
+                        bsheet = bsheet.droplevel(0)
+                    bs = bsheet.T
+                    
+                # Build a minimal fast_info-like object from yahooquery
+                price_data = yq.price.get(ticker_symbol, {})
+                stats = yq.key_stats.get(ticker_symbol, {})
+                
+                class FastInfoProxy:
+                    pass
+                fast_info_obj = FastInfoProxy()
+                if isinstance(price_data, dict):
+                    fast_info_obj.last_price = price_data.get("regularMarketPrice")
+                    fast_info_obj.market_cap = price_data.get("marketCap")
+                    fast_info_obj.currency = price_data.get("currency", "INR")
+                if isinstance(stats, dict):
+                    fast_info_obj.shares = stats.get("sharesOutstanding")
+                    
+                # 52-week from summary_detail
+                detail = yq.summary_detail.get(ticker_symbol, {})
+                if isinstance(detail, dict):
+                    fast_info_obj.year_high = detail.get("fiftyTwoWeekHigh")
+                    fast_info_obj.year_low = detail.get("fiftyTwoWeekLow")
+                    fast_info_obj.last_volume = detail.get("volume")
+                    if not hasattr(fast_info_obj, 'last_price') or not fast_info_obj.last_price:
+                        fast_info_obj.last_price = detail.get("regularMarketPrice")
+                        
             except Exception as e:
                 from app.utils import get_logger
-                get_logger("finnai.market_deep_analyze").warning(f"Failed to fetch statements for {ticker_symbol}: {e}")
-                fin, bs, fast_info, info = None, None, {}, {}
+                get_logger("finnai.market_deep_analyze").warning(f"yahooquery failed for {ticker_symbol}: {e}. Trying yfinance...")
+                # Fallback: yfinance
+                try:
+                    import yfinance as yf
+                    t = yf.Ticker(ticker_symbol, session=service.repository.session)
+                    fin = t.financials
+                    bs = t.balance_sheet
+                    fast_info_obj = getattr(t, "fast_info", {})
+                except Exception as e2:
+                    get_logger("finnai.market_deep_analyze").warning(f"yfinance also failed for {ticker_symbol}: {e2}")
                 
             fi_service = FinancialIntelligenceService()
-            metrics = fi_service.normalize_metrics(ticker_symbol, fast_info, fin, bs, info)
+            metrics = fi_service.normalize_metrics(ticker_symbol, fast_info_obj, fin, bs, info)
             report = fi_service.generate_intelligence_report(ticker_symbol, metrics)
             
             return {
                 "metrics": metrics,
-                "snapshots": report.get("snapshots", {}),
-                "key_insights": report.get("key_insights", []),
-                "red_flags": report.get("red_flags", [])
+                **report,
             }
         
         data = await asyncio.to_thread(_fetch_all)
