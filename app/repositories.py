@@ -406,16 +406,9 @@ class MarketRepository:
             Dictionary containing raw sanitized quote parameters.
         """
         def _fetch():
+            # Fetch info exclusively using yahooquery since yfinance is consistently rate-limited
+            info = self._fetch_info_with_yahooquery(ticker_symbol)
             ticker = yf.Ticker(ticker_symbol, session=self.session)
-            try:
-                info = ticker.info or {}
-            except Exception as ex:
-                logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
-                info = {}
-                
-            if not info or len(info) < 10:
-                logger.info(f"yfinance.info is nearly empty for '{ticker_symbol}', falling back to yahooquery...")
-                info = self._fetch_info_with_yahooquery(ticker_symbol)
 
             fast_info = getattr(ticker, "fast_info", {})
 
@@ -492,15 +485,8 @@ class MarketRepository:
         Retrieve company profile and business information from yfinance.
         """
         def _fetch():
-            ticker = yf.Ticker(ticker_symbol, session=self.session)
-            try:
-                info = ticker.info or {}
-            except Exception as ex:
-                logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
-                info = {}
-                
-            if not info or len(info) < 10:
-                info = self._fetch_info_with_yahooquery(ticker_symbol)
+            # Fetch info exclusively using yahooquery since yfinance is consistently rate-limited
+            info = self._fetch_info_with_yahooquery(ticker_symbol)
                 
             return {
                 "company_name": info.get("longName") or info.get("shortName") or ticker_symbol,
@@ -520,15 +506,9 @@ class MarketRepository:
         Retrieve financial ratios, valuation metrics, and balance sheet statistics from yfinance.
         """
         def _fetch():
+            # Fetch info exclusively using yahooquery since yfinance is consistently rate-limited
+            info = self._fetch_info_with_yahooquery(ticker_symbol)
             ticker = yf.Ticker(ticker_symbol, session=self.session)
-            try:
-                info = ticker.info or {}
-            except Exception as ex:
-                logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
-                info = {}
-                
-            if not info or len(info) < 10:
-                info = self._fetch_info_with_yahooquery(ticker_symbol)
             
             # Fetch financials for manual ratio calculations
             try:

@@ -100,15 +100,7 @@ async def get_deep_analyze(
         
         def _fetch_all():
             t = yf.Ticker(ticker_symbol, session=service.repository.session)
-            try:
-                info = t.info or {}
-            except Exception as ex:
-                from app.utils import get_logger
-                get_logger("finnai.market_deep_analyze").warning(f"Deep analyze info rate-limited: {ex}")
-                info = {}
-                
-            if not info or len(info) < 10:
-                info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
+            info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
             
             # Fetch financials for manually computed ratios
             try:
