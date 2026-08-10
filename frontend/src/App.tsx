@@ -46,16 +46,16 @@ export const App: React.FC = () => {
   const { initSession, setGuestLimitModalOpen, preferences } = useAppStore();
 
   useEffect(() => {
-    initSession();
-
     // Check for Google OAuth callback token in URL query
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
       localStorage.setItem('auth_token', token);
       window.history.replaceState({}, document.title, window.location.pathname);
-      initSession();
     }
+    
+    // Call initSession exactly once
+    initSession();
 
     // Listen for custom limit reached events
     const handleGuestLimit = () => setGuestLimitModalOpen(true);
