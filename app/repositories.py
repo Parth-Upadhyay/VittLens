@@ -441,6 +441,16 @@ class MarketRepository:
         fast_info = getattr(ticker, "fast_info", {})
 
         price = getattr(fast_info, "last_price", 0.0)
+        
+        # If fast_info failed to return a price, fallback to historical data
+        if not price or price == 0.0:
+            try:
+                hist = ticker.history(period="1d", session=self.session)
+                if not hist.empty:
+                    price = float(hist["Close"].iloc[-1])
+            except Exception as hist_err:
+                logger.warning(f"yfinance history fallback failed for {ticker_symbol}: {hist_err}")
+
         prev_close = getattr(fast_info, "previous_close", price)
 
         change = price - prev_close if price and prev_close else 0.0

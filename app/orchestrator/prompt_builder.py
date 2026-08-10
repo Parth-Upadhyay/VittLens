@@ -28,7 +28,7 @@ class OrchestratorPromptBuilder:
         """Format raw decimal float into clean percentage string (e.g. 0.1384 -> 13.84%)."""
         if val is None:
             return "N/A"
-        return f"{val * 100.0:.2f}%" if abs(val) <= 1.0 and val != 0 else f"{val:.2f}%"
+        return f"{val * 100.0:.2f}%"
 
     @staticmethod
     def format_num(val: Optional[float], suffix: str = "") -> str:

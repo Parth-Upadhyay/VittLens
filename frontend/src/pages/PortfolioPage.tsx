@@ -71,10 +71,13 @@ export const PortfolioPage: React.FC = () => {
 
   return (
     <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
-      {/* Professional Title Bar without Emojis or Bounding Box */}
       <div className="flex items-center space-x-2.5 pb-2">
         <PieChartIcon className="w-5 h-5 text-accent" />
         <h1 className="text-xl font-medium text-cream tracking-tight">Portfolio Holdings & Asset Allocation</h1>
+        <span className="bg-bg-tertiary text-tx-tertiary border border-border px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider font-semibold ml-3 flex items-center shadow-sm whitespace-nowrap">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent/70 animate-pulse mr-1.5"></span>
+          In Progress
+        </span>
       </div>
 
       {/* Summary Cards */}

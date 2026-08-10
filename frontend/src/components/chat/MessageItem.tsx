@@ -1,10 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, AlertTriangle, ExternalLink, Globe } from 'lucide-react';
+import { User, AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown } from 'lucide-react';
 import { ImageCarousel } from './ImageCarousel';
 import { SourcesPanel, getCleanSiteName } from './SourcesPanel';
 import { AgentChip } from './AgentChip';
+import { MarketService } from '../../services/api';
+import { MiniSparkline } from '../visual/MiniSparkline';
+import { HistoricalData, StockQuote } from '../../types';
+
+// Custom component to render a rich chart directly in the chat bubble
+const ChatChartBlock: React.FC<{ symbol: string }> = ({ symbol }) => {
+  const [quote, setQuote] = useState<StockQuote | null>(null);
+  const [chart, setChart] = useState<HistoricalData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [q, c] = await Promise.all([
+          MarketService.getQuote(symbol),
+          MarketService.getChart(symbol, '1mo')
+        ]);
+        if (active) {
+          setQuote(q);
+          setChart(c);
+        }
+      } catch (err) {
+        console.error("Failed to load chart for chat:", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { active = false; };
+  }, [symbol]);
+
+  if (loading) {
+    return (
+      <div className="my-4 p-4 surface-card flex items-center justify-center h-[120px] rounded-xl border border-border">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-accent mb-2"></div>
+          <span className="text-xs text-tx-secondary font-mono animate-pulse">Loading {symbol} chart...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quote || !chart) return null;
+
+  const isGain = quote.change >= 0;
+
+  return (
+    <div className="my-5 p-5 surface-card rounded-xl border border-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 select-none">
+      <div className="flex flex-col items-start w-full sm:w-1/3">
+        <div className="flex items-center space-x-2 mb-1">
+          <span className="font-mono font-semibold text-tx-primary text-sm tracking-wide">{symbol}</span>
+          <span className="text-[10px] text-tx-tertiary bg-bg-tertiary px-1.5 py-0.5 rounded">1MO</span>
+        </div>
+        <div className="text-2xl font-semibold text-tx-primary font-mono tracking-tight">
+          ₹{quote.price.toLocaleString()}
+        </div>
+        <div className={`flex items-center text-xs font-mono font-medium mt-1 ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
+          {isGain ? <TrendingUp className="w-3.5 h-3.5 mr-1" /> : <TrendingDown className="w-3.5 h-3.5 mr-1" />}
+          {isGain ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
+        </div>
+      </div>
+      <div className="w-full sm:w-2/3 h-[60px] flex justify-end">
+        <div className="w-full max-w-[200px]">
+          <MiniSparkline data={chart.series ? chart.series.map(b => b.close) : []} />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface MessageItemProps {
   role: 'user' | 'assistant';
@@ -293,11 +364,18 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                         {children}
                       </em>
                     ),
-                    code: ({ children }) => (
-                      <code className="font-mono text-sm bg-bg-tertiary text-tx-primary border border-border px-2 py-0.5 rounded break-all">
-                        {children}
-                      </code>
-                    ),
+                    code: ({ inline, className, children, ...props }: any) => {
+                      const match = /language-(\w+)/.exec(className || '');
+                      if (!inline && match && match[1] === 'chart') {
+                        const symbol = String(children).replace(/\n$/, '').trim();
+                        return <ChatChartBlock symbol={symbol} />;
+                      }
+                      return (
+                        <code className="font-mono text-sm bg-bg-tertiary text-tx-primary border border-border px-2 py-0.5 rounded break-all" {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
                   }}
                 >
                   {mainBody}
