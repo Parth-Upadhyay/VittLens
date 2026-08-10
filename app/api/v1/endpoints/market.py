@@ -116,24 +116,90 @@ async def get_deep_analyze(
                             pass
                     return None
                 
+                # 1. Grab raw values from financials
                 net_income = _get(fin, "Net Income")
-                equity = _get(bs, "Stockholders Equity")
+                total_revenue = _get(fin, "Total Revenue")
+                gross_profit = _get(fin, "Gross Profit")
+                operating_income = _get(fin, "Operating Income")
+                ebitda = _get(fin, "EBITDA") or _get(fin, "Normalized EBITDA")
+                ebit = _get(fin, "EBIT") or operating_income
+                
+                # 2. Grab raw values from balance sheet
+                equity = _get(bs, "Stockholders Equity") or _get(bs, "Total Equity Gross Minority Interest")
                 total_assets = _get(bs, "Total Assets")
                 current_liabilities = _get(bs, "Current Liabilities")
-                ebit = _get(fin, "EBIT") or _get(fin, "Operating Income")
+                current_assets = _get(bs, "Current Assets")
+                total_debt = _get(bs, "Total Debt")
+                total_cash = _get(bs, "Cash And Cash Equivalents") or _get(bs, "Cash Cash Equivalents And Short Term Investments")
                 
-                if net_income and equity and equity != 0 and not info.get("returnOnEquity"):
-                    info["returnOnEquity"] = net_income / equity
+                # 3. Grab raw values from fast_info
+                fast_info = getattr(t, "fast_info", {})
+                price = getattr(fast_info, "last_price", None)
+                market_cap = getattr(fast_info, "market_cap", None)
+                shares = getattr(fast_info, "shares", None)
+                
+                # Assign fast_info basics
+                if price: info.setdefault("regularMarketPrice", price)
+                if price: info.setdefault("currentPrice", price)
+                if market_cap: info.setdefault("marketCap", market_cap)
+                if getattr(fast_info, "previous_close", None): info.setdefault("previousClose", fast_info.previous_close)
+                if getattr(fast_info, "day_high", None): info.setdefault("dayHigh", fast_info.day_high)
+                if getattr(fast_info, "day_low", None): info.setdefault("dayLow", fast_info.day_low)
+                if getattr(fast_info, "year_high", None): info.setdefault("fiftyTwoWeekHigh", fast_info.year_high)
+                if getattr(fast_info, "year_low", None): info.setdefault("fiftyTwoWeekLow", fast_info.year_low)
+                if getattr(fast_info, "last_volume", None): info.setdefault("volume", fast_info.last_volume)
+                if shares: info.setdefault("sharesOutstanding", shares)
+                
+                # Assign raw financials
+                if total_revenue: info.setdefault("totalRevenue", total_revenue)
+                if ebitda: info.setdefault("ebitda", ebitda)
+                if total_debt: info.setdefault("totalDebt", total_debt)
+                if total_cash: info.setdefault("totalCash", total_cash)
+                
+                # Calculate Ratios Natively
+                if net_income and shares and shares != 0:
+                    eps = net_income / shares
+                    info.setdefault("trailingEps", eps)
+                    if price and eps != 0:
+                        info.setdefault("trailingPE", price / eps)
+                        
+                if total_revenue and shares and shares != 0:
+                    info.setdefault("revenuePerShare", total_revenue / shares)
+                    
+                if total_cash and shares and shares != 0:
+                    info.setdefault("totalCashPerShare", total_cash / shares)
+                    
+                if equity and shares and shares != 0:
+                    info.setdefault("bookValue", equity / shares)
+                    
+                if equity and equity != 0:
+                    if market_cap: info.setdefault("priceToBook", market_cap / equity)
+                    if net_income: info.setdefault("returnOnEquity", net_income / equity)
+                    if total_debt: info.setdefault("debtToEquity", (total_debt / equity) * 100) # yfinance uses percentage here
+                    
+                if total_revenue and total_revenue != 0:
+                    if net_income: info.setdefault("profitMargins", net_income / total_revenue)
+                    if gross_profit: info.setdefault("grossMargins", gross_profit / total_revenue)
+                    if operating_income: info.setdefault("operatingMargins", operating_income / total_revenue)
+                    
+                if current_assets and current_liabilities and current_liabilities != 0:
+                    info.setdefault("currentRatio", current_assets / current_liabilities)
                     
                 if ebit and total_assets and current_liabilities:
                     cap_emp = total_assets - current_liabilities
                     if cap_emp != 0:
-                        info["returnOnCapitalEmployed"] = ebit / cap_emp
+                        info.setdefault("returnOnCapitalEmployed", ebit / cap_emp)
                         
-                if not info.get("priceToBook") and info.get("marketCap") and equity and equity != 0:
-                    info["priceToBook"] = info["marketCap"] / equity
-                    
-            except Exception:
+                if market_cap and total_debt is not None and total_cash is not None:
+                    ev = market_cap + total_debt - total_cash
+                    info.setdefault("enterpriseValue", ev)
+                    if total_revenue and total_revenue != 0:
+                        info.setdefault("enterpriseToRevenue", ev / total_revenue)
+                    if ebitda and ebitda != 0:
+                        info.setdefault("enterpriseToEbitda", ev / ebitda)
+            except Exception as e:
+                from app.utils import get_logger
+                get_logger("finnai.market_deep_analyze").warning(f"Failed to manually compute ratios: {e}")
                 pass
             
             # Sanitize: remove None, NaN, non-serializable types, and lists of dicts
