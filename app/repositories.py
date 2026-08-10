@@ -406,40 +406,28 @@ class MarketRepository:
             Dictionary containing raw sanitized quote parameters.
         """
         def _fetch():
-            # Fetch info exclusively using yahooquery since yfinance is consistently rate-limited
-            info = self._fetch_info_with_yahooquery(ticker_symbol)
             ticker = yf.Ticker(ticker_symbol, session=self.session)
-
             fast_info = getattr(ticker, "fast_info", {})
 
-            # Extract current price with fallback chain
-            price = (
-                info.get("currentPrice")
-                or info.get("regularMarketPrice")
-                or getattr(fast_info, "last_price", None)
-                or getattr(fast_info, "previous_close", 0.0)
-            )
-            prev_close = (
-                info.get("regularMarketPreviousClose")
-                or info.get("previousClose")
-                or getattr(fast_info, "previous_close", price)
-            )
+            # Extract current price using only fast_info
+            price = getattr(fast_info, "last_price", 0.0)
+            prev_close = getattr(fast_info, "previous_close", price)
 
             change = price - prev_close if price and prev_close else 0.0
             change_percent = (change / prev_close * 100.0) if prev_close else 0.0
 
             return {
                 "symbol": ticker_symbol,
-                "price": self._sanitize_val(price),
+                "price": self._sanitize_val(price) if price else None,
                 "change": self._sanitize_val(change),
                 "change_percent": self._sanitize_val(change_percent),
-                "volume": self._sanitize_val(info.get("regularMarketVolume") or getattr(fast_info, "last_volume", 0)),
-                "market_cap": self._sanitize_val(info.get("marketCap") or getattr(fast_info, "market_cap", None)),
-                "day_high": self._sanitize_val(info.get("dayHigh") or getattr(fast_info, "day_high", None)),
-                "day_low": self._sanitize_val(info.get("dayLow") or getattr(fast_info, "day_low", None)),
-                "fifty_two_week_high": self._sanitize_val(info.get("fiftyTwoWeekHigh") or getattr(fast_info, "year_high", None)),
-                "fifty_two_week_low": self._sanitize_val(info.get("fiftyTwoWeekLow") or getattr(fast_info, "year_low", None)),
-                "currency": info.get("currency", "INR"),
+                "volume": self._sanitize_val(getattr(fast_info, "last_volume", 0)),
+                "market_cap": self._sanitize_val(getattr(fast_info, "market_cap", None)),
+                "day_high": self._sanitize_val(getattr(fast_info, "day_high", None)),
+                "day_low": self._sanitize_val(getattr(fast_info, "day_low", None)),
+                "fifty_two_week_high": self._sanitize_val(getattr(fast_info, "year_high", None)),
+                "fifty_two_week_low": self._sanitize_val(getattr(fast_info, "year_low", None)),
+                "currency": getattr(fast_info, "currency", "INR"),
             }
 
         return self._execute_with_retry("get_current_quote", ticker_symbol, _fetch)
@@ -506,11 +494,11 @@ class MarketRepository:
         Retrieve financial ratios, valuation metrics, and balance sheet statistics from yfinance.
         """
         def _fetch():
-            # Fetch info exclusively using yahooquery since yfinance is consistently rate-limited
+            # info might be empty if Cloudflare blocked it, we'll try to get what we can
             info = self._fetch_info_with_yahooquery(ticker_symbol)
             ticker = yf.Ticker(ticker_symbol, session=self.session)
+            fast_info = getattr(ticker, "fast_info", {})
             
-            # Fetch financials for manual ratio calculations
             try:
                 financials = ticker.financials
                 balance_sheet = ticker.balance_sheet
@@ -520,74 +508,87 @@ class MarketRepository:
                 balance_sheet = None
 
             def get_series_val(df, *keys):
-                """Try multiple key names; return first valid non-NaN float found."""
                 import math as _math
-                if df is None or df.empty:
-                    return None
+                if df is None or df.empty: return None
                 for key in keys:
                     if key in df.index:
                         try:
                             val = df.loc[key].iloc[0]
-                            if val is None:
-                                continue
+                            if val is None: continue
                             fval = float(val)
-                            if _math.isnan(fval) or _math.isinf(fval):
-                                continue
+                            if _math.isnan(fval) or _math.isinf(fval): continue
                             return fval
-                        except Exception:
-                            continue
+                        except Exception: continue
                 return None
 
-            # Calculate ROE: Net Income / Stockholders Equity
-            roe = info.get("returnOnEquity")
-            if roe is None:
-                net_income = get_series_val(financials, "Net Income", "Net Income Common Stockholders")
-                equity = get_series_val(
-                    balance_sheet,
-                    "Stockholders Equity",
-                    "Common Stock Equity",
-                    "Total Equity Gross Minority Interest",
-                )
-                if net_income is not None and equity is not None and equity != 0:
-                    roe = net_income / equity
+            net_income = get_series_val(financials, "Net Income", "Net Income Common Stockholders")
+            total_revenue = get_series_val(financials, "Total Revenue")
+            gross_profit = get_series_val(financials, "Gross Profit")
+            operating_income = get_series_val(financials, "Operating Income")
+            ebitda = get_series_val(financials, "EBITDA", "Normalized EBITDA")
+            ebit = get_series_val(financials, "EBIT") or operating_income
 
-            # Calculate ROCE: EBIT / (Total Assets - Current Liabilities)
-            roce = None
-            ebit = get_series_val(financials, "EBIT", "Operating Income")
+            equity = get_series_val(balance_sheet, "Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest")
             total_assets = get_series_val(balance_sheet, "Total Assets")
             current_liabilities = get_series_val(balance_sheet, "Current Liabilities")
-            if ebit is not None and total_assets is not None and current_liabilities is not None:
-                capital_employed = total_assets - current_liabilities
-                if capital_employed != 0:
-                    roce = ebit / capital_employed
+            current_assets = get_series_val(balance_sheet, "Current Assets")
+            total_debt = get_series_val(balance_sheet, "Total Debt")
 
-            # Calculate P/B: prefer info field, then compute from market cap
+            price = getattr(fast_info, "last_price", None)
+            market_cap = getattr(fast_info, "market_cap", None)
+            shares = getattr(fast_info, "shares", None)
+
+            roe = info.get("returnOnEquity")
+            if roe is None and net_income is not None and equity is not None and equity != 0:
+                roe = net_income / equity
+
+            roce = None
+            if ebit is not None and total_assets is not None and current_liabilities is not None:
+                cap_emp = total_assets - current_liabilities
+                if cap_emp != 0: roce = ebit / cap_emp
+
             pb_ratio = info.get("priceToBook")
-            if pb_ratio is None:
-                market_cap = info.get("marketCap")
-                equity = get_series_val(
-                    balance_sheet,
-                    "Stockholders Equity",
-                    "Common Stock Equity",
-                    "Total Equity Gross Minority Interest",
-                )
-                if market_cap is not None and equity is not None and equity != 0:
-                    pb_ratio = market_cap / equity
+            if pb_ratio is None and market_cap is not None and equity is not None and equity != 0:
+                pb_ratio = market_cap / equity
+                
+            eps = info.get("trailingEps")
+            if eps is None and net_income is not None and shares and shares != 0:
+                eps = net_income / shares
+                
+            pe = info.get("trailingPE")
+            if pe is None and price is not None and eps is not None and eps != 0:
+                pe = price / eps
+                
+            profit_margins = info.get("profitMargins")
+            if profit_margins is None and net_income is not None and total_revenue and total_revenue != 0:
+                profit_margins = net_income / total_revenue
+                
+            gross_margins = info.get("grossMargins")
+            if gross_margins is None and gross_profit is not None and total_revenue and total_revenue != 0:
+                gross_margins = gross_profit / total_revenue
+                
+            debt_to_equity = info.get("debtToEquity")
+            if debt_to_equity is None and total_debt is not None and equity is not None and equity != 0:
+                debt_to_equity = (total_debt / equity) * 100 # usually presented as percentage in yf
+                
+            current_ratio = info.get("currentRatio")
+            if current_ratio is None and current_assets is not None and current_liabilities is not None and current_liabilities != 0:
+                current_ratio = current_assets / current_liabilities
 
             return {
-                "pe_ratio": self._sanitize_val(info.get("trailingPE")),
+                "pe_ratio": self._sanitize_val(pe),
                 "forward_pe": self._sanitize_val(info.get("forwardPE")),
                 "peg_ratio": self._sanitize_val(info.get("pegRatio")),
-                "eps": self._sanitize_val(info.get("trailingEps")),
+                "eps": self._sanitize_val(eps),
                 "beta": self._sanitize_val(info.get("beta")),
                 "dividend_yield": self._sanitize_dividend_yield(info.get("dividendYield")),
                 "roe": self._sanitize_val(roe),
-                "profit_margins": self._sanitize_val(info.get("profitMargins")),
-                "gross_margins": self._sanitize_val(info.get("grossMargins")),
-                "revenue": self._sanitize_val(info.get("totalRevenue")),
-                "ebitda": self._sanitize_val(info.get("ebitda")),
-                "debt_to_equity": self._sanitize_val(info.get("debtToEquity")),
-                "current_ratio": self._sanitize_val(info.get("currentRatio")),
+                "profit_margins": self._sanitize_val(profit_margins),
+                "gross_margins": self._sanitize_val(gross_margins),
+                "revenue": self._sanitize_val(total_revenue or info.get("totalRevenue")),
+                "ebitda": self._sanitize_val(ebitda or info.get("ebitda")),
+                "debt_to_equity": self._sanitize_val(debt_to_equity),
+                "current_ratio": self._sanitize_val(current_ratio),
                 "target_price": self._sanitize_val(info.get("targetMeanPrice")),
                 "roce": self._sanitize_val(roce),
                 "pb_ratio": self._sanitize_val(pb_ratio),
