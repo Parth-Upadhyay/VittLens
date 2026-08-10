@@ -271,6 +271,62 @@ class MarketRepository:
             return round(val, 4)
         return val
 
+    def _fetch_info_with_yahooquery(self, ticker_symbol: str) -> dict:
+        """
+        Fallback method to fetch company info using yahooquery when yfinance.info is rate-limited.
+        Maps yahooquery nested data to the flat dictionary structure expected from yfinance.info.
+        """
+        try:
+            from yahooquery import Ticker
+            t = Ticker(ticker_symbol)
+            info = {}
+            
+            profile = t.summary_profile.get(ticker_symbol, {})
+            if isinstance(profile, dict):
+                info["sector"] = profile.get("sector")
+                info["industry"] = profile.get("industry")
+                info["longBusinessSummary"] = profile.get("longBusinessSummary")
+                info["website"] = profile.get("website")
+                info["fullTimeEmployees"] = profile.get("fullTimeEmployees")
+                info["country"] = profile.get("country")
+                info["city"] = profile.get("city")
+                info["state"] = profile.get("state")
+                
+            q_type = t.quote_type.get(ticker_symbol, {})
+            if isinstance(q_type, dict):
+                info["longName"] = q_type.get("longName")
+                info["shortName"] = q_type.get("shortName")
+                
+            stats = t.key_stats.get(ticker_symbol, {})
+            if isinstance(stats, dict):
+                info["forwardPE"] = stats.get("forwardPE")
+                info["beta"] = stats.get("beta")
+                info["bookValue"] = stats.get("bookValue")
+                info["priceToBook"] = stats.get("priceToBook")
+                info["enterpriseToEbitda"] = stats.get("enterpriseToEbitda")
+                info["enterpriseToRevenue"] = stats.get("enterpriseToRevenue")
+                info["trailingEps"] = stats.get("trailingEps")
+                info["forwardEps"] = stats.get("forwardEps")
+                
+            detail = t.summary_detail.get(ticker_symbol, {})
+            if isinstance(detail, dict):
+                info["trailingPE"] = detail.get("trailingPE")
+                info["dividendYield"] = detail.get("dividendYield")
+                info["marketCap"] = detail.get("marketCap")
+                info["previousClose"] = detail.get("previousClose")
+                info["regularMarketPrice"] = detail.get("regularMarketPrice")
+                info["dayHigh"] = detail.get("dayHigh")
+                info["dayLow"] = detail.get("dayLow")
+                info["fiftyTwoWeekHigh"] = detail.get("fiftyTwoWeekHigh")
+                info["fiftyTwoWeekLow"] = detail.get("fiftyTwoWeekLow")
+                info["volume"] = detail.get("volume")
+                info["currency"] = detail.get("currency")
+                
+            return info
+        except Exception as e:
+            logger.error(f"yahooquery fallback failed for '{ticker_symbol}': {e}")
+            return {}
+
     def _sanitize_dividend_yield(self, val: Any) -> Any:
         """
         Sanitize yfinance dividendYield which is returned inconsistently:
@@ -356,6 +412,10 @@ class MarketRepository:
             except Exception as ex:
                 logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
                 info = {}
+                
+            if not info:
+                logger.info(f"yfinance.info is empty for '{ticker_symbol}', falling back to yahooquery...")
+                info = self._fetch_info_with_yahooquery(ticker_symbol)
 
             fast_info = getattr(ticker, "fast_info", {})
 
@@ -438,6 +498,10 @@ class MarketRepository:
             except Exception as ex:
                 logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
                 info = {}
+                
+            if not info:
+                info = self._fetch_info_with_yahooquery(ticker_symbol)
+                
             return {
                 "company_name": info.get("longName") or info.get("shortName") or ticker_symbol,
                 "sector": info.get("sector"),
@@ -462,6 +526,9 @@ class MarketRepository:
             except Exception as ex:
                 logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
                 info = {}
+                
+            if not info:
+                info = self._fetch_info_with_yahooquery(ticker_symbol)
             
             # Fetch financials for manual ratio calculations
             try:

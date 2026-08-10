@@ -106,6 +106,9 @@ async def get_deep_analyze(
                 from app.utils import get_logger
                 get_logger("finnai.market_deep_analyze").warning(f"Deep analyze info rate-limited: {ex}")
                 info = {}
+                
+            if not info:
+                info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
             
             # Fetch financials for manually computed ratios
             try:

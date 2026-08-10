@@ -18,3 +18,4 @@ psycopg[binary]
 openpyxl
 pandas
 langgraph
+yahooquery
