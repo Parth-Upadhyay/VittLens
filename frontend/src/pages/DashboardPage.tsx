@@ -157,19 +157,31 @@ export const DashboardPage: React.FC = () => {
       <div className="space-y-4">
         <h2 className="metric-label">Watchlist Overview</h2>
 
-        {isLoading ? (
+        {watchlist.length === 0 && isLoading ? (
           <div className="py-12 text-center text-sm text-tx-secondary font-sans">Loading market quotes...</div>
-        ) : Object.keys(quotes).length === 0 ? (
+        ) : watchlist.length === 0 ? (
           <div className="py-12 text-center text-sm text-tx-secondary font-sans">No symbols in watchlist. Add a symbol above.</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            {Object.entries(quotes).map(([sym, quote]) => {
+            {watchlist.map((wItem) => {
+              const sym = wItem.symbol;
+              const quote = quotes[sym];
+
+              if (!quote) {
+                return (
+                  <div key={sym} className="surface-card p-6 flex flex-col justify-center items-center h-full min-h-[140px]">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent mb-3"></div>
+                    <span className="text-xs text-tx-secondary font-mono tracking-wide animate-pulse">Loading {sym}</span>
+                  </div>
+                );
+              }
+
               const isGain = quote.change >= 0;
               return (
                 <div
                   key={sym}
                   onClick={() => navigate(`/company/${sym}`)}
-                  className="surface-card p-6 card-interactive cursor-pointer space-y-3 relative group"
+                  className="surface-card p-6 card-interactive cursor-pointer space-y-3 relative group flex flex-col justify-between h-full min-h-[140px]"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -188,9 +200,11 @@ export const DashboardPage: React.FC = () => {
 
                   <div className="flex items-baseline justify-between">
                     <div>
-                      <span className="text-xl font-semibold text-tx-primary font-mono">₹{quote.price.toLocaleString()}</span>
+                      <span className="text-xl font-semibold text-tx-primary font-mono">
+                        {quote.price != null ? `₹${quote.price.toLocaleString()}` : 'N/A'}
+                      </span>
                       <div className={`text-xs font-mono ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
-                        {quote.change >= 0 ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
+                        {quote.change >= 0 ? '+' : ''}{(quote.change || 0).toFixed(2)} ({(quote.change_percent || 0).toFixed(2)}%)
                       </div>
                     </div>
 
