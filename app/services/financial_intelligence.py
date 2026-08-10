@@ -239,7 +239,7 @@ class FinancialIntelligenceService:
                 }
             }
 
-    def extract_agent_data(self, ticker_symbol: str, fast_info: Any, financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> Dict[str, Any]:
+    def extract_agent_data(self, ticker_symbol: str, fast_info: Any, financials: Any, balance_sheet: Any) -> Dict[str, Any]:
         from app.schemas import AgentCurrent, AgentValuation, AgentFinancialYear, AgentHealth, AgentFinancialData
         import datetime
         
