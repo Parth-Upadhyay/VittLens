@@ -23,7 +23,11 @@ export const SymbolSearch: React.FC<SymbolSearchProps> = ({
 
   useEffect(() => {
     if (isOpen && !query) {
-      setResults([]);
+      const defaultResults = (preferences.default_symbols || []).map(sym => ({
+        canonical: sym,
+        match: sym
+      }));
+      setResults(defaultResults);
       return;
     }
 
@@ -92,6 +96,7 @@ export const SymbolSearch: React.FC<SymbolSearchProps> = ({
         onFocus={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        autoComplete="off"
         className="w-full bg-[#0D1912] border border-hairline text-xs text-cream placeholder-cream-dim rounded-lg pl-9 pr-8 py-2 focus:outline-none focus:border-accent font-sans"
       />
       {query && (
