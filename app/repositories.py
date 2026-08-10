@@ -413,8 +413,8 @@ class MarketRepository:
                 logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
                 info = {}
                 
-            if not info:
-                logger.info(f"yfinance.info is empty for '{ticker_symbol}', falling back to yahooquery...")
+            if not info or len(info) < 10:
+                logger.info(f"yfinance.info is nearly empty for '{ticker_symbol}', falling back to yahooquery...")
                 info = self._fetch_info_with_yahooquery(ticker_symbol)
 
             fast_info = getattr(ticker, "fast_info", {})
@@ -499,7 +499,7 @@ class MarketRepository:
                 logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
                 info = {}
                 
-            if not info:
+            if not info or len(info) < 10:
                 info = self._fetch_info_with_yahooquery(ticker_symbol)
                 
             return {
@@ -527,7 +527,7 @@ class MarketRepository:
                 logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
                 info = {}
                 
-            if not info:
+            if not info or len(info) < 10:
                 info = self._fetch_info_with_yahooquery(ticker_symbol)
             
             # Fetch financials for manual ratio calculations
