@@ -433,7 +433,11 @@ class MarketRepository:
         """
         def _fetch():
             ticker = yf.Ticker(ticker_symbol, session=self.session)
-            info = ticker.info or {}
+            try:
+                info = ticker.info or {}
+            except Exception as ex:
+                logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
+                info = {}
             return {
                 "company_name": info.get("longName") or info.get("shortName") or ticker_symbol,
                 "sector": info.get("sector"),
@@ -453,7 +457,11 @@ class MarketRepository:
         """
         def _fetch():
             ticker = yf.Ticker(ticker_symbol, session=self.session)
-            info = ticker.info or {}
+            try:
+                info = ticker.info or {}
+            except Exception as ex:
+                logger.warning(f"Could not fetch yfinance ticker.info for '{ticker_symbol}': {ex}")
+                info = {}
             
             # Fetch financials for manual ratio calculations
             try:
