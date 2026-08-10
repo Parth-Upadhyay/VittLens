@@ -22,6 +22,7 @@ import {
   FileSpreadsheet,
   Award,
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import {
   PieChart,
   Pie,
@@ -69,6 +70,8 @@ export const PortfolioAnalyzerPage: React.FC = () => {
     }
   };
 
+
+
   const handleUploadAndAnalyze = async () => {
     if (!file) return;
     setIsAnalyzing(true);
@@ -78,6 +81,17 @@ export const PortfolioAnalyzerPage: React.FC = () => {
       const res = await PortfolioAnalyzerService.analyzePortfolio(file);
       setAnalysis(res);
       loadSavedAnalyses();
+      
+      if (res.portfolio_metrics.total_pnl === 0 && res.portfolio_metrics.day_pnl === 0) {
+        toast.error("[Beta] Yahoo query finance doesn't have active price data for these assets at the moment. Displaying invested values.", {
+          duration: 6000,
+          style: {
+            background: 'var(--bg-secondary)',
+            color: 'var(--tx-primary)',
+            border: '1px solid var(--border)',
+          }
+        });
+      }
     } catch (err: any) {
       const msg = err.response?.data?.detail || err.message || 'Failed to analyze portfolio CSV.';
       setErrorMsg(msg);
