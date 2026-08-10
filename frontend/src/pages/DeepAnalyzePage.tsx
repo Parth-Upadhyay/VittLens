@@ -20,6 +20,14 @@ interface DeepAnalysisMetric {
   interpretation: string;
 }
 
+interface AgentData {
+  company: string;
+  current: { price: number; currency: string; marketCap?: number; dayHigh?: number; dayLow?: number; timestamp: string };
+  valuation: { forwardPE?: number; trailingPE?: number; priceToBook?: number; enterpriseValue?: number };
+  financials: { year: number; revenue?: number; netIncome?: number; eps?: number; operatingMargin?: number }[];
+  health: { totalDebt?: number; cash?: number; netDebt?: number; debtToEquity?: number; currentRatio?: number };
+}
+
 interface DeepData {
   symbol: string;
   ticker: string;
@@ -38,6 +46,7 @@ interface DeepData {
     valuation_observation: string;
     health_observation: string;
   };
+  agent_data?: AgentData;
 }
 
 function formatValue(value: any, rule: string, unit: string): string {
@@ -280,6 +289,84 @@ export const DeepAnalyzePage: React.FC = () => {
             </div>
 
           </div>
+
+          {/* Agent API Data Dashboard */}
+          {deepData.agent_data && (
+            <div className="pt-4 mt-8 animate-in fade-in duration-700">
+              <div className="flex items-center space-x-2 border-b border-hairline pb-4 mb-6">
+                <BarChart3 className="w-5 h-5 text-accent" />
+                <h3 className="text-lg font-medium text-cream">Programmatic API Metrics (Deterministic API)</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Valuation Metrics */}
+                <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 shadow-sm">
+                  <h4 className="text-sm font-medium text-cream-muted uppercase tracking-wider mb-4">Valuation</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Forward P/E</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{deepData.agent_data.valuation.forwardPE ? deepData.agent_data.valuation.forwardPE.toFixed(2) + 'x' : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Trailing P/E</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{deepData.agent_data.valuation.trailingPE ? deepData.agent_data.valuation.trailingPE.toFixed(2) + 'x' : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Price to Book</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{deepData.agent_data.valuation.priceToBook ? deepData.agent_data.valuation.priceToBook.toFixed(2) + 'x' : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Enterprise Value</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{formatValue(deepData.agent_data.valuation.enterpriseValue, 'large_currency', deepData.agent_data.current.currency === 'INR' ? '₹' : '$')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Health Metrics */}
+                <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 shadow-sm">
+                  <h4 className="text-sm font-medium text-cream-muted uppercase tracking-wider mb-4">Health</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Net Debt</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{formatValue(deepData.agent_data.health.netDebt, 'large_currency', deepData.agent_data.current.currency === 'INR' ? '₹' : '$')}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Debt / Equity</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{deepData.agent_data.health.debtToEquity ? deepData.agent_data.health.debtToEquity.toFixed(2) + 'x' : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Current Ratio</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{deepData.agent_data.health.currentRatio ? deepData.agent_data.health.currentRatio.toFixed(2) : 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-cream-muted">Cash Reserves</span>
+                      <span className="text-[13px] text-cream font-mono font-medium">{formatValue(deepData.agent_data.health.cash, 'large_currency', deepData.agent_data.current.currency === 'INR' ? '₹' : '$')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Growth Trends */}
+                <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 shadow-sm">
+                  <h4 className="text-sm font-medium text-cream-muted uppercase tracking-wider mb-4">Financials (Last 3 Years)</h4>
+                  <div className="space-y-3">
+                    {/* Header */}
+                    <div className="flex justify-between items-center text-[10px] text-cream-muted uppercase tracking-wider border-b border-hairline pb-2">
+                      <span className="w-8">Year</span>
+                      <span className="text-right flex-1">Revenue</span>
+                      <span className="text-right w-16">Op Margin</span>
+                    </div>
+                    {deepData.agent_data.financials.slice().reverse().slice(-3).reverse().map(yr => (
+                      <div key={yr.year} className="flex justify-between items-center text-xs pt-1">
+                        <span className="text-cream-muted w-8 font-medium">{yr.year}</span>
+                        <span className="text-cream font-mono text-right flex-1">{formatValue(yr.revenue, 'large_currency', deepData.agent_data.current.currency === 'INR' ? '₹' : '$')}</span>
+                        <span className="text-semantic-green font-mono text-right w-16">{yr.operatingMargin ? (yr.operatingMargin * 100).toFixed(1) + '%' : 'N/A'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Supporting Evidence (Raw Metrics) */}
           <div className="pt-8">

@@ -767,3 +767,46 @@ class QuantComparison(BaseModel):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+# Agent Pipeline Redesign Schemas
+
+class AgentCurrent(BaseModel):
+    price: float
+    currency: str
+    marketCap: Optional[float]
+    dayHigh: Optional[float]
+    dayLow: Optional[float]
+    timestamp: str
+
+class AgentValuation(BaseModel):
+    forwardPE: Optional[float]
+    trailingPE: Optional[float]
+    priceToBook: Optional[float]
+    enterpriseValue: Optional[float]
+
+class AgentFinancialYear(BaseModel):
+    year: int
+    revenue: Optional[float]
+    netIncome: Optional[float]
+    eps: Optional[float]
+    operatingMargin: Optional[float]
+
+class AgentHealth(BaseModel):
+    totalDebt: Optional[float]
+    cash: Optional[float]
+    netDebt: Optional[float]
+    debtToEquity: Optional[float]
+    currentRatio: Optional[float]
+
+class AgentFinancialData(BaseModel):
+    company: str
+    current: AgentCurrent
+    valuation: AgentValuation
+    financials: List[AgentFinancialYear]
+    health: AgentHealth
+
+class AgentResponse(BaseModel):
+    status: str
+    data: Any
+    timestamp: Optional[str] = None
+

@@ -238,3 +238,119 @@ class FinancialIntelligenceService:
                     "health_observation": "N/A"
                 }
             }
+
+    def extract_agent_data(self, ticker_symbol: str, fast_info: Any, financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> Dict[str, Any]:
+        from app.schemas import AgentCurrent, AgentValuation, AgentFinancialYear, AgentHealth, AgentFinancialData
+        import datetime
+        
+        price = getattr(fast_info, "last_price", None)
+        if price is None: price = 0.0
+        currency = getattr(fast_info, "currency", "USD")
+        market_cap = getattr(fast_info, "market_cap", None)
+        day_high = getattr(fast_info, "year_high", None)  # Fallback to 52w high if day high missing
+        day_low = getattr(fast_info, "year_low", None)
+
+        current = AgentCurrent(
+            price=price,
+            currency=currency,
+            marketCap=market_cap,
+            dayHigh=day_high,
+            dayLow=day_low,
+            timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        )
+        
+        # Valuation
+        pe = None
+        shares = getattr(fast_info, "shares", None)
+        net_income_ttm = self._get_val(financials, "Net Income", 0)
+        eps = None
+        if net_income_ttm and shares:
+            eps = net_income_ttm / shares
+        if price and eps and eps > 0:
+            pe = price / eps
+            
+        equity = self._get_val(balance_sheet, "Stockholders Equity", 0) or self._get_val(balance_sheet, "Common Stock Equity", 0) or self._get_val(balance_sheet, "Total Equity Gross Minority Interest", 0)
+        pb = None
+        if market_cap and equity and equity > 0:
+            pb = market_cap / equity
+            
+        total_debt = self._get_val(balance_sheet, "Total Debt", 0)
+        total_cash = self._get_val(balance_sheet, "Cash And Cash Equivalents", 0) or self._get_val(balance_sheet, "Cash Cash Equivalents And Short Term Investments", 0)
+        ev = None
+        if market_cap and total_debt is not None and total_cash is not None:
+            ev = market_cap + total_debt - total_cash
+            
+        valuation = AgentValuation(
+            forwardPE=pe,
+            trailingPE=pe,
+            priceToBook=pb,
+            enterpriseValue=ev
+        )
+        
+        # Health
+        net_debt = None
+        if total_debt is not None and total_cash is not None:
+            net_debt = total_debt - total_cash
+        debt_to_equity = None
+        if total_debt is not None and equity and equity > 0:
+            debt_to_equity = total_debt / equity
+            
+        current_assets = self._get_val(balance_sheet, "Current Assets", 0)
+        current_liabilities = self._get_val(balance_sheet, "Current Liabilities", 0)
+        current_ratio = None
+        if current_assets and current_liabilities and current_liabilities > 0:
+            current_ratio = current_assets / current_liabilities
+            
+        health = AgentHealth(
+            totalDebt=total_debt,
+            cash=total_cash,
+            netDebt=net_debt,
+            debtToEquity=debt_to_equity,
+            currentRatio=current_ratio
+        )
+        
+        # Financials
+        fin_list = []
+        if financials is not None and not financials.empty:
+            num_years = min(4, len(financials.columns))
+            for i in range(num_years - 1, -1, -1):
+                rev = self._get_val(financials, "Total Revenue", i)
+                ni = self._get_val(financials, "Net Income", i)
+                ebitda = self._get_val(financials, "EBITDA", i) or self._get_val(financials, "Normalized EBITDA", i)
+                op_margin = None
+                if ebitda and rev and rev > 0:
+                    op_margin = ebitda / rev
+                e_eps = None
+                if ni and shares:
+                    e_eps = ni / shares
+                
+                try:
+                    # Parse year from timestamp
+                    col_name = financials.columns[i]
+                    if isinstance(col_name, str):
+                        year = int(col_name[:4])
+                    elif hasattr(col_name, "year"):
+                        year = col_name.year
+                    else:
+                        year = 2024 - i
+                except:
+                    year = 2024 - i
+                    
+                fin_list.append(AgentFinancialYear(
+                    year=year,
+                    revenue=rev,
+                    netIncome=ni,
+                    eps=e_eps,
+                    operatingMargin=op_margin
+                ))
+                
+        agent_data = AgentFinancialData(
+            company=ticker_symbol,
+            current=current,
+            valuation=valuation,
+            financials=fin_list,
+            health=health
+        )
+        
+        return agent_data.model_dump()
+

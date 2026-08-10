@@ -177,10 +177,12 @@ async def get_deep_analyze(
             fi_service = FinancialIntelligenceService()
             metrics = fi_service.normalize_metrics(ticker_symbol, fast_info_obj, fin, bs, info)
             report = fi_service.generate_intelligence_report(ticker_symbol, metrics)
+            agent_data = fi_service.extract_agent_data(ticker_symbol, fast_info_obj, fin, bs)
             
             return {
                 "metrics": metrics,
                 **report,
+                "agent_data": agent_data,
             }
         
         data = await asyncio.to_thread(_fetch_all)
@@ -190,3 +192,161 @@ async def get_deep_analyze(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Deep analyze data unavailable for '{symbol}'. Reason: {str(e)}",
         ) from e
+
+
+def _calculate_cagr(start: float, end: float, years: int) -> float:
+    if not start or start <= 0 or not end or end <= 0 or years <= 0:
+        return 0.0
+    return round(((end / start) ** (1 / years) - 1) * 100, 4)
+
+def _calculate_avg_growth(values: list) -> float:
+    growths = []
+    for i in range(1, len(values)):
+        if values[i-1] and values[i-1] > 0 and values[i] is not None:
+            growths.append(((values[i] - values[i-1]) / values[i-1]) * 100)
+    if not growths: return 0.0
+    return round(sum(growths) / len(growths), 2)
+
+@router.get("/deep-analyze/{symbol}/all", summary="Get all agent structured data")
+async def get_agent_all(symbol: str, service: MarketService = Depends(get_market_service)):
+    import datetime
+    res = await get_deep_analyze(symbol, service)
+    return {"status": "ok", "data": res.get("agent_data"), "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()}
+
+@router.get("/deep-analyze/{symbol}/valuation", summary="Get agent valuation data")
+async def get_agent_valuation(symbol: str, service: MarketService = Depends(get_market_service)):
+    res = await get_deep_analyze(symbol, service)
+    ad = res.get("agent_data", {})
+    return {
+        "status": "ok",
+        "data": {
+            "currentPrice": ad.get("current", {}).get("price"),
+            "currency": ad.get("current", {}).get("currency"),
+            "forwardPE": ad.get("valuation", {}).get("forwardPE"),
+            "trailingPE": ad.get("valuation", {}).get("trailingPE"),
+            "priceToBook": ad.get("valuation", {}).get("priceToBook"),
+            "marketCap": ad.get("current", {}).get("marketCap"),
+            "dayHigh": ad.get("current", {}).get("dayHigh"),
+            "dayLow": ad.get("current", {}).get("dayLow"),
+            "enterpriseValue": ad.get("valuation", {}).get("enterpriseValue")
+        },
+        "timestamp": ad.get("current", {}).get("timestamp")
+    }
+
+@router.get("/deep-analyze/{symbol}/growth", summary="Get agent growth data")
+async def get_agent_growth(symbol: str, service: MarketService = Depends(get_market_service)):
+    res = await get_deep_analyze(symbol, service)
+    ad = res.get("agent_data", {})
+    fins = ad.get("financials", [])
+    
+    # Financials are newest first, let's reverse them for growth calc (oldest first)
+    fins_rev = list(reversed(fins))
+    
+    growth_rates = []
+    for i, yr in enumerate(fins_rev):
+        rev = yr.get("revenue")
+        eps = yr.get("eps")
+        prev_rev = fins_rev[i-1].get("revenue") if i > 0 else None
+        prev_eps = fins_rev[i-1].get("eps") if i > 0 else None
+        
+        rev_growth = ((rev - prev_rev) / prev_rev * 100) if (i > 0 and rev and prev_rev and prev_rev > 0) else None
+        eps_growth = ((eps - prev_eps) / prev_eps * 100) if (i > 0 and eps and prev_eps and prev_eps > 0) else None
+        
+        growth_rates.append({
+            "year": yr.get("year"),
+            "revenue": rev,
+            "revenueGrowthYoY": rev_growth,
+            "netIncome": yr.get("netIncome"),
+            "eps": eps,
+            "epsGrowthYoY": eps_growth,
+            "operatingMargin": yr.get("operatingMargin")
+        })
+        
+    cagr3 = 0.0
+    if len(fins_rev) >= 4:
+        cagr3 = _calculate_cagr(fins_rev[0].get("revenue"), fins_rev[-1].get("revenue"), len(fins_rev)-1)
+        
+    avg_eps = _calculate_avg_growth([f.get("eps") for f in fins_rev])
+        
+    return {
+        "status": "ok",
+        "data": {
+            "financials": growth_rates, # Client requested old->new or new->old, we provide old->new based on the script
+            "cagr3Year": cagr3,
+            "averageEPSGrowth": avg_eps
+        }
+    }
+
+@router.get("/deep-analyze/{symbol}/health", summary="Get agent health data")
+async def get_agent_health(symbol: str, service: MarketService = Depends(get_market_service)):
+    res = await get_deep_analyze(symbol, service)
+    ad = res.get("agent_data", {})
+    health = ad.get("health", {})
+    fins = ad.get("financials", [])
+    
+    net_debt = health.get("netDebt", 0)
+    debt_to_equity = health.get("debtToEquity", 0)
+    current_ratio = health.get("currentRatio", 0)
+    
+    score = 50
+    if net_debt is not None and net_debt < 0: score += 20
+    if current_ratio is not None and current_ratio > 1: score += 10
+    if debt_to_equity is not None and debt_to_equity < 1: score += 15
+    score = min(score, 100)
+    
+    assessment = "Low Risk" if net_debt is not None and net_debt < 0 else "Moderate Risk"
+    
+    latest_ni = fins[0].get("netIncome") if fins else None
+    latest_margin = fins[0].get("operatingMargin") if fins else None
+    
+    return {
+        "status": "ok",
+        "data": {
+            "debt": {
+                "totalDebt": health.get("totalDebt"),
+                "cash": health.get("cash"),
+                "netDebt": net_debt,
+                "debtToEquity": str(round(debt_to_equity, 2)) if debt_to_equity else "0.00"
+            },
+            "liquidity": {
+                "currentRatio": str(round(current_ratio, 2)) if current_ratio else "0.00",
+                "netDebt": net_debt,
+                "cashPosition": health.get("cash")
+            },
+            "profitability": {
+                "netIncome": latest_ni,
+                "operatingMargin": f"{round(latest_margin * 100, 1)}%" if latest_margin else "N/A"
+            },
+            "riskAssessment": {
+                "score": score,
+                "assessment": assessment
+            }
+        }
+    }
+
+@router.get("/deep-analyze/{symbol}/summary", summary="Get agent summary data")
+async def get_agent_summary(symbol: str, service: MarketService = Depends(get_market_service)):
+    res = await get_deep_analyze(symbol, service)
+    ad = res.get("agent_data", {})
+    health = ad.get("health", {})
+    fins = ad.get("financials", [])
+    
+    net_debt = health.get("netDebt", 0)
+    risk = "Low" if net_debt is not None and net_debt < 0 else "Moderate"
+    
+    latest_rev = fins[0].get("revenue") if fins else None
+    latest_eps = fins[0].get("eps") if fins else None
+    
+    return {
+        "status": "ok",
+        "data": {
+            "company": ad.get("company"),
+            "price": ad.get("current", {}).get("price"),
+            "forwardPE": ad.get("valuation", {}).get("forwardPE"),
+            "recentRevenue": latest_rev,
+            "recentEPS": latest_eps,
+            "netDebt": net_debt,
+            "riskLevel": risk
+        }
+    }
+
