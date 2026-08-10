@@ -48,12 +48,15 @@ class FinancialIntelligenceService:
         # Current values
         net_income = self._get_val(financials, "Net Income") or self._get_val(financials, "NetIncome")
         total_revenue = self._get_val(financials, "Total Revenue") or self._get_val(financials, "TotalRevenue")
+        gross_profit = self._get_val(financials, "Gross Profit") or self._get_val(financials, "GrossProfit")
         operating_income = self._get_val(financials, "Operating Income") or self._get_val(financials, "OperatingIncome")
         ebitda = self._get_val(financials, "EBITDA") or self._get_val(financials, "Normalized EBITDA") or self._get_val(financials, "NormalizedEBITDA")
         ebit = self._get_val(financials, "EBIT") or operating_income
+        interest_expense = self._get_val(financials, "Interest Expense") or self._get_val(financials, "InterestExpense")
 
         equity = self._get_val(balance_sheet, "Stockholders Equity") or self._get_val(balance_sheet, "StockholdersEquity") or self._get_val(balance_sheet, "Total Equity Gross Minority Interest") or self._get_val(balance_sheet, "TotalEquityGrossMinorityInterest")
         total_assets = self._get_val(balance_sheet, "Total Assets") or self._get_val(balance_sheet, "TotalAssets")
+        current_assets = self._get_val(balance_sheet, "Current Assets") or self._get_val(balance_sheet, "CurrentAssets")
         current_liabilities = self._get_val(balance_sheet, "Current Liabilities") or self._get_val(balance_sheet, "CurrentLiabilities")
         total_debt = self._get_val(balance_sheet, "Total Debt") or self._get_val(balance_sheet, "TotalDebt")
         total_cash = self._get_val(balance_sheet, "Cash And Cash Equivalents") or self._get_val(balance_sheet, "CashAndCashEquivalents") or self._get_val(balance_sheet, "Cash Cash Equivalents And Short Term Investments") or self._get_val(balance_sheet, "CashCashEquivalentsAndShortTermInvestments")
@@ -147,16 +150,24 @@ class FinancialIntelligenceService:
 
         # Profitability
         if total_revenue and total_revenue > 0:
+            if gross_profit: add_metric("Profitability", "grossMargin", "Gross Margin", gross_profit / total_revenue, "%", "percent")
+            if operating_income: add_metric("Profitability", "operatingMargin", "Operating Margin", operating_income / total_revenue, "%", "percent")
             if net_income: add_metric("Profitability", "netMargin", "Net Margin", net_income / total_revenue, "%", "percent")
             if ebitda: add_metric("Profitability", "ebitdaMargin", "EBITDA Margin", ebitda / total_revenue, "%", "percent")
         if net_income and equity and equity > 0:
             add_metric("Profitability", "roe", "Return on Equity (ROE)", net_income / equity, "%", "percent")
+        if net_income and total_assets and total_assets > 0:
+            add_metric("Profitability", "roa", "Return on Assets (ROA)", net_income / total_assets, "%", "percent")
         if ebit and total_assets and current_liabilities:
             cap_emp = total_assets - current_liabilities
             if cap_emp > 0:
                 add_metric("Profitability", "roce", "Return on Capital Employed (ROCE)", ebit / cap_emp, "%", "percent")
 
         # Financial Health
+        if current_assets and current_liabilities and current_liabilities > 0:
+            add_metric("Financial Health", "currentRatio", "Current Ratio", current_assets / current_liabilities, "x", "multiple")
+        if ebit and interest_expense and interest_expense > 0:
+            add_metric("Financial Health", "interestCoverage", "Interest Coverage", ebit / interest_expense, "x", "multiple")
         if total_debt is not None and equity and equity > 0:
             add_metric("Financial Health", "debtToEquity", "Debt / Equity", total_debt / equity, "x", "multiple")
         if total_debt is not None and total_cash is not None:
