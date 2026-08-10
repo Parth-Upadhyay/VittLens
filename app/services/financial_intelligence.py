@@ -1,8 +1,8 @@
 import json
 import math
 from typing import Dict, Any, List, Optional
+from app.services.factory import get_llm_provider
 from app.utils import get_logger
-from app.services.factory import LLMFactory
 
 logger = get_logger("finnai.financial_intelligence")
 
@@ -12,7 +12,7 @@ class FinancialIntelligenceService:
     """
 
     def __init__(self):
-        self.llm = LLMFactory.get_provider()
+        self.llm = get_llm_provider()
 
     def _get_val(self, df, key, year_idx=0):
         if df is None or key not in df.index or df.empty:
