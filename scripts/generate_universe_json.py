@@ -15,35 +15,50 @@ def build_universe():
         "mutual_funds": {}
     }
 
-    # Load nifty500_aliases.json as base stock universe
+    # Load nifty500_aliases.json to update it and use for fallback
     aliases_path = os.path.join("config", "nifty500_aliases.json")
     if os.path.exists(aliases_path):
         with open(aliases_path, "r", encoding="utf-8") as f:
-            stock_data = json.load(f)
+            stock_aliases = json.load(f)
     else:
-        stock_data = {}
+        stock_aliases = {}
 
-    sectors = [
-        "Financial Services", "Information Technology", "Automobile & Auto Components",
-        "Oil Gas & Consumable Fuels", "Fast Moving Consumer Goods", "Healthcare & Pharma",
-        "Metals & Mining", "Power & Energy", "Construction & Infrastructure", "Consumer Durables",
-        "Telecommunication", "Chemicals", "Services & Retail"
-    ]
+    # Read user's NIFTY 500 raw tsv
+    raw_path = os.path.join("config", "nifty500_raw.tsv")
+    if os.path.exists(raw_path):
+        with open(raw_path, "r", encoding="utf-8") as f:
+            lines = f.read().strip().split('\n')
+            
+        rank = 1
+        for line in lines[1:]: # Skip header
+            parts = line.split('\t')
+            if len(parts) >= 3:
+                name = parts[0].strip()
+                sector = parts[1].strip()
+                symbol = parts[2].strip().upper()
+                
+                universe["stocks"][symbol] = {
+                    "symbol": symbol,
+                    "name": name,
+                    "type": "stock",
+                    "sector": sector,
+                    "market_cap_rank": rank
+                }
+                
+                # Update aliases
+                if symbol not in stock_aliases:
+                    stock_aliases[symbol] = [symbol.lower(), name.lower()]
+                else:
+                    if name.lower() not in stock_aliases[symbol]:
+                        stock_aliases[symbol].append(name.lower())
+                        
+                rank += 1
+                
+        # Save back updated aliases
+        with open(aliases_path, "w", encoding="utf-8") as f:
+            json.dump(stock_aliases, f, indent=2)
 
-    # Populate Stocks
-    rank = 1
-    for symbol in stock_data.keys():
-        sec = sectors[rank % len(sectors)]
-        universe["stocks"][symbol.upper()] = {
-            "symbol": symbol.upper(),
-            "name": f"{symbol.upper()} India Ltd",
-            "type": "stock",
-            "sector": sec,
-            "market_cap_rank": rank
-        }
-        rank += 1
-
-    # Ensure major stocks present
+    # Ensure major stocks present as fallback if they aren't in the tsv
     major_stocks = [
         ("RELIANCE", "Reliance Industries Ltd", "Oil Gas & Consumable Fuels"),
         ("TCS", "Tata Consultancy Services Ltd", "Information Technology"),
@@ -65,13 +80,14 @@ def build_universe():
     ]
 
     for sym, name, sec in major_stocks:
-        universe["stocks"][sym] = {
-            "symbol": sym,
-            "name": name,
-            "type": "stock",
-            "sector": sec,
-            "market_cap_rank": rank
-        }
+        if sym not in universe["stocks"]:
+            universe["stocks"][sym] = {
+                "symbol": sym,
+                "name": name,
+                "type": "stock",
+                "sector": sec,
+                "market_cap_rank": 999
+            }
 
     # Populate Popular ETFs
     etfs = [
