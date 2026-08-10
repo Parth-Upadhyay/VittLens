@@ -19,6 +19,7 @@ from app.schemas import FilingChunk
 from app.schemas import StockQuote
 from app.schemas import NewsArticleResponse
 from app.schemas import RatioSnapshot
+from app.schemas import KeyStatistics
 from app.utils import get_logger
 
 logger = get_logger("finnai.context_builder")
@@ -51,10 +52,12 @@ class ContextBuilder:
             InvestorContext model with Token Guard truncation flags.
         """
         market_data: Dict[str, StockQuote] = {}
+        key_stats: Dict[str, KeyStatistics] = {}
         news: Dict[str, List[NewsArticleResponse]] = {}
         ratios: Dict[str, RatioSnapshot] = {}
         filings: Dict[str, List[FilingChunk]] = {}
         image_urls: List[str] = []
+        raw_metrics: Dict[str, List[Dict[str, Any]]] = {}
 
         for r in results:
             if r.status != "success" or not r.data:
@@ -64,6 +67,11 @@ class ContextBuilder:
             if isinstance(r.data, MarketAgentResult):
                 for sym, quote in r.data.quotes.items():
                     market_data[sym] = quote
+                for sym, stat in r.data.key_stats.items():
+                    key_stats[sym] = stat
+                if hasattr(r.data, 'raw_metrics'):
+                    for sym, r_metrics in r.data.raw_metrics.items():
+                        raw_metrics[sym] = r_metrics
 
             # Process NewsAgentResult
             elif isinstance(r.data, NewsAgentResult):
@@ -136,9 +144,11 @@ class ContextBuilder:
 
         return InvestorContext(
             market_data=market_data,
+            key_stats=key_stats,
             news=news,
             ratios=ratios,
             filings=filings,
             image_urls=image_urls,
             context_truncated=context_truncated,
+            raw_metrics=raw_metrics,
         )

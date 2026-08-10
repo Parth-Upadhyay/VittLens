@@ -144,6 +144,15 @@ class OrchestratorPromptBuilder:
                     f"Volume: {quote.volume:,} | Market Cap: {mcap_str} | "
                     f"52-Week Range: ₹{quote.fifty_two_week_low} - ₹{quote.fifty_two_week_high}"
                 )
+                
+                # Append key_stats if available (often fetched via MarketAgent)
+                if hasattr(context, "key_stats") and context.key_stats and sym in context.key_stats:
+                    stat = context.key_stats[sym]
+                    prompt_parts.append(
+                        f"  -> Key Stats for {sym}: P/E={cls.format_num(stat.pe_ratio)}, ROE={cls.format_pct(stat.roe)}, "
+                        f"Net Margin={cls.format_pct(stat.profit_margins)}, Gross Margin={cls.format_pct(stat.gross_margins)}, "
+                        f"Div Yield={cls.format_pct(stat.dividend_yield)}, Target Price=₹{cls.format_num(stat.target_price)}"
+                    )
             prompt_parts.append("")
 
         # 2. Financial Statements & Quantitative Ratios Section (Pre-formatted clean ratios)
@@ -161,6 +170,17 @@ class OrchestratorPromptBuilder:
                     f"  • Solvency & Liquidity: Debt/Equity={cls.format_num(lev.debt_to_equity)}, Current Ratio={cls.format_num(lev.current_ratio)}\n"
                     f"  • Dividend: Yield={cls.format_pct(div.dividend_yield)}"
                 )
+            prompt_parts.append("")
+
+        # 2b. Supporting Evidence (Raw Metrics)
+        if getattr(context, "raw_metrics", None):
+            prompt_parts.append("### 2b. SUPPORTING EVIDENCE (RAW METRICS)")
+            for sym, metrics_list in context.raw_metrics.items():
+                if metrics_list:
+                    prompt_parts.append(f"[{sym}] Additional Raw Metrics:")
+                    for m in metrics_list:
+                        val_str = f"{m.get('value')} {m.get('unit', '')}".strip()
+                        prompt_parts.append(f"  • {m.get('category')} | {m.get('label')}: {val_str}")
             prompt_parts.append("")
 
         # 3. Macro Intelligence Context

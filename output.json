@@ -1,0 +1,82 @@
+{
+  "id": null,
+  "summary": "The portfolio has a total value of \u20b99,816.1, a total invested amount of \u20b99,829.75, and a total P&L of -\u20b913.65, resulting in a negative 0.14% return. The risk score is 9, indicating a high-risk portfolio. The concentration risk is 100%, indicating a highly concentrated portfolio.",
+  "holdings": [
+    {
+      "symbol": "NIFTYBEES",
+      "name": "Nippon India Nifty 50 ETF",
+      "asset_type": "etf",
+      "quantity": 35.0,
+      "avg_buy_price": 280.85,
+      "current_price": 280.46,
+      "total_invested": 9829.75,
+      "current_value": 9816.1,
+      "pnl": -13.65,
+      "pnl_percent": -0.14,
+      "day_change": 0.63,
+      "weight_percent": 100.0,
+      "sector": "Broad Market ETF",
+      "pe_ratio": null,
+      "debt_to_equity": null,
+      "news_summary": ""
+    }
+  ],
+  "portfolio_metrics": {
+    "total_value": 9816.1,
+    "total_invested": 9829.75,
+    "total_pnl": -13.65,
+    "total_pnl_percent": -0.14,
+    "day_pnl": 22.05,
+    "risk_score": 9,
+    "concentration_risk_percent": 100.0
+  },
+  "allocation": {
+    "sector_breakdown": {
+      "Broad Market ETF": 100.0
+    },
+    "asset_type_breakdown": {
+      "etf": 100.0
+    }
+  },
+  "rebalancing_suggestions": [
+    "Consider rebalancing the portfolio to reduce concentration risk and improve diversification."
+  ],
+  "news_alerts": {},
+  "red_flags": [
+    "High risk score of 9, indicating a high-risk portfolio.",
+    "Concentration risk is 100%, indicating a highly concentrated portfolio."
+  ],
+  "benchmark_comparison": [
+    {
+      "period": "1M",
+      "portfolio_return_percent": -0.14,
+      "nifty50_return_percent": 1.5,
+      "outperformance_percent": -1.64
+    },
+    {
+      "period": "6M",
+      "portfolio_return_percent": -0.14,
+      "nifty50_return_percent": -4.5,
+      "outperformance_percent": 4.36
+    },
+    {
+      "period": "1Y",
+      "portfolio_return_percent": -0.14,
+      "nifty50_return_percent": -0.06,
+      "outperformance_percent": -0.08
+    }
+  ],
+  "tax_loss_harvesting": [
+    {
+      "symbol": "NIFTYBEES",
+      "name": "Nippon India Nifty 50 ETF",
+      "unrealized_loss": 13.65,
+      "unrealized_loss_percent": 0.14,
+      "est_stcg_tax_saving": 2.73,
+      "est_ltcg_tax_saving": 1.71,
+      "recommendation": "Sell NIFTYBEES position to harvest \u20b913.65 unrealized loss. Offsets capital gains tax, saving up to \u20b92.73 STCG or \u20b91.71 LTCG tax."
+    }
+  ],
+  "images": [],
+  "created_at": "2026-08-10T20:30:46.185679+00:00"
+}

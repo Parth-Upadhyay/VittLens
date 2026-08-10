@@ -205,6 +205,26 @@ class FinancialIntelligenceService:
             add_metric("Financial Health", "debtToEquity", "Debt / Equity", total_debt / equity, "x", "multiple")
         if total_debt is not None and total_cash is not None:
             add_metric("Financial Health", "netDebt", "Net Debt", total_debt - total_cash, "₹", "large_currency")
+        # Add all other Yahoo Query metrics as Supporting Metrics (excluding NaN)
+        # 1. Financials
+        if financials is not None and not financials.empty:
+            for metric_name in financials.index:
+                val = self._get_val(financials, metric_name, 0)
+                if val is not None and not (isinstance(val, float) and math.isnan(val)):
+                    add_metric("Supporting Metrics", f"fin_{metric_name}", str(metric_name), val, "", "standard")
+                    
+        # 2. Balance Sheet
+        if balance_sheet is not None and not balance_sheet.empty:
+            for metric_name in balance_sheet.index:
+                val = self._get_val(balance_sheet, metric_name, 0)
+                if val is not None and not (isinstance(val, float) and math.isnan(val)):
+                    add_metric("Supporting Metrics", f"bs_{metric_name}", str(metric_name), val, "", "standard")
+                    
+        # 3. Info / Fast Info
+        if info is not None:
+            for metric_name, val in info.items():
+                if val is not None and isinstance(val, (int, float)) and not (isinstance(val, float) and math.isnan(val)):
+                    add_metric("Supporting Metrics", f"info_{metric_name}", str(metric_name), val, "", "standard")
 
         return metrics
 

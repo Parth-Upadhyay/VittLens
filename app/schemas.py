@@ -50,6 +50,7 @@ class MarketAgentResult(BaseModel):
     charts: Dict[str, HistoricalData] = Field(default_factory=dict, description="Chart data mapped by symbol.")
     profiles: Dict[str, CompanyInfo] = Field(default_factory=dict, description="Company profiles mapped by symbol.")
     key_stats: Dict[str, KeyStatistics] = Field(default_factory=dict, description="Key statistics mapped by symbol.")
+    raw_metrics: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict, description="Raw supporting metrics from deep analyze")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -171,11 +172,13 @@ class InvestorContext(BaseModel):
     """
 
     market_data: Dict[str, StockQuote] = Field(default_factory=dict, description="Stock quotes mapped by canonical symbol.")
+    key_stats: Dict[str, KeyStatistics] = Field(default_factory=dict, description="Key statistics mapped by canonical symbol.")
     news: Dict[str, List[NewsArticleResponse]] = Field(default_factory=dict, description="News articles mapped by canonical symbol.")
     ratios: Dict[str, RatioSnapshot] = Field(default_factory=dict, description="Ratio snapshots mapped by canonical symbol.")
     filings: Dict[str, List[FilingChunk]] = Field(default_factory=dict, description="SEC filing chunks mapped by canonical symbol.")
     image_urls: List[str] = Field(default_factory=list, description="Flat list of Cloudinary visual chart image URLs.")
     context_truncated: bool = Field(default=False, description="Flag indicating whether ContextBuilder had to truncate evidence.")
+    raw_metrics: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict, description="Raw supporting metrics from deep analyze")
 
     model_config = ConfigDict(from_attributes=True)
 
