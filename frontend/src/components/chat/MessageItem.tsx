@@ -29,7 +29,7 @@ const renderTextWithTabularNums = (text: string): React.ReactNode => {
   return parts.map((part, i) => {
     if (part.match(numberRegex)) {
       return (
-        <span key={i} className="font-mono tabular-nums text-cream font-medium">
+        <span key={i} className="font-mono tabular-nums text-tx-primary font-medium">
           {part}
         </span>
       );
@@ -123,29 +123,29 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   }
 
   return (
-    <div className={`py-5 border-b border-hairline ${isUser ? 'bg-[#060E0A]' : 'bg-[#0D1912]'}`}>
-      <div className="max-w-4xl mx-auto px-4 flex space-x-4 min-w-0 w-full overflow-hidden">
+    <div className={`py-6 border-b border-border ${isUser ? 'bg-bg-primary' : 'bg-bg-secondary shadow-sm'}`}>
+      <div className="max-w-4xl mx-auto px-4 md:px-8 flex space-x-5 min-w-0 w-full overflow-hidden">
         {/* Author Avatar */}
         <div className="flex-shrink-0 pt-0.5">
           {isUser ? (
-            <div className="w-8 h-8 rounded-full bg-[#14251B] border border-hairline flex items-center justify-center text-cream-muted font-sans text-xs">
+            <div className="w-9 h-9 rounded-full bg-bg-tertiary border border-border flex items-center justify-center text-tx-secondary font-sans text-xs shadow-sm">
               <User className="w-4 h-4" />
             </div>
           ) : (
-            <div className="w-8 h-8 rounded-full bg-[#14251B] border border-hairline flex items-center justify-center text-accent font-sans font-medium text-xs">
+            <div className="w-9 h-9 rounded-full bg-accent-light border border-accent/20 flex items-center justify-center text-accent font-sans font-bold text-xs shadow-sm">
               AI
             </div>
           )}
         </div>
 
         {/* Message Content Container - Prevents horizontal overflow */}
-        <div className="flex-1 space-y-3 min-w-0 overflow-hidden break-words">
+        <div className="flex-1 space-y-4 min-w-0 overflow-hidden break-words">
           {/* Header Metadata (Agent Chips & Symbol Labels) */}
-          <div className="flex flex-wrap items-center gap-2 text-xs text-cream-muted">
-            <span className="font-sans font-medium text-cream">{isUser ? 'You' : 'VittLens Analyst'}</span>
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-tx-secondary">
+            <span className="font-heading font-semibold text-tx-primary tracking-wide uppercase text-xs">{isUser ? 'You' : 'VittLens Analyst'}</span>
 
             {!isUser && agents_used && agents_used.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 ml-1">
+              <div className="flex flex-wrap items-center gap-2 ml-2">
                 {agents_used.map((agent) => (
                   <AgentChip key={agent} name={agent} />
                 ))}
@@ -153,9 +153,9 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             )}
 
             {symbols_queried && symbols_queried.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1 ml-1">
+              <div className="flex flex-wrap items-center gap-1.5 ml-2">
                 {symbols_queried.map((sym) => (
-                  <span key={sym} className="text-[10px] font-mono tabular-nums text-accent bg-accent/15 px-1.5 py-0.5 rounded border border-accent/30">
+                  <span key={sym} className="text-[11px] font-mono tabular-nums text-accent bg-accent-light px-2 py-0.5 rounded-md border border-accent/20">
                     ${sym}
                   </span>
                 ))}
@@ -165,7 +165,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
           {/* Context Truncated Warning Banner */}
           {context_truncated && (
-            <div className="flex items-center space-x-2 p-2.5 rounded bg-semantic-amber/10 border border-semantic-amber/30 text-semantic-amber text-xs font-sans">
+            <div className="alert-warm">
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
               <span>Evidence ranked and compressed to fit token budget bounds.</span>
             </div>
@@ -173,23 +173,23 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
           {/* Message Body */}
           {isUser ? (
-            <p className="text-sm text-cream whitespace-pre-wrap font-sans leading-relaxed break-words">{content}</p>
+            <p className="text-[15px] text-tx-primary whitespace-pre-wrap font-sans leading-relaxed break-words">{content}</p>
           ) : (
-            <div className="space-y-4 min-w-0">
+            <div className="space-y-5 min-w-0">
               {/* Synthesized 1-2 sentence takeaway in Fraunces font */}
               {openingTakeaway && (
-                <div className="p-4 bg-[#14251B]/60 border-l-2 border-accent rounded-r space-y-1.5 shadow-sm">
-                  <div className="text-[10px] font-sans font-medium tracking-widest text-cream-muted uppercase">
+                <div className="p-5 bg-bg-tertiary border-l-4 border-accent rounded-r-lg space-y-2 shadow-sm">
+                  <div className="text-[11px] font-sans font-semibold tracking-widest text-tx-secondary uppercase">
                     KEY TAKEAWAY
                   </div>
-                  <div className="ai-answer-serif text-base text-cream italic leading-relaxed">
+                  <div className="ai-answer-serif text-lg text-tx-primary italic leading-relaxed">
                     {openingTakeaway}
                   </div>
                 </div>
               )}
 
               {/* Restructured Main Answer Content */}
-              <div className="ai-answer-serif text-base space-y-4 min-w-0 break-words">
+              <div className="ai-answer-serif text-[16px] space-y-4 min-w-0 break-words text-tx-primary leading-loose">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -202,37 +202,37 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                           href={href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 my-0.5 rounded bg-[#14251B] border border-hairline hover:border-accent text-cream hover:text-accent text-xs font-sans font-medium transition-all shadow-sm group no-underline align-middle"
+                          className="inline-flex items-center space-x-1.5 px-3 py-1 my-0.5 rounded-md bg-bg-tertiary border border-border hover:border-accent text-tx-primary hover:text-accent text-xs font-sans font-medium nav-transition shadow-sm group no-underline align-middle"
                         >
                           <Globe className="w-3.5 h-3.5 text-accent flex-shrink-0" />
                           <span className="truncate max-w-[180px]">{siteName}</span>
-                          <ExternalLink className="w-3 h-3 text-cream-muted group-hover:text-accent flex-shrink-0" />
+                          <ExternalLink className="w-3 h-3 text-tx-tertiary group-hover:text-accent flex-shrink-0" />
                         </a>
                       );
                     },
                     // Prominent, high-contrast cream headers
                     h1: ({ children }) => (
-                      <h1 className="font-sans text-sm md:text-base font-medium tracking-wide text-cream uppercase mt-6 mb-3 pb-1.5 border-b border-hairline flex items-center gap-2 select-none">
+                      <h1 className="font-heading text-lg md:text-xl font-semibold tracking-wide text-tx-primary uppercase mt-8 mb-4 pb-2 border-b border-border flex items-center gap-2 select-none">
                         {children}
                       </h1>
                     ),
                     h2: ({ children }) => (
-                      <h2 className="font-sans text-sm md:text-base font-medium tracking-wide text-cream uppercase mt-6 mb-3 pb-1.5 border-b border-hairline flex items-center gap-2 select-none">
+                      <h2 className="font-heading text-base md:text-lg font-semibold tracking-wide text-tx-primary uppercase mt-8 mb-4 pb-2 border-b border-border flex items-center gap-2 select-none">
                         {children}
                       </h2>
                     ),
                     h3: ({ children }) => (
-                      <h3 className="font-sans text-xs md:text-sm font-medium tracking-wide text-cream uppercase mt-5 mb-2.5 pb-1 border-b border-hairline/80 flex items-center gap-2 select-none">
+                      <h3 className="font-heading text-sm md:text-base font-semibold tracking-wide text-tx-primary uppercase mt-6 mb-3 pb-1.5 border-b border-border flex items-center gap-2 select-none">
                         {children}
                       </h3>
                     ),
                     h4: ({ children }) => (
-                      <h4 className="font-sans text-xs font-medium tracking-wider text-cream-muted uppercase mt-4 mb-2 select-none">
+                      <h4 className="font-heading text-xs font-semibold tracking-wider text-tx-secondary uppercase mt-5 mb-2 select-none">
                         {children}
                       </h4>
                     ),
                     p: ({ children }) => (
-                      <p className="text-sm text-cream leading-relaxed my-2 break-words">
+                      <p className="text-[15px] text-tx-primary leading-relaxed my-3 break-words">
                         {React.Children.map(children, (child) =>
                           typeof child === 'string' ? renderTextWithTabularNums(child) : child
                         )}
@@ -240,61 +240,61 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                     ),
                     // Real Markdown Tables with columns and IBM Plex Mono tabular numbers
                     table: ({ children }) => (
-                      <div className="overflow-x-auto max-w-full my-4 rounded-lg border border-hairline bg-[#060E0A] shadow-sm">
-                        <table className="w-full text-left border-collapse text-xs font-sans">
+                      <div className="overflow-x-auto max-w-full my-5 rounded-xl border border-border bg-bg-primary shadow-sm">
+                        <table className="w-full text-left border-collapse text-sm font-sans">
                           {children}
                         </table>
                       </div>
                     ),
                     thead: ({ children }) => (
-                      <thead className="bg-[#14251B] border-b border-hairline">
+                      <thead className="bg-bg-tertiary border-b border-border">
                         {children}
                       </thead>
                     ),
                     tr: ({ children }) => (
-                      <tr className="border-b border-hairline/40 hover:bg-[#14251B]/40 transition-colors">
+                      <tr className="border-b border-border hover:bg-bg-hover nav-transition">
                         {children}
                       </tr>
                     ),
                     th: ({ children }) => (
-                      <th className="p-2.5 text-[11px] font-medium tracking-wider text-cream uppercase font-sans">
+                      <th className="p-3 text-xs font-semibold tracking-wider text-tx-primary uppercase font-sans">
                         {children}
                       </th>
                     ),
                     td: ({ children }) => (
-                      <td className="p-2.5 text-cream-muted font-mono tabular-nums text-xs">
+                      <td className="p-3 text-tx-secondary font-mono tabular-nums text-sm">
                         {children}
                       </td>
                     ),
                     ul: ({ children }) => (
-                      <ul className="space-y-1.5 my-3 pl-4 list-disc text-cream font-sans text-sm">
+                      <ul className="space-y-2 my-4 pl-5 list-disc text-tx-primary font-sans text-[15px]">
                         {children}
                       </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="space-y-1.5 my-3 pl-4 list-decimal text-cream font-sans text-sm">
+                      <ol className="space-y-2 my-4 pl-5 list-decimal text-tx-primary font-sans text-[15px]">
                         {children}
                       </ol>
                     ),
                     li: ({ children }) => (
-                      <li className="leading-relaxed font-sans text-sm text-cream break-words">
+                      <li className="leading-relaxed font-sans text-[15px] text-tx-primary break-words">
                         {React.Children.map(children, (child) =>
                           typeof child === 'string' ? renderTextWithTabularNums(child) : child
                         )}
                       </li>
                     ),
                     strong: ({ children }) => (
-                      <strong className="font-sans font-medium text-cream">
+                      <strong className="font-sans font-semibold text-tx-primary">
                         {children}
                       </strong>
                     ),
                     em: ({ children }) => (
-                      <em className="ai-answer-serif italic text-cream">
+                      <em className="ai-answer-serif italic text-tx-primary">
                         {children}
                       </em>
                     ),
                     code: ({ children }) => (
-                      <code className="font-mono text-xs bg-[#14251B] text-cream border border-hairline px-1.5 py-0.5 rounded break-all">
+                      <code className="font-mono text-sm bg-bg-tertiary text-tx-primary border border-border px-2 py-0.5 rounded break-all">
                         {children}
                       </code>
                     ),
@@ -308,7 +308,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
           {/* Assistant Sub-components (Image Carousel & Sources Panel) */}
           {!isUser && (
-            <div className="space-y-2 pt-1 min-w-0">
+            <div className="space-y-3 pt-2 min-w-0">
               <ImageCarousel images={images} />
               <SourcesPanel sources={sources} />
             </div>
