@@ -233,7 +233,7 @@ class FinancialIntelligenceService:
         
         metrics_context = "\n".join([
             f"- {m['category']} | {m['label']}: {m['value']} {m['unit']} (Format: {m['format_rule']})"
-            for m in metrics
+            for m in metrics if m['category'] != "Supporting Metrics"
         ])
         
         system_prompt = (
