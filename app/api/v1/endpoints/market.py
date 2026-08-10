@@ -20,9 +20,9 @@ def get_market_service(settings: Settings = Depends(get_settings)) -> MarketServ
 
 
 @router.get("/symbols", response_model=Dict[str, List[str]], summary="Get all symbols and aliases")
-async def get_all_symbols() -> Dict[str, List[str]]:
+async def get_all_symbols(settings: Settings = Depends(get_settings)) -> Dict[str, List[str]]:
     """Return a mapping of canonical symbols to their aliases for frontend search."""
-    file_path = "config/nifty500_aliases.json"
+    file_path = settings.aliases_file_path
     if os.path.exists(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
             return json.load(f)

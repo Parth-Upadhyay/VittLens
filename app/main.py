@@ -37,11 +37,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Database schema verified.")
 
     # 2. Start background news worker scheduler
-    worker_handle = start_news_worker_lifespan(app)
+    # worker_handle = start_news_worker_lifespan(app)
 
     # 3. Start Macro Intelligence background scheduler (every 1 hour)
     from app.macro_agent.scheduler import start_macro_scheduler
-    macro_handle = start_macro_scheduler(app, interval_minutes=30)
+    # macro_handle = start_macro_scheduler(app, interval_minutes=30)
 
     yield
 

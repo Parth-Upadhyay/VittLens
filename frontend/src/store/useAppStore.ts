@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { ChatThread, GuestSession, User, UserPreferences, WatchlistItem } from '../types';
-import { AuthService, ChatService, PreferencesService, WatchlistService } from '../services/api';
+import { AuthService, ChatService, PreferencesService, WatchlistService, MarketService } from '../services/api';
 
 interface AppState {
   user: User | null;
@@ -101,7 +101,6 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   fetchMarketSymbols: async () => {
     try {
-      const { MarketService } = await import('../services/api');
       const marketSymbols = await MarketService.getSymbols();
       set({ marketSymbols });
     } catch (e) {

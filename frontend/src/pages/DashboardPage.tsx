@@ -20,6 +20,8 @@ export const DashboardPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    let isActive = true;
+
     const loadQuotes = async () => {
       setIsLoading(true);
       const dict: Record<string, StockQuote> = {};
@@ -30,23 +32,34 @@ export const DashboardPage: React.FC = () => {
         if (symbolsToFetch.length > 0) {
           const newsPromises = symbolsToFetch.map(sym => NewsService.getNews(sym, 3));
           const newsResults = await Promise.allSettled(newsPromises);
+          
           let combinedNews: NewsArticle[] = [];
+          let hasSuccess = false;
+          
           newsResults.forEach(res => {
             if (res.status === 'fulfilled' && res.value) {
               combinedNews = [...combinedNews, ...res.value];
+              hasSuccess = true;
             }
           });
-          combinedNews.sort((a, b) => new Date(b.published_time || 0).getTime() - new Date(a.published_time || 0).getTime());
-          setNews(combinedNews.slice(0, 6));
+          
+          if (isActive) {
+            if (hasSuccess) {
+              combinedNews.sort((a, b) => new Date(b.published_time || 0).getTime() - new Date(a.published_time || 0).getTime());
+              setNews(combinedNews.slice(0, 6));
+            } else if (newsPromises.length > 0 && combinedNews.length === 0) {
+              // Rate limited or all failed, keep old news to prevent disappearing
+            }
+          }
         } else {
-          setNews([]);
+          if (isActive) setNews([]);
         }
       } catch (e) {
         console.error('Failed to fetch news:', e);
-        setNews([]);
       }
 
       for (const sym of symbolsToFetch) {
+        if (!isActive) break;
         try {
           const [quote, chart] = await Promise.all([
             MarketService.getQuote(sym),
@@ -59,12 +72,19 @@ export const DashboardPage: React.FC = () => {
           // Skip adding this symbol to dashboard
         }
       }
-      setQuotes(dict);
-      setCharts(chartDict);
-      setIsLoading(false);
+      
+      if (isActive) {
+        setQuotes(dict);
+        setCharts(chartDict);
+        setIsLoading(false);
+      }
     };
 
     loadQuotes();
+    
+    return () => {
+      isActive = false;
+    };
   }, [watchlist]);
 
   const handleSelectSymbol = async (canonical: string) => {
