@@ -2,13 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Send, AtSign, Loader2 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 
-const NIFTY20_SYMBOLS = [
-  'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK',
-  'BHARTIARTL', 'SBIN', 'ITC', 'HCLTECH',
-  'BAJFINANCE', 'LT', 'MARUTI', 'AXISBANK', 'KOTAKBANK',
-  'SUNPHARMA', 'TITAN', 'ULTRACEMCO', 'TATASTEEL', 'NTPC'
-];
-
 interface ChatComposerProps {
   onSend: (question: string) => void;
   isLoading: boolean;
@@ -19,7 +12,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionFilter, setMentionFilter] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { preferences } = useAppStore();
+  const { preferences, marketSymbols } = useAppStore();
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -43,10 +36,12 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
     const cursor = textareaRef.current.selectionStart;
     const textBeforeCursor = text.slice(0, cursor);
     const lastAtIdx = textBeforeCursor.lastIndexOf('@');
-
-    const newText = text.slice(0, lastAtIdx) + `@${symbol} ` + text.slice(cursor);
-    setText(newText);
-    setShowMentionDropdown(false);
+    
+    if (lastAtIdx !== -1) {
+      const newText = textBeforeCursor.slice(0, lastAtIdx) + `@${symbol} ` + text.slice(cursor);
+      setText(newText);
+      setShowMentionDropdown(false);
+    }
     textareaRef.current.focus();
   };
 
@@ -58,7 +53,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
     setShowMentionDropdown(false);
   };
 
-  const filteredSymbols = NIFTY20_SYMBOLS.filter((s) => s.includes(mentionFilter));
+  const allSymbols = Object.keys(marketSymbols);
+  const filteredSymbols = allSymbols
+    .filter((s) => s.includes(mentionFilter))
+    .slice(0, 20); // Cap at 20 for UI performance
 
   return (
     <div className="relative max-w-4xl mx-auto px-4 pt-4 pb-5 w-full">
@@ -81,7 +79,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
       {/* Autocomplete Dropdown */}
       {showMentionDropdown && filteredSymbols.length > 0 && (
         <div className="absolute bottom-full mb-2 left-4 z-30 w-64 bg-[#14251B] border border-hairline rounded-lg shadow-xl max-h-48 overflow-y-auto p-1 space-y-0.5">
-          <div className="px-2 py-1 text-[10px] text-cream-dim font-mono">NIFTY 20 SYMBOLS</div>
+          <div className="px-2 py-1 text-[10px] text-cream-dim font-mono">MARKET SYMBOLS</div>
           {filteredSymbols.map((sym) => (
             <button
               key={sym}
