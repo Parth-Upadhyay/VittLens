@@ -147,14 +147,10 @@ class Settings(BaseSettings):
         alias="MAX_ARTICLES_PER_COMPANY",
         description="Maximum news articles to ingest per company per cycle (Default: 5).",
     )
-    aliases_file_path: str = Field(
-        default_factory=lambda: os.getenv(
-            "ALIASES_FILE_PATH",
-            "config/nifty500_aliases.json" if os.path.exists("config/nifty500_aliases.json") else "config/nifty20_aliases.json",
-        ),
-        alias="ALIASES_FILE_PATH",
-        description="Path to JSON file containing NIFTY company alias mappings.",
-    )
+    @property
+    def aliases_file_path(self) -> str:
+        """Path to JSON file containing NIFTY company alias mappings. Hardcoded to ignore env overrides."""
+        return "config/nifty500_aliases.json" if os.path.exists("config/nifty500_aliases.json") else "config/nifty20_aliases.json"
 
     # yfinance Market Data Service settings
     yfinance_symbol_suffix: str = Field(
