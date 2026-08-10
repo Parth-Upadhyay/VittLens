@@ -19,7 +19,6 @@ from langgraph.graph import StateGraph, END
 from app.config.settings import Settings
 from app.services.market_service import MarketService
 from app.services.news_service import NewsService
-from app.services.quant_service import QuantService
 from app.services.groq_service import GroqProvider
 from app.prompts import PromptBuilder
 from app.prompts import FINANCIAL_ANALYST_SYSTEM_PROMPT
@@ -33,7 +32,7 @@ from app.schemas import (
     TaxLossHarvestingAlert,
 )
 from app.schemas import PortfolioState
-from app.utils import CompanyNormalizer
+from app.utils import CompanyNormalizer, MarketSymbolMapper
 from app.utils import get_logger
 
 logger = get_logger("finnai.portfolio_agent")
@@ -49,7 +48,7 @@ class PortfolioAgent:
         self.settings = settings or Settings()
         self.db = db
         self.market_service = MarketService(self.settings)
-        self.quant_service = QuantService()
+        self.mapper = MarketSymbolMapper(self.settings)
         self.normalizer = CompanyNormalizer()
         self.llm_provider = GroqProvider(settings=self.settings)
         self.universe = self._load_universe()
@@ -93,16 +92,20 @@ class PortfolioAgent:
         return {"type": "stock", "sector": "Other", "name": symbol}
 
     def _analyze_single_holding(self, h: HoldingInput, news_service: Optional[NewsService]) -> HoldingAnalysis:
-        """Fetch market, news, and quant data for a single holding."""
+        """Fetch market, news, and quant data for a single holding (fully synchronous)."""
         canonical = self.normalizer.normalize(h.symbol) or h.symbol.upper()
         meta = self._lookup_asset_info(canonical)
+        
+        # Build the yfinance ticker symbol
+        ticker_symbol = self.mapper.to_yfinance_ticker(canonical)
 
-        # 1. Fetch Market Quote
+        # 1. Fetch Market Quote (synchronous — no asyncio.run)
         try:
-            import asyncio
-            quote = asyncio.run(self.market_service.get_stock_quote(canonical))
-            current_price = quote.price if quote and quote.price > 0 else h.avg_buy_price
-            day_change = quote.change if quote else 0.0
+            raw_quote = self.market_service.repository.get_current_quote(ticker_symbol)
+            current_price = raw_quote.get("price") or h.avg_buy_price
+            prev_close = raw_quote.get("price", current_price)
+            change_val = raw_quote.get("change", 0.0) or 0.0
+            day_change = change_val
         except Exception:
             current_price = h.avg_buy_price
             day_change = 0.0
@@ -115,19 +118,23 @@ class PortfolioAgent:
         # 2. Fetch News Summary
         news_summary = ""
         if news_service:
-            articles = news_service.get_latest_by_symbol(symbol=canonical, limit=5)
-            if articles:
-                news_summary = articles[0].headline
+            try:
+                articles = news_service.get_latest_by_symbol(symbol=canonical, limit=5)
+                if articles:
+                    news_summary = articles[0].headline
+            except Exception:
+                pass
 
-        # 3. Quant Ratios
+        # 3. Quant Ratios (use yahooquery info directly — no async)
         pe_ratio = None
         debt_to_equity = None
         if meta["type"] == "stock":
             try:
-                import asyncio
-                snapshot = asyncio.run(self.quant_service.get_full_ratio_snapshot(canonical))
-                pe_ratio = snapshot.valuation.pe_ratio
-                debt_to_equity = snapshot.leverage.debt_to_equity
+                info = self.market_service.repository._fetch_info_with_yahooquery(ticker_symbol)
+                pe_ratio = info.get("trailingPE")
+                de_raw = info.get("debtToEquity")
+                if de_raw is not None:
+                    debt_to_equity = de_raw
             except Exception:
                 pass
 
@@ -266,19 +273,19 @@ class PortfolioAgent:
     def node_fetch_benchmarks(self, state: PortfolioState) -> PortfolioState:
         nifty_benchmarks = []
         try:
-            import asyncio
-            chart = asyncio.run(self.market_service.get_chart_data("^NSEI", period="1y", interval="1d"))
-            if chart and chart.series and len(chart.series) > 0:
-                latest_close = chart.series[-1].close or 0.0
-                idx_1m = max(0, len(chart.series) - 21)
-                close_1m = chart.series[idx_1m].close or latest_close
+            # Use repository directly (synchronous) to avoid asyncio.run() inside running loop
+            raw_bars = self.market_service.repository.get_historical_data("^NSEI", period="1y", interval="1d")
+            if raw_bars and len(raw_bars) > 0:
+                latest_close = raw_bars[-1].get("close", 0.0) or 0.0
+                idx_1m = max(0, len(raw_bars) - 21)
+                close_1m = raw_bars[idx_1m].get("close", latest_close) or latest_close
                 ret_1m = ((latest_close - close_1m) / close_1m * 100.0) if close_1m else 0.0
                 
-                idx_6m = max(0, len(chart.series) - 126)
-                close_6m = chart.series[idx_6m].close or latest_close
+                idx_6m = max(0, len(raw_bars) - 126)
+                close_6m = raw_bars[idx_6m].get("close", latest_close) or latest_close
                 ret_6m = ((latest_close - close_6m) / close_6m * 100.0) if close_6m else 0.0
                 
-                close_1y = chart.series[0].close or latest_close
+                close_1y = raw_bars[0].get("close", latest_close) or latest_close
                 ret_1y = ((latest_close - close_1y) / close_1y * 100.0) if close_1y else 0.0
                 
                 nifty_benchmarks = [

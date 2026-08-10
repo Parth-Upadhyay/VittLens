@@ -397,40 +397,90 @@ class MarketRepository:
 
     def get_current_quote(self, ticker_symbol: str) -> Dict[str, Any]:
         """
-        Retrieve current trade price quote and 24h market metrics from yfinance.
-
-        Args:
-            ticker_symbol: Full yfinance ticker (e.g., 'RELIANCE.NS').
-
-        Returns:
-            Dictionary containing raw sanitized quote parameters.
+        Retrieve current trade price quote and 24h market metrics.
+        Tries yfinance fast_info first; falls back to yahooquery if rate-limited.
         """
-        def _fetch():
-            ticker = yf.Ticker(ticker_symbol, session=self.session)
-            fast_info = getattr(ticker, "fast_info", {})
+        # Attempt 1: yfinance (fast_info)
+        try:
+            result = self._execute_with_retry("get_current_quote", ticker_symbol, lambda: self._yf_quote(ticker_symbol))
+            if result and result.get("price"):
+                return result
+        except Exception as e:
+            logger.warning(f"yfinance quote failed for '{ticker_symbol}': {e}. Trying yahooquery fallback...")
 
-            # Extract current price using only fast_info
-            price = getattr(fast_info, "last_price", 0.0)
-            prev_close = getattr(fast_info, "previous_close", price)
-
-            change = price - prev_close if price and prev_close else 0.0
-            change_percent = (change / prev_close * 100.0) if prev_close else 0.0
-
+        # Attempt 2: yahooquery fallback
+        try:
+            return self._yahooquery_quote(ticker_symbol)
+        except Exception as e2:
+            logger.error(f"yahooquery quote fallback also failed for '{ticker_symbol}': {e2}")
             return {
-                "symbol": ticker_symbol,
-                "price": self._sanitize_val(price) if price else None,
-                "change": self._sanitize_val(change),
-                "change_percent": self._sanitize_val(change_percent),
-                "volume": self._sanitize_val(getattr(fast_info, "last_volume", 0)),
-                "market_cap": self._sanitize_val(getattr(fast_info, "market_cap", None)),
-                "day_high": self._sanitize_val(getattr(fast_info, "day_high", None)),
-                "day_low": self._sanitize_val(getattr(fast_info, "day_low", None)),
-                "fifty_two_week_high": self._sanitize_val(getattr(fast_info, "year_high", None)),
-                "fifty_two_week_low": self._sanitize_val(getattr(fast_info, "year_low", None)),
-                "currency": getattr(fast_info, "currency", "INR"),
+                "symbol": ticker_symbol, "price": None, "change": 0.0,
+                "change_percent": 0.0, "volume": 0, "market_cap": None,
+                "day_high": None, "day_low": None,
+                "fifty_two_week_high": None, "fifty_two_week_low": None,
+                "currency": "INR",
             }
 
-        return self._execute_with_retry("get_current_quote", ticker_symbol, _fetch)
+    def _yf_quote(self, ticker_symbol: str) -> Dict[str, Any]:
+        """Extract quote from yfinance fast_info."""
+        ticker = yf.Ticker(ticker_symbol, session=self.session)
+        fast_info = getattr(ticker, "fast_info", {})
+
+        price = getattr(fast_info, "last_price", 0.0)
+        prev_close = getattr(fast_info, "previous_close", price)
+
+        change = price - prev_close if price and prev_close else 0.0
+        change_percent = (change / prev_close * 100.0) if prev_close else 0.0
+
+        return {
+            "symbol": ticker_symbol,
+            "price": self._sanitize_val(price) if price else None,
+            "change": self._sanitize_val(change),
+            "change_percent": self._sanitize_val(change_percent),
+            "volume": self._sanitize_val(getattr(fast_info, "last_volume", 0)),
+            "market_cap": self._sanitize_val(getattr(fast_info, "market_cap", None)),
+            "day_high": self._sanitize_val(getattr(fast_info, "day_high", None)),
+            "day_low": self._sanitize_val(getattr(fast_info, "day_low", None)),
+            "fifty_two_week_high": self._sanitize_val(getattr(fast_info, "year_high", None)),
+            "fifty_two_week_low": self._sanitize_val(getattr(fast_info, "year_low", None)),
+            "currency": getattr(fast_info, "currency", "INR"),
+        }
+
+    def _yahooquery_quote(self, ticker_symbol: str) -> Dict[str, Any]:
+        """Fetch quote data using yahooquery as a fallback when yfinance is rate-limited."""
+        from yahooquery import Ticker as YQTicker
+        t = YQTicker(ticker_symbol)
+
+        detail = t.summary_detail.get(ticker_symbol, {})
+        price_data = t.price.get(ticker_symbol, {})
+
+        if not isinstance(detail, dict):
+            detail = {}
+        if not isinstance(price_data, dict):
+            price_data = {}
+
+        price = price_data.get("regularMarketPrice") or detail.get("regularMarketPrice")
+        prev_close = detail.get("previousClose") or detail.get("regularMarketPreviousClose")
+        
+        change = 0.0
+        change_percent = 0.0
+        if price and prev_close:
+            change = price - prev_close
+            change_percent = (change / prev_close * 100.0) if prev_close else 0.0
+
+        return {
+            "symbol": ticker_symbol,
+            "price": self._sanitize_val(price),
+            "change": self._sanitize_val(change),
+            "change_percent": self._sanitize_val(change_percent),
+            "volume": self._sanitize_val(detail.get("volume") or price_data.get("regularMarketVolume")),
+            "market_cap": self._sanitize_val(detail.get("marketCap") or price_data.get("marketCap")),
+            "day_high": self._sanitize_val(detail.get("dayHigh") or price_data.get("regularMarketDayHigh")),
+            "day_low": self._sanitize_val(detail.get("dayLow") or price_data.get("regularMarketDayLow")),
+            "fifty_two_week_high": self._sanitize_val(detail.get("fiftyTwoWeekHigh")),
+            "fifty_two_week_low": self._sanitize_val(detail.get("fiftyTwoWeekLow")),
+            "currency": price_data.get("currency") or detail.get("currency", "INR"),
+        }
 
     def get_historical_data(
         self, ticker_symbol: str, period: str = "1mo", interval: str = "1d"
