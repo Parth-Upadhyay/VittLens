@@ -97,7 +97,7 @@ export const MarketService = {
     const res = await api.get('/market/symbols');
     return res.data;
   },
-  deepAnalyze: async (symbol: string): Promise<{ symbol: string; ticker: string; data: Record<string, any> }> => {
+  deepAnalyze: async (symbol: string): Promise<any> => {
     const res = await api.get(`/market/deep-analyze/${symbol}`);
     return res.data;
   },

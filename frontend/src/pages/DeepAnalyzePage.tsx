@@ -1,160 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Microscope, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Microscope, Search, ChevronDown, ChevronUp, AlertTriangle, Lightbulb, Activity } from 'lucide-react';
 import { MarketService } from '../services/api';
 import { SymbolSearch } from '../components/common/SymbolSearch';
 
-// Human-readable labels for yfinance info keys
-const DEEP_STAT_LABELS: Record<string, string> = {
-  currentPrice: 'Current Price',
-  previousClose: 'Previous Close',
-  open: 'Open',
-  dayHigh: 'Day High',
-  dayLow: 'Day Low',
-  volume: 'Volume',
-  averageVolume: 'Avg Volume (3M)',
-  marketCap: 'Market Cap',
-  enterpriseValue: 'Enterprise Value',
-  trailingPE: 'P/E Ratio (TTM)',
-  forwardPE: 'Forward P/E',
-  priceToBook: 'Price to Book',
-  priceToSalesTrailing12Months: 'Price to Sales',
-  enterpriseToRevenue: 'EV / Revenue',
-  enterpriseToEbitda: 'EV / EBITDA',
-  trailingEps: 'EPS (TTM)',
-  forwardEps: 'Forward EPS',
-  pegRatio: 'PEG Ratio',
-  bookValue: 'Book Value Per Share',
-  dividendRate: 'Dividend Rate (₹)',
-  dividendYield: 'Dividend Yield',
-  payoutRatio: 'Payout Ratio',
-  fiveYearAvgDividendYield: '5Y Avg Dividend Yield',
-  beta: 'Beta',
-  returnOnEquity: 'Return on Equity',
-  returnOnCapitalEmployed: 'Return on Capital Employed',
-  profitMargins: 'Net Profit Margin',
-  grossMargins: 'Gross Margin',
-  operatingMargins: 'Operating Margin',
-  ebitdaMargins: 'EBITDA Margin',
-  totalRevenue: 'Total Revenue',
-  revenuePerShare: 'Revenue Per Share',
-  revenueGrowth: 'Revenue Growth (YoY)',
-  earningsGrowth: 'Earnings Growth (YoY)',
-  earningsQuarterlyGrowth: 'Quarterly Earnings Growth',
-  ebitda: 'EBITDA',
-  totalDebt: 'Total Debt',
-  totalCash: 'Total Cash',
-  totalCashPerShare: 'Cash Per Share',
-  debtToEquity: 'Debt to Equity',
-  currentRatio: 'Current Ratio',
-  quickRatio: 'Quick Ratio',
-  sharesOutstanding: 'Shares Outstanding',
-  floatShares: 'Float Shares',
-  heldPercentInsiders: 'Insider Holding %',
-  heldPercentInstitutions: 'Institutional Holding %',
-  fiftyTwoWeekHigh: '52W High',
-  fiftyTwoWeekLow: '52W Low',
-  fiftyDayAverage: '50D Avg Price',
-  twoHundredDayAverage: '200D Avg Price',
-  targetMeanPrice: 'Analyst Target (Mean)',
-  targetHighPrice: 'Analyst Target (High)',
-  targetLowPrice: 'Analyst Target (Low)',
-  recommendationKey: 'Analyst Recommendation',
-  numberOfAnalystOpinions: 'Analyst Coverage Count',
-  sector: 'Sector',
-  industry: 'Industry',
-  country: 'Country',
-  fullTimeEmployees: 'Full-Time Employees',
-  website: 'Website',
-  trailingPegRatio: 'Trailing PEG Ratio',
-  longName: 'Company Name',
-  shortName: 'Short Name',
-  currency: 'Currency',
-  exchange: 'Exchange',
-  quoteType: 'Quote Type',
-  regularMarketPrice: 'Regular Market Price',
+interface Metric {
+  category: string;
+  key: string;
+  label: string;
+  value: number | string;
+  unit: string;
+  format_rule: string;
+  source?: string;
+}
+
+interface DeepData {
+  symbol: string;
+  ticker: string;
+  metrics: Metric[];
+  snapshots: Record<string, string>;
+  key_insights: { title: string; description: string; type: string }[];
+  red_flags: { title: string; description: string; type: string }[];
+}
+
+function formatValue(value: any, rule: string, unit: string): string {
+  if (value === null || value === undefined) return 'N/A';
+  
+  if (rule === 'percent') {
+    return `${(Number(value) * 100).toFixed(2)}%`;
+  }
+  if (rule === 'large_currency' || rule === 'large_number') {
+    const num = Number(value);
+    const prefix = unit || '';
+    if (num >= 1e12) return `${prefix}${(num / 1e12).toFixed(2)}T`;
+    if (num >= 1e9) return `${prefix}${(num / 1e9).toFixed(2)}B`;
+    if (num >= 1e6) return `${prefix}${(num / 1e6).toFixed(2)}M`;
+    if (num >= 1e3) return `${prefix}${(num / 1e3).toFixed(2)}K`;
+    return `${prefix}${num.toLocaleString()}`;
+  }
+  if (rule === 'currency') {
+    return `${unit}${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  }
+  if (rule === 'multiple') {
+    return `${Number(value).toFixed(2)}${unit}`;
+  }
+  
+  if (typeof value === 'number') return value.toLocaleString(undefined, { maximumFractionDigits: 4 });
+  return String(value);
+}
+
+const getRatingColor = (rating: string) => {
+  const r = rating?.toLowerCase() || '';
+  if (r === 'strong' || r === 'excellent') return 'text-semantic-green bg-semantic-green/10 border-semantic-green/20';
+  if (r === 'moderate' || r === 'good' || r === 'reasonable') return 'text-semantic-yellow bg-semantic-yellow/10 border-semantic-yellow/20';
+  if (r === 'weak' || r === 'poor' || r === 'overvalued') return 'text-semantic-red bg-semantic-red/10 border-semantic-red/20';
+  if (r === 'undervalued') return 'text-semantic-green bg-semantic-green/10 border-semantic-green/20';
+  return 'text-cream-muted bg-white/5 border-white/10';
 };
 
-const DEEP_STAT_GROUPS: { label: string; keys: string[] }[] = [
-  {
-    label: 'Company Info',
-    keys: ['longName', 'shortName', 'sector', 'industry', 'country', 'fullTimeEmployees', 'website', 'currency', 'exchange'],
-  },
-  {
-    label: 'Price & Trading',
-    keys: ['currentPrice', 'regularMarketPrice', 'previousClose', 'open', 'dayHigh', 'dayLow', 'volume', 'averageVolume', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'fiftyDayAverage', 'twoHundredDayAverage', 'beta'],
-  },
-  {
-    label: 'Valuation',
-    keys: ['marketCap', 'enterpriseValue', 'trailingPE', 'forwardPE', 'priceToBook', 'priceToSalesTrailing12Months', 'enterpriseToRevenue', 'enterpriseToEbitda', 'pegRatio', 'trailingPegRatio', 'bookValue'],
-  },
-  {
-    label: 'Profitability & Returns',
-    keys: ['profitMargins', 'grossMargins', 'operatingMargins', 'ebitdaMargins', 'returnOnEquity', 'returnOnCapitalEmployed', 'earningsGrowth', 'revenueGrowth', 'earningsQuarterlyGrowth'],
-  },
-  {
-    label: 'Income & EPS',
-    keys: ['totalRevenue', 'revenuePerShare', 'ebitda', 'trailingEps', 'forwardEps'],
-  },
-  {
-    label: 'Balance Sheet & Liquidity',
-    keys: ['totalDebt', 'totalCash', 'totalCashPerShare', 'debtToEquity', 'currentRatio', 'quickRatio'],
-  },
-  {
-    label: 'Dividends',
-    keys: ['dividendRate', 'dividendYield', 'payoutRatio', 'fiveYearAvgDividendYield'],
-  },
-  {
-    label: 'Ownership & Shares',
-    keys: ['sharesOutstanding', 'floatShares', 'heldPercentInsiders', 'heldPercentInstitutions'],
-  },
-  {
-    label: 'Analyst Targets',
-    keys: ['targetMeanPrice', 'targetHighPrice', 'targetLowPrice', 'recommendationKey', 'numberOfAnalystOpinions'],
-  },
-];
-
-function formatDeepValue(key: string, val: any): string {
-  if (val === null || val === undefined) return 'N/A';
-  if (typeof val === 'string') return val;
-  if (typeof val === 'boolean') return val ? 'Yes' : 'No';
-
-  const percentKeys = ['profitMargins', 'grossMargins', 'operatingMargins', 'ebitdaMargins', 'returnOnEquity',
-    'returnOnCapitalEmployed', 'dividendYield', 'payoutRatio', 'fiveYearAvgDividendYield',
-    'heldPercentInsiders', 'heldPercentInstitutions', 'revenueGrowth', 'earningsGrowth', 'earningsQuarterlyGrowth'];
-  const largeNumKeys = ['marketCap', 'enterpriseValue', 'totalRevenue', 'ebitda', 'totalDebt', 'totalCash',
-    'sharesOutstanding', 'floatShares', 'volume', 'averageVolume'];
-  const priceKeys = ['currentPrice', 'regularMarketPrice', 'previousClose', 'open', 'dayHigh', 'dayLow',
-    'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'fiftyDayAverage', 'twoHundredDayAverage',
-    'targetMeanPrice', 'targetHighPrice', 'targetLowPrice', 'bookValue', 'totalCashPerShare',
-    'revenuePerShare', 'dividendRate', 'trailingEps', 'forwardEps'];
-
-  if (percentKeys.includes(key)) {
-    let num = typeof val === 'number' ? val : parseFloat(val);
-    if (!isNaN(num)) {
-      if (Math.abs(num) > 1.0) num = num / 100.0;
-      if (Math.abs(num) > 1.0) num = num / 100.0;
-      if (Math.abs(num) > 0.5) return 'N/A';
-      return `${(num * 100).toFixed(2)}%`;
-    }
-  }
-  if (largeNumKeys.includes(key)) {
-    if (val >= 1e12) return `₹${(val / 1e12).toFixed(2)}T`;
-    if (val >= 1e9) return `₹${(val / 1e9).toFixed(2)}B`;
-    if (val >= 1e6) return `₹${(val / 1e6).toFixed(2)}M`;
-    if (val >= 1e3) return `₹${(val / 1e3).toFixed(2)}K`;
-    return `₹${val.toLocaleString()}`;
-  }
-  if (priceKeys.includes(key)) return `₹${typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : val}`;
-  if (typeof val === 'number') return val.toLocaleString(undefined, { maximumFractionDigits: 4 });
-  return String(val);
-}
+const getRatingEmoji = (rating: string) => {
+  const r = rating?.toLowerCase() || '';
+  if (r === 'strong' || r === 'excellent' || r === 'undervalued') return '🟢';
+  if (r === 'moderate' || r === 'good' || r === 'reasonable') return '🟡';
+  if (r === 'weak' || r === 'poor' || r === 'overvalued') return '🔴';
+  return '⚪';
+};
 
 export const DeepAnalyzePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [selectedSymbol, setSelectedSymbol] = useState(searchParams.get('symbol') || '');
-  const [deepData, setDeepData] = useState<Record<string, any> | null>(null);
-  const [ticker, setTicker] = useState('');
+  const [deepData, setDeepData] = useState<DeepData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
@@ -166,10 +81,11 @@ export const DeepAnalyzePage: React.FC = () => {
     setError(null);
     try {
       const result = await MarketService.deepAnalyze(sym);
-      setDeepData(result.data);
-      setTicker(result.ticker);
+      setDeepData(result);
+      
       const expanded: Record<string, boolean> = {};
-      DEEP_STAT_GROUPS.forEach(g => { expanded[g.label] = true; });
+      const categories = [...new Set(result.metrics.map((m: Metric) => m.category))];
+      categories.forEach(c => { expanded[c as string] = true; });
       setExpandedGroups(expanded);
     } catch {
       setError('Could not fetch data. This company may not have active data on Yahoo Finance.');
@@ -178,7 +94,6 @@ export const DeepAnalyzePage: React.FC = () => {
     }
   };
 
-  // Auto-trigger if navigated from company page with ?symbol=
   useEffect(() => {
     const sym = searchParams.get('symbol');
     if (sym) {
@@ -193,26 +108,28 @@ export const DeepAnalyzePage: React.FC = () => {
     setExpandedGroups(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const totalMetrics = deepData
-    ? DEEP_STAT_GROUPS.flatMap(g => g.keys).filter(k => deepData[k] !== undefined).length
-    : 0;
+  // Group metrics by category
+  const metricsByCategory = deepData?.metrics.reduce((acc, metric) => {
+    if (!acc[metric.category]) acc[metric.category] = [];
+    acc[metric.category].push(metric);
+    return acc;
+  }, {} as Record<string, Metric[]>) || {};
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6]">
-
+    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto space-y-6 font-sans bg-[#060E0A] text-[#F5EFE6] overflow-y-auto">
       {/* Header */}
       <div className="flex items-center space-x-3 pb-2">
         <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
-          <Microscope className="w-5 h-5 text-accent" />
+          <Activity className="w-5 h-5 text-accent" />
         </div>
         <div>
-          <h1 className="text-xl font-medium text-cream tracking-tight">Deep Analyze</h1>
-          <p className="text-xs text-cream-muted">All available Yahoo Finance metrics for any company — in one view</p>
+          <h1 className="text-xl font-medium text-cream tracking-tight">Financial Intelligence Engine</h1>
+          <p className="text-xs text-cream-muted">Normalized historical metrics and AI-driven insights</p>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm">
+      <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm flex-shrink-0">
         <h2 className="text-xs font-medium text-cream-muted uppercase tracking-wider">Select Company</h2>
         <div className="flex items-center gap-3">
           <div className="flex-1">
@@ -228,83 +145,150 @@ export const DeepAnalyzePage: React.FC = () => {
             className="bg-accent hover:bg-accent-hover disabled:opacity-50 text-cream text-xs font-medium px-5 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition-colors whitespace-nowrap"
           >
             <Search className="w-3.5 h-3.5" />
-            <span>{isLoading ? 'Fetching...' : 'Run Analysis'}</span>
+            <span>{isLoading ? 'Analyzing...' : 'Run Analysis'}</span>
           </button>
         </div>
       </div>
 
-      {/* Loading */}
       {isLoading && (
-        <div className="flex flex-col items-center py-16 space-y-3">
-          <Microscope className="w-8 h-8 text-accent animate-pulse" />
-          <div className="text-xs text-cream-muted">Fetching all available data from Yahoo Finance...</div>
+        <div className="flex flex-col items-center py-16 space-y-4">
+          <Activity className="w-8 h-8 text-accent animate-pulse" />
+          <div className="text-sm font-medium text-cream">Running Financial Intelligence Engine...</div>
+          <div className="text-xs text-cream-muted">Extracting multi-year financials, computing normalizations, and generating AI insights.</div>
         </div>
       )}
 
-      {/* Error */}
       {error && (
-        <div className="bg-[#1A0A0A] border border-semantic-red/30 rounded-xl p-4 text-xs text-semantic-red text-center">
+        <div className="bg-[#1A0A0A] border border-semantic-red/30 rounded-xl p-4 text-xs text-semantic-red text-center flex-shrink-0">
           {error}
         </div>
       )}
 
-      {/* Results */}
       {deepData && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Summary Bar */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-shrink-0">
             <div>
-              <span className="text-sm font-medium text-cream">{deepData.longName || selectedSymbol}</span>
-              <span className="ml-2 font-mono text-xs text-accent bg-[#0D1912] border border-hairline px-2 py-0.5 rounded">{ticker}</span>
+              <span className="text-lg font-medium text-cream">{deepData.symbol.toUpperCase()}</span>
+              <span className="ml-3 font-mono text-xs text-accent bg-[#0D1912] border border-hairline px-2 py-0.5 rounded">{deepData.ticker}</span>
             </div>
-            <span className="text-xs text-cream-muted tabular-nums">{totalMetrics} metrics found</span>
+            <span className="text-xs text-cream-muted tabular-nums">{deepData.metrics.length} metrics calculated</span>
           </div>
 
-          {/* Groups */}
-          <div className="space-y-2">
-            {DEEP_STAT_GROUPS.map((group) => {
-              const groupData = group.keys
-                .filter(k => deepData[k] !== undefined && deepData[k] !== null)
-                .map(k => ({ key: k, label: DEEP_STAT_LABELS[k] || k, value: deepData[k] }));
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            
+            {/* Left Column: Metrics Tables */}
+            <div className="xl:col-span-2 space-y-4">
+              {Object.entries(metricsByCategory).map(([category, metrics]) => {
+                const isOpen = expandedGroups[category] !== false;
+                return (
+                  <div key={category} className="bg-[#0D1912] border border-hairline rounded-xl overflow-hidden shadow-sm flex-shrink-0">
+                    <button
+                      onClick={() => toggleGroup(category)}
+                      className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#14251B]/50 transition-colors"
+                    >
+                      <div className="flex items-center space-x-2.5">
+                        <span className="text-xs font-medium text-cream uppercase tracking-wider">{category}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[10px] text-cream-muted tabular-nums">{metrics.length} metrics</span>
+                        {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-cream-muted" /> : <ChevronDown className="w-3.5 h-3.5 text-cream-muted" />}
+                      </div>
+                    </button>
 
-              if (groupData.length === 0) return null;
-              const isOpen = expandedGroups[group.label] !== false;
-
-              return (
-                <div key={group.label} className="bg-[#0D1912] border border-hairline rounded-xl overflow-hidden shadow-sm">
-                  <button
-                    onClick={() => toggleGroup(group.label)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#14251B]/50 transition-colors"
-                  >
-                    <div className="flex items-center space-x-2.5">
-                      <span className="text-xs font-medium text-cream uppercase tracking-wider">{group.label}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-[10px] text-cream-muted tabular-nums">{groupData.length} metrics</span>
-                      {isOpen
-                        ? <ChevronUp className="w-3.5 h-3.5 text-cream-muted" />
-                        : <ChevronDown className="w-3.5 h-3.5 text-cream-muted" />
-                      }
-                    </div>
-                  </button>
-
-                  {isOpen && (
-                    <div className="border-t border-hairline">
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-px bg-hairline">
-                        {groupData.map(({ key, label, value }) => (
-                          <div key={key} className="bg-[#0D1912] px-4 py-3 space-y-1 hover:bg-[#14251B]/30 transition-colors">
-                            <div className="text-[10px] text-cream-muted uppercase tracking-wide leading-tight">{label}</div>
-                            <div className="text-xs font-mono font-medium text-cream tabular-nums break-all">
-                              {formatDeepValue(key, value)}
+                    {isOpen && (
+                      <div className="border-t border-hairline bg-hairline">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-px">
+                          {metrics.map((metric) => (
+                            <div key={metric.key} className="bg-[#0D1912] p-4 space-y-1.5 hover:bg-[#14251B]/30 transition-colors relative group">
+                              <div className="text-[10px] text-cream-muted uppercase tracking-wide leading-tight">{metric.label}</div>
+                              <div className="flex items-end justify-between">
+                                <div className="text-sm font-mono font-medium text-cream tabular-nums break-all">
+                                  {formatValue(metric.value, metric.format_rule, metric.unit)}
+                                </div>
+                              </div>
+                              {metric.source === 'calculated' && (
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="text-[8px] bg-accent/20 text-accent px-1.5 py-0.5 rounded border border-accent/20">Calculated</div>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right Column: AI Insights */}
+            <div className="space-y-4">
+              
+              {/* Financial Snapshot */}
+              <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm flex-shrink-0">
+                <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                  <Activity className="w-4 h-4 text-accent" />
+                  <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Financial Snapshot</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(deepData.snapshots || {}).map(([key, rating]) => (
+                    <div key={key} className="space-y-1">
+                      <div className="text-[10px] text-cream-muted uppercase tracking-wide">{key.replace('_', ' ')}</div>
+                      <div className={`text-[11px] font-medium px-2 py-1 rounded border inline-flex items-center space-x-1.5 ${getRatingColor(rating)}`}>
+                        <span>{getRatingEmoji(rating)}</span>
+                        <span>{rating}</span>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Key Insights */}
+              <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm flex-shrink-0">
+                <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                  <Lightbulb className="w-4 h-4 text-semantic-green" />
+                  <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Key Insights</h3>
+                </div>
+                <div className="space-y-4">
+                  {deepData.key_insights?.map((insight, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex items-start space-x-2">
+                        <span className="text-xs font-medium text-cream">{idx + 1}. {insight.title}</span>
+                      </div>
+                      <p className="text-[11px] text-cream-muted leading-relaxed pl-4 border-l border-hairline ml-1">
+                        {insight.description}
+                      </p>
+                    </div>
+                  ))}
+                  {!deepData.key_insights?.length && (
+                    <div className="text-xs text-cream-muted italic">No insights generated.</div>
                   )}
                 </div>
-              );
-            })}
+              </div>
+
+              {/* Things to Watch */}
+              <div className="bg-[#0D1912] border border-hairline rounded-xl p-5 space-y-4 shadow-sm flex-shrink-0">
+                <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                  <AlertTriangle className="w-4 h-4 text-semantic-red" />
+                  <h3 className="text-sm font-medium text-semantic-red uppercase tracking-wider">Things to Watch</h3>
+                </div>
+                <div className="space-y-3">
+                  {deepData.red_flags?.map((flag, idx) => (
+                    <div key={idx} className="bg-semantic-red/5 border border-semantic-red/10 rounded-lg p-3 space-y-1">
+                      <div className="text-xs font-medium text-semantic-red">{flag.title}</div>
+                      <p className="text-[11px] text-semantic-red/70 leading-relaxed">
+                        {flag.description}
+                      </p>
+                    </div>
+                  ))}
+                  {!deepData.red_flags?.length && (
+                    <div className="text-xs text-cream-muted italic">No red flags identified.</div>
+                  )}
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       )}
@@ -317,7 +301,7 @@ export const DeepAnalyzePage: React.FC = () => {
           </div>
           <div>
             <div className="text-sm font-medium text-cream-muted">Search a company above</div>
-            <div className="text-xs text-cream-dim mt-1">We'll pull every available metric from Yahoo Finance — P/E, ROE, ROCE, P/B, margins, analyst targets, and more</div>
+            <div className="text-xs text-cream-dim mt-1">We'll reconstruct the full financial profile natively and generate AI-driven insights.</div>
           </div>
         </div>
       )}
