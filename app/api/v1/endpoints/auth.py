@@ -140,7 +140,7 @@ def google_callback(
         jwt_token = create_access_token(data={"user_id": user.id, "email": user.email})
 
         # 5. Redirect to frontend with JWT token
-        frontend_target = f"{settings.frontend_url}/auth/callback?token={jwt_token}"
+        frontend_target = f"{settings.frontend_url}/chat?token={jwt_token}"
         logger.info(f"Google OAuth login succeeded for user '{user.email}'. Redirecting to frontend.")
         return RedirectResponse(url=frontend_target)
 
