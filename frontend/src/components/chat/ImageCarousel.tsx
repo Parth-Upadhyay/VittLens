@@ -22,7 +22,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
           <div
             key={idx}
             onClick={() => setActiveImage(url)}
-            className="flex-shrink-0 w-48 h-32 bg-[#0D1912] border border-hairline rounded-lg overflow-hidden cursor-pointer group hover:border-accent transition-colors relative"
+            className="flex-shrink-0 w-48 h-32 bg-bg-secondary border border-border rounded-lg overflow-hidden cursor-pointer group hover:border-accent nav-transition relative"
           >
             <img
               src={url}
@@ -46,7 +46,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
           className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
           onClick={() => setActiveImage(null)}
         >
-          <div className="relative max-w-4xl max-h-[90vh] bg-[#0D1912] border border-hairline rounded-xl p-2 overflow-hidden shadow-2xl">
+          <div className="relative max-w-4xl max-h-[90vh] bg-bg-secondary border border-border rounded-xl p-2 overflow-hidden shadow-2xl">
             <button
               onClick={() => setActiveImage(null)}
               className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-full text-cream-muted hover:text-cream transition-colors"

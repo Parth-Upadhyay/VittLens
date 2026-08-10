@@ -69,7 +69,7 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({ sources }) => {
                   href={src}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#14251B] border border-hairline hover:border-accent text-cream hover:text-accent text-xs font-sans font-medium transition-all shadow-sm group no-underline"
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-bg-tertiary border border-border hover:border-accent text-tx-primary hover:text-accent text-xs font-sans font-medium nav-transition shadow-sm group no-underline"
                 >
                   <Globe className="w-3.5 h-3.5 text-accent flex-shrink-0" />
                   <span className="truncate max-w-[180px]">{siteName}</span>
@@ -81,7 +81,7 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({ sources }) => {
             return (
               <div
                 key={idx}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#14251B] border border-hairline text-cream-muted text-xs font-sans"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-bg-tertiary border border-border text-tx-secondary text-xs font-sans"
               >
                 <FileText className="w-3.5 h-3.5 text-cream-muted flex-shrink-0" />
                 <span className="truncate max-w-[200px]">{src}</span>
