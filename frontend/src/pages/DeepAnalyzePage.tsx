@@ -34,11 +34,11 @@ interface DeepData {
   metrics: Metric[];
   overall_assessment: string;
   deep_analysis: {
-    business_quality: DeepAnalysisMetric[];
-    valuation: DeepAnalysisMetric[];
-    financial_strength: string[];
-    growth: string[];
-    risks: string[];
+    business_quality?: DeepAnalysisMetric[];
+    valuation?: DeepAnalysisMetric[];
+    financial_strength?: string[];
+    growth?: string[];
+    risks?: string[];
   };
   key_findings: {
     biggest_positive: string;
@@ -181,81 +181,85 @@ export const DeepAnalyzePage: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               
               {/* Business Quality */}
-              <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
-                <div className="flex items-center space-x-2 border-b border-hairline pb-3">
-                  <Shield className="w-4 h-4 text-accent" />
-                  <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Business Quality</h3>
+              {deepData.deep_analysis?.business_quality && deepData.deep_analysis.business_quality.length > 0 && (
+                <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
+                  <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                    <Briefcase className="w-4 h-4 text-accent" />
+                    <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Business Quality</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {deepData.deep_analysis.business_quality.map((item, i) => (
+                      <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
+                        <span className="text-xs font-mono font-medium text-cream min-w-[120px]">{item.metric}: {item.value}</span>
+                        <span className="text-[13px] text-cream-muted leading-relaxed">→ {item.interpretation}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {deepData.deep_analysis.business_quality?.map((item, i) => (
-                    <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
-                      <span className="text-xs font-mono font-medium text-cream min-w-[120px]">{item.metric}: {item.value}</span>
-                      <span className="text-[13px] text-cream-muted leading-relaxed">→ {item.interpretation}</span>
-                    </div>
-                  ))}
-                  {(!deepData.deep_analysis.business_quality || deepData.deep_analysis.business_quality.length === 0) && (
-                    <div className="text-xs text-cream-muted italic">No data available.</div>
-                  )}
-                </div>
-              </div>
+              )}
 
               {/* Valuation */}
-              <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
-                <div className="flex items-center space-x-2 border-b border-hairline pb-3">
-                  <BarChart3 className="w-4 h-4 text-semantic-yellow" />
-                  <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Valuation</h3>
+              {deepData.deep_analysis?.valuation && deepData.deep_analysis.valuation.length > 0 && (
+                <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
+                  <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                    <BarChart3 className="w-4 h-4 text-semantic-yellow" />
+                    <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Valuation</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {deepData.deep_analysis.valuation.map((item, i) => (
+                      <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
+                        <span className="text-xs font-mono font-medium text-cream min-w-[120px]">{item.metric}: {item.value}</span>
+                        <span className="text-[13px] text-cream-muted leading-relaxed">→ {item.interpretation}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {deepData.deep_analysis.valuation?.map((item, i) => (
-                    <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
-                      <span className="text-xs font-mono font-medium text-cream min-w-[120px]">{item.metric}: {item.value}</span>
-                      <span className="text-[13px] text-cream-muted leading-relaxed">→ {item.interpretation}</span>
-                    </div>
-                  ))}
-                  {(!deepData.deep_analysis.valuation || deepData.deep_analysis.valuation.length === 0) && (
-                    <div className="text-xs text-cream-muted italic">No data available.</div>
-                  )}
-                </div>
-              </div>
+              )}
 
               {/* Growth & Financial Strength */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
-                  <div className="flex items-center space-x-2 border-b border-hairline pb-3">
-                    <TrendingUp className="w-4 h-4 text-semantic-green" />
-                    <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Growth</h3>
+                {deepData.deep_analysis.growth && deepData.deep_analysis.growth.length > 0 && (
+                  <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
+                    <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                      <TrendingUp className="w-4 h-4 text-semantic-green" />
+                      <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Growth</h3>
+                    </div>
+                    <ul className="space-y-3 list-disc list-inside text-[13px] text-cream-muted">
+                      {deepData.deep_analysis.growth.map((item, i) => (
+                        <li key={i} className="leading-relaxed">{item}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="space-y-3 list-disc list-inside text-[13px] text-cream-muted">
-                    {deepData.deep_analysis.growth?.map((item, i) => (
-                      <li key={i} className="leading-relaxed">{item}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
-                  <div className="flex items-center space-x-2 border-b border-hairline pb-3">
-                    <Activity className="w-4 h-4 text-accent" />
-                    <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Financial Strength</h3>
+                )}
+                {deepData.deep_analysis.financial_strength && deepData.deep_analysis.financial_strength.length > 0 && (
+                  <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 space-y-4 shadow-sm">
+                    <div className="flex items-center space-x-2 border-b border-hairline pb-3">
+                      <Activity className="w-4 h-4 text-accent" />
+                      <h3 className="text-sm font-medium text-cream uppercase tracking-wider">Financial Strength</h3>
+                    </div>
+                    <ul className="space-y-3 list-disc list-inside text-[13px] text-cream-muted">
+                      {deepData.deep_analysis.financial_strength.map((item, i) => (
+                        <li key={i} className="leading-relaxed">{item}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="space-y-3 list-disc list-inside text-[13px] text-cream-muted">
-                    {deepData.deep_analysis.financial_strength?.map((item, i) => (
-                      <li key={i} className="leading-relaxed">{item}</li>
-                    ))}
-                  </ul>
-                </div>
+                )}
               </div>
 
               {/* Risks */}
-              <div className="bg-semantic-red/5 border border-semantic-red/10 rounded-xl p-6 space-y-4 shadow-sm">
-                <div className="flex items-center space-x-2 border-b border-semantic-red/10 pb-3">
-                  <AlertTriangle className="w-4 h-4 text-semantic-red" />
-                  <h3 className="text-sm font-medium text-semantic-red uppercase tracking-wider">Risks</h3>
+              {deepData.deep_analysis.risks && deepData.deep_analysis.risks.length > 0 && (
+                <div className="bg-semantic-red/5 border border-semantic-red/10 rounded-xl p-6 space-y-4 shadow-sm">
+                  <div className="flex items-center space-x-2 border-b border-semantic-red/10 pb-3">
+                    <AlertTriangle className="w-4 h-4 text-semantic-red" />
+                    <h3 className="text-sm font-medium text-semantic-red uppercase tracking-wider">Risks</h3>
+                  </div>
+                  <ul className="space-y-3 list-disc list-inside text-[13px] text-semantic-red/80">
+                    {deepData.deep_analysis.risks.map((item, i) => (
+                      <li key={i} className="leading-relaxed">{item}</li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-3 list-disc list-inside text-[13px] text-semantic-red/80">
-                  {deepData.deep_analysis.risks?.map((item, i) => (
-                    <li key={i} className="leading-relaxed">{item}</li>
-                  ))}
-                </ul>
-              </div>
+              )}
 
             </div>
 

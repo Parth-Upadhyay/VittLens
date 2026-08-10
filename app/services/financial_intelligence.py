@@ -58,8 +58,11 @@ class FinancialIntelligenceService:
         total_assets = self._get_val(balance_sheet, "Total Assets") or self._get_val(balance_sheet, "TotalAssets")
         current_assets = self._get_val(balance_sheet, "Current Assets") or self._get_val(balance_sheet, "CurrentAssets")
         current_liabilities = self._get_val(balance_sheet, "Current Liabilities") or self._get_val(balance_sheet, "CurrentLiabilities")
+        inventory = self._get_val(balance_sheet, "Inventory") or 0.0
         total_debt = self._get_val(balance_sheet, "Total Debt") or self._get_val(balance_sheet, "TotalDebt")
         total_cash = self._get_val(balance_sheet, "Cash And Cash Equivalents") or self._get_val(balance_sheet, "CashAndCashEquivalents") or self._get_val(balance_sheet, "Cash Cash Equivalents And Short Term Investments") or self._get_val(balance_sheet, "CashCashEquivalentsAndShortTermInvestments")
+
+        net_interest_income = self._get_val(financials, "Net Interest Income") or self._get_val(financials, "NetInterestIncome")
 
         price = getattr(fast_info, "last_price", None)
         market_cap = getattr(fast_info, "market_cap", None)
@@ -128,15 +131,34 @@ class FinancialIntelligenceService:
             if ebitda and ebitda > 0:
                 add_metric("Valuation", "evToEbitda", "EV / EBITDA", ev / ebitda, "x", "multiple")
 
+        if market_cap and total_revenue and total_revenue > 0:
+            add_metric("Valuation", "priceToSales", "Price to Sales", market_cap / total_revenue, "x", "multiple")
+            
+        fcf = info.get("freeCashflow")
+        if fcf:
+            add_metric("Valuation", "freeCashFlow", "Free Cash Flow", fcf, "₹", "large_currency")
+            if market_cap and fcf > 0:
+                add_metric("Valuation", "priceToFcf", "Price to FCF", market_cap / fcf, "x", "multiple")
+
+        ocf = info.get("operatingCashflow")
+        if ocf:
+            add_metric("Valuation", "operatingCashFlow", "Operating Cash Flow", ocf, "₹", "large_currency")
+
         # Growth
         if financials is not None and len(financials.columns) >= 2:
-            prev_revenue = self._get_val(financials, "Total Revenue", 1)
+            prev_revenue = self._get_val(financials, "Total Revenue", 1) or self._get_val(financials, "TotalRevenue", 1)
             prev_eps = (self._get_val(financials, "Net Income", 1) / shares) if (self._get_val(financials, "Net Income", 1) and shares and not is_currency_mismatch) else None
+            prev_ni = self._get_val(financials, "Net Income", 1) or self._get_val(financials, "NetIncome", 1)
+            prev_oi = self._get_val(financials, "Operating Income", 1) or self._get_val(financials, "OperatingIncome", 1)
             
             if total_revenue and prev_revenue and prev_revenue > 0:
                 add_metric("Growth", "revenueGrowth", "Revenue Growth (YoY)", (total_revenue - prev_revenue) / prev_revenue, "%", "percent")
             if eps and prev_eps and prev_eps > 0:
                 add_metric("Growth", "epsGrowth", "EPS Growth (YoY)", (eps - prev_eps) / prev_eps, "%", "percent")
+            if net_income and prev_ni and prev_ni > 0:
+                add_metric("Growth", "netIncomeGrowth", "Net Income Growth (YoY)", (net_income - prev_ni) / prev_ni, "%", "percent")
+            if operating_income and prev_oi and prev_oi > 0:
+                add_metric("Growth", "operatingIncomeGrowth", "Operating Income Growth (YoY)", (operating_income - prev_oi) / prev_oi, "%", "percent")
                 
         if financials is not None and len(financials.columns) >= 4:
             rev_3y = self._get_val(financials, "Total Revenue", 3)
@@ -154,6 +176,11 @@ class FinancialIntelligenceService:
             if operating_income: add_metric("Profitability", "operatingMargin", "Operating Margin", operating_income / total_revenue, "%", "percent")
             if net_income: add_metric("Profitability", "netMargin", "Net Margin", net_income / total_revenue, "%", "percent")
             if ebitda: add_metric("Profitability", "ebitdaMargin", "EBITDA Margin", ebitda / total_revenue, "%", "percent")
+            if fcf: add_metric("Profitability", "fcfMargin", "FCF Margin", fcf / total_revenue, "%", "percent")
+            
+        if net_interest_income and total_assets and total_assets > 0:
+            add_metric("Profitability", "netInterestMargin", "Net Interest Margin (NIM)", net_interest_income / total_assets, "%", "percent")
+            
         if net_income and equity and equity > 0:
             add_metric("Profitability", "roe", "Return on Equity (ROE)", net_income / equity, "%", "percent")
         if net_income and total_assets and total_assets > 0:
@@ -162,10 +189,15 @@ class FinancialIntelligenceService:
             cap_emp = total_assets - current_liabilities
             if cap_emp > 0:
                 add_metric("Profitability", "roce", "Return on Capital Employed (ROCE)", ebit / cap_emp, "%", "percent")
+        if operating_income and total_assets and current_liabilities and total_cash is not None:
+            invested_capital = (total_assets - total_cash) - current_liabilities
+            if invested_capital > 0:
+                add_metric("Profitability", "roic", "Return on Invested Capital (ROIC)", operating_income / invested_capital, "%", "percent")
 
         # Financial Health
         if current_assets and current_liabilities and current_liabilities > 0:
             add_metric("Financial Health", "currentRatio", "Current Ratio", current_assets / current_liabilities, "x", "multiple")
+            add_metric("Financial Health", "quickRatio", "Quick Ratio", (current_assets - inventory) / current_liabilities, "x", "multiple")
         if ebit and interest_expense and interest_expense > 0:
             add_metric("Financial Health", "interestCoverage", "Interest Coverage", ebit / interest_expense, "x", "multiple")
         if total_debt is not None and equity and equity > 0:
@@ -206,12 +238,13 @@ class FinancialIntelligenceService:
             "    \"valuation_observation\": \"string\",\n"
             "    \"health_observation\": \"string\"\n"
             "  }\n"
-            "}\n"
-            "CRITICAL GUIDELINES:\n"
-            "1. Do NOT equate EBITDA directly to free cash flow. EBITDA represents operating profitability before interest, taxes, depreciation, and amortization.\n"
-            "2. Do NOT evaluate margins (like Net Margin) in a vacuum. A 10% margin might be perfectly healthy depending on the industry.\n"
-            "3. Do NOT definitively label a company as 'Undervalued' or 'Overvalued' without examining multiples like P/E, P/B, or EV/EBITDA. If valuation metrics are missing, state that valuation cannot be conclusively determined.\n"
-            "4. Debt/Equity ratios under 1.0x (and especially under 0.5x) generally indicate low leverage or a net cash position. Do NOT label them as 'High Debt'.\n"
+            "}\n\n"
+            "CRITICAL INSTRUCTIONS:\n"
+            "1. If a category (e.g. Valuation, Growth) has NO supporting metrics in the data provided, completely omit it from the `deep_analysis` object instead of returning an empty list.\n"
+            "2. Do NOT equate EBITDA directly to free cash flow. EBITDA represents operating profitability before interest, taxes, depreciation, and amortization.\n"
+            "3. Do NOT evaluate margins (like Net Margin) in a vacuum. A 10% margin might be perfectly healthy depending on the industry.\n"
+            "4. Do NOT definitively label a company as 'Undervalued' or 'Overvalued' without examining multiples like P/E, P/B, or EV/EBITDA. If valuation metrics are missing, omit the valuation category.\n"
+            "5. Debt/Equity ratios under 1.0x (and especially under 0.5x) generally indicate low leverage or a net cash position. Do NOT label them as 'High Debt'.\n"
             "Provide insightful interpretations for metrics. Make your insights extremely analytical, referencing specific numbers. "
             "Do NOT output markdown code blocks. Output ONLY raw parseable JSON."
         )
