@@ -99,7 +99,7 @@ async def get_deep_analyze(
         ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
         
         def _fetch_all():
-            t = yf.Ticker(ticker_symbol)
+            t = yf.Ticker(ticker_symbol, session=service.repository.session)
             info = t.info or {}
             
             # Fetch financials for manually computed ratios

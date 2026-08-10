@@ -251,6 +251,13 @@ class MarketRepository:
         self.settings = settings or Settings()
         self.max_retries = self.settings.yfinance_max_retries
         self.timeout = self.settings.yfinance_timeout
+        
+        # Configure custom session to bypass yfinance rate-limiting on Render
+        import requests
+        self.session = requests.Session()
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
 
     def _sanitize_val(self, val: Any) -> Any:
         """
@@ -343,7 +350,7 @@ class MarketRepository:
             Dictionary containing raw sanitized quote parameters.
         """
         def _fetch():
-            ticker = yf.Ticker(ticker_symbol)
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
             try:
                 info = ticker.info or {}
             except Exception as ex:
@@ -399,7 +406,7 @@ class MarketRepository:
             List of dictionaries representing OHLCV bars.
         """
         def _fetch():
-            ticker = yf.Ticker(ticker_symbol)
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
             df = ticker.history(period=period, interval=interval)
             if df.empty:
                 logger.warning(f"yfinance returned empty historical dataframe for '{ticker_symbol}' (period={period}).")
@@ -425,7 +432,7 @@ class MarketRepository:
         Retrieve company profile and business information from yfinance.
         """
         def _fetch():
-            ticker = yf.Ticker(ticker_symbol)
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
             info = ticker.info or {}
             return {
                 "company_name": info.get("longName") or info.get("shortName") or ticker_symbol,
@@ -445,7 +452,7 @@ class MarketRepository:
         Retrieve financial ratios, valuation metrics, and balance sheet statistics from yfinance.
         """
         def _fetch():
-            ticker = yf.Ticker(ticker_symbol)
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
             info = ticker.info or {}
             
             # Fetch financials for manual ratio calculations
