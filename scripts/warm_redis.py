@@ -49,8 +49,8 @@ async def main():
     try:
         with open(config_path, "r") as f:
             nifty = json.load(f)
-            nifty_symbols = [n.get("canonical_symbol") for n in nifty]
-            nifty_symbols = [s for s in nifty_symbols if s]
+            # nifty500_aliases.json is a dict mapping canonical_symbol -> list of aliases
+            nifty_symbols = list(nifty.keys())
             print(f"Loaded {len(nifty_symbols)} Nifty 500 stocks.")
     except Exception as e:
         print(f"Failed to load Nifty 500 config: {e}")
