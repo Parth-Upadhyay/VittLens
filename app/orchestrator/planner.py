@@ -142,7 +142,10 @@ class Planner:
             "WHAT", "WHY", "HOW", "WHEN", "WHERE", "WHO", "CAN", "YOU", "THINK", "WILL",
             "STOCK", "PRICE", "QUOTE", "NEWS", "RATIO", "BUY", "SELL", "HOLD", "FOR",
             "TODAY", "TOMORROW", "FUTURE", "PREDICTION", "TARGET", "FORECAST", "AND",
-            "THE", "THIS", "THAT", "WITH", "ABOUT", "OVER", "UNDER", "NIFTY", "SENSEX"
+            "THE", "THIS", "THAT", "WITH", "ABOUT", "OVER", "UNDER", "NIFTY", "SENSEX",
+            "USA", "US", "US-", "GDP", "CPI", "FED", "RBI", "SEBI", "ECONOMY", "GLOBAL", 
+            "WORLD", "MARKET", "MARKETS", "SECTOR", "INDUSTRY", "COMPANY", "COMPANIES", 
+            "INFO", "DATA", "RATE", "RATES", "INFLATION"
         }
         raw_tokens = re.findall(r"\b[A-Z0-9&\-]{2,12}\b", text)
         for token in raw_tokens:

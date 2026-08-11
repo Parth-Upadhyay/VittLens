@@ -25,6 +25,10 @@ _RSS_FEEDS = [
     ("Economic Times Markets", "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms"),
     ("Business Standard", "https://www.business-standard.com/rss/markets-106.rss"),
     ("Mint Economy", "https://www.livemint.com/rss/economy"),
+    ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
+    ("Investing.com Global", "https://www.investing.com/rss/news_285.rss"),
+    ("CNBC World", "https://search.cnbc.com/rs/search/combinedcms/view.xml?profile=12000000&id=100727362"),
+    ("CNBC US Economy", "https://search.cnbc.com/rs/search/combinedcms/view.xml?profile=12000000&id=20910258"),
 ]
 
 

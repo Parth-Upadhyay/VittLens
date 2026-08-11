@@ -19,6 +19,7 @@ interface DeepAnalysisMetric {
   metric: string;
   value: string;
   interpretation: string;
+  status?: "good" | "moderate" | "bad";
 }
 
 interface AgentData {
@@ -41,9 +42,9 @@ interface SynthesisData {
   deep_analysis?: {
     business_quality?: DeepAnalysisMetric[];
     valuation?: DeepAnalysisMetric[];
-    financial_strength?: string[];
-    growth?: string[];
-    risks?: string[];
+    financial_strength?: DeepAnalysisMetric[];
+    growth?: DeepAnalysisMetric[];
+    risks?: DeepAnalysisMetric[];
   };
   key_findings?: {
     biggest_positive?: string;
@@ -88,6 +89,18 @@ export const DeepAnalyzePage: React.FC = () => {
   const [isSynthesisLoading, setIsSynthesisLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showRawMetrics, setShowRawMetrics] = useState(false);
+  const [sectorStats, setSectorStats] = useState<any>(null);
+
+  const renderStatusBadge = (status?: string) => {
+    if (!status) return null;
+    const colors = {
+      good: "bg-semantic-green/10 text-semantic-green border-semantic-green/20",
+      moderate: "bg-semantic-amber/10 text-semantic-amber border-semantic-amber/20",
+      bad: "bg-semantic-red/10 text-semantic-red border-semantic-red/20"
+    };
+    const colorClass = colors[status as keyof typeof colors] || "bg-bg-tertiary text-tx-secondary border-border";
+    return <span className={`ml-2 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border ${colorClass}`}>{status}</span>;
+  };
 
   const runAnalysis = async (sym: string) => {
     if (!sym) return;
@@ -95,6 +108,7 @@ export const DeepAnalyzePage: React.FC = () => {
     setIsSynthesisLoading(true);
     setMetricsData(null);
     setSynthesisData(null);
+    setSectorStats(null);
     setError(null);
     setShowRawMetrics(false);
     
@@ -102,6 +116,15 @@ export const DeepAnalyzePage: React.FC = () => {
       const mData = await MarketService.deepAnalyzeMetrics(sym);
       setMetricsData(mData);
       setIsMetricsLoading(false);
+
+      // Fetch sector stats in the background
+      import('../services/api').then(({ CompanyService }) => {
+        CompanyService.getDetail(sym).then(detail => {
+          if (detail.sector) {
+             MarketService.getSectorStats(detail.sector).then(setSectorStats).catch(() => {});
+          }
+        }).catch(() => {});
+      });
 
       try {
         const sData = await MarketService.deepAnalyzeSynthesis(sym);
@@ -214,6 +237,13 @@ export const DeepAnalyzePage: React.FC = () => {
             {isSynthesisLoading && (
               <p className="text-sm text-tx-secondary italic flex items-center gap-2"><Activity className="w-4 h-4 animate-spin text-accent" /> Synthesizing overall assessment...</p>
             )}
+            {sectorStats && sectorStats.pe && (
+              <div className="flex flex-wrap gap-3 pt-2">
+                <div className="text-xs bg-bg-secondary px-3 py-1.5 rounded-lg border border-border">Sector Median P/E: <span className="font-mono text-tx-primary ml-1">{sectorStats.pe.median.toFixed(1)}</span></div>
+                {sectorStats.roe && <div className="text-xs bg-bg-secondary px-3 py-1.5 rounded-lg border border-border">Sector Median ROE: <span className="font-mono text-tx-primary ml-1">{(sectorStats.roe.median).toFixed(1)}%</span></div>}
+                {sectorStats.rev_growth && <div className="text-xs bg-bg-secondary px-3 py-1.5 rounded-lg border border-border">Sector Max Rev Growth: <span className="font-mono text-tx-primary ml-1">{(sectorStats.rev_growth.max).toFixed(1)}%</span></div>}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -238,11 +268,13 @@ export const DeepAnalyzePage: React.FC = () => {
                         <Briefcase className="w-4 h-4 text-accent" />
                         <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Business Quality</h3>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {synthesisData.deep_analysis.business_quality.map((item, i) => (
-                          <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
-                            <span className="text-sm font-mono font-medium text-tx-primary min-w-[140px]">{item.metric}: {item.value}</span>
-                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed">→ {item.interpretation}</span>
+                          <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
+                            <span className="text-sm font-mono font-medium text-tx-primary min-w-[200px] flex items-center">
+                              {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                            </span>
+                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed mt-1 sm:mt-0">→ {item.interpretation}</span>
                           </div>
                         ))}
                       </div>
@@ -256,11 +288,13 @@ export const DeepAnalyzePage: React.FC = () => {
                         <BarChart3 className="w-4 h-4 text-semantic-amber" />
                         <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Valuation</h3>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {synthesisData.deep_analysis.valuation.map((item, i) => (
-                          <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
-                            <span className="text-sm font-mono font-medium text-tx-primary min-w-[140px]">{item.metric}: {item.value}</span>
-                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed">→ {item.interpretation}</span>
+                          <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
+                            <span className="text-sm font-mono font-medium text-tx-primary min-w-[200px] flex items-center">
+                              {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                            </span>
+                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed mt-1 sm:mt-0">→ {item.interpretation}</span>
                           </div>
                         ))}
                       </div>
@@ -275,11 +309,16 @@ export const DeepAnalyzePage: React.FC = () => {
                           <TrendingUp className="w-4 h-4 text-semantic-green" />
                           <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Growth</h3>
                         </div>
-                        <ul className="space-y-3 list-disc list-inside text-sm text-tx-secondary ai-answer-serif">
+                        <div className="space-y-4">
                           {synthesisData.deep_analysis.growth.map((item, i) => (
-                            <li key={i} className="leading-relaxed">{item}</li>
+                            <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
+                              <span className="font-mono text-tx-primary font-medium flex items-center mb-1">
+                                {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                              </span>
+                              {item.interpretation}
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                     {synthesisData.deep_analysis?.financial_strength && synthesisData.deep_analysis.financial_strength.length > 0 && (
@@ -288,11 +327,16 @@ export const DeepAnalyzePage: React.FC = () => {
                           <Activity className="w-4 h-4 text-accent" />
                           <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Financial Strength</h3>
                         </div>
-                        <ul className="space-y-3 list-disc list-inside text-sm text-tx-secondary ai-answer-serif">
+                        <div className="space-y-4">
                           {synthesisData.deep_analysis.financial_strength.map((item, i) => (
-                            <li key={i} className="leading-relaxed">{item}</li>
+                            <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
+                              <span className="font-mono text-tx-primary font-medium flex items-center mb-1">
+                                {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                              </span>
+                              {item.interpretation}
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -304,11 +348,16 @@ export const DeepAnalyzePage: React.FC = () => {
                         <AlertTriangle className="w-4 h-4 text-semantic-amber" />
                         <h3 className="text-sm font-semibold text-semantic-amber uppercase tracking-wider font-heading">Risks</h3>
                       </div>
-                      <ul className="space-y-3 list-disc list-inside text-sm text-tx-primary ai-answer-serif">
+                      <div className="space-y-4">
                         {synthesisData.deep_analysis.risks.map((item, i) => (
-                          <li key={i} className="leading-relaxed">{item}</li>
+                          <div key={i} className="flex flex-col text-sm text-tx-primary ai-answer-serif leading-relaxed border-l-2 border-semantic-amber/30 pl-3">
+                            <span className="font-mono font-medium flex items-center mb-1">
+                              {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                            </span>
+                            {item.interpretation}
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
                 </>
@@ -375,10 +424,10 @@ export const DeepAnalyzePage: React.FC = () => {
                     <div className="grid grid-cols-2 gap-px bg-border">
                       {metrics.map((metric) => (
                         <div key={metric.key} className="bg-bg-secondary p-4 space-y-1 relative group">
-                          <div className="text-[10px] text-tx-secondary uppercase tracking-wide leading-tight truncate" title={metric.label}>
-                            {metric.label}
+                          <div className="text-[10px] text-tx-secondary uppercase tracking-wider leading-tight truncate" title={metric.label}>
+                            {metric.label.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim()}
                           </div>
-                          <div className="text-sm font-mono font-medium text-tx-primary tabular-nums break-all">
+                          <div className="text-[15px] font-mono font-medium text-tx-primary tabular-nums break-all mt-1">
                             {formatValue(metric.value, metric.format_rule, metric.unit)}
                           </div>
                           {metric.source === 'calculated' && (

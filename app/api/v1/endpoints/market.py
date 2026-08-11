@@ -455,3 +455,14 @@ async def get_agent_summary(symbol: str, service: MarketService = Depends(get_ma
         }
     }
 
+
+@router.get("/sector-stats/{sector}", summary="Get aggregated sector statistics")
+async def get_sector_stats(sector: str):
+    """Return aggregated median and average stats for a given sector."""
+    cache_key = f"market:sector_stats:{sector}"
+    cached = await CacheService.get(cache_key)
+    if cached:
+        return {"sector": sector, "stats": cached}
+    return {"sector": sector, "stats": {}}
+
+

@@ -105,6 +105,10 @@ export const MarketService = {
     const res = await api.get(`/market/deep-analyze/${symbol}/synthesis`);
     return res.data;
   },
+  getSectorStats: async (sector: string): Promise<any> => {
+    const res = await api.get(`/market/sector-stats/${encodeURIComponent(sector)}`);
+    return res.data.stats;
+  },
 };
 
 export const CompanyService = {
