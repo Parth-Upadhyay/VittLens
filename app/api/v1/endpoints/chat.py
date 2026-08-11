@@ -54,6 +54,66 @@ def generate_thread_title(question: str, settings) -> str:
         return question[:30] + "..."
 
 
+_GIBBERISH_REJECT_MSG = (
+    "Your query doesn't seem to be related to stocks or finance. "
+    "Please ask a specific question about Indian equity markets, "
+    "company performance, ratios, or stock news."
+)
+
+_KEYBOARD_PATTERNS = [
+    "asdf", "sdfg", "dfgh", "fghj", "ghjk", "hjkl",
+    "qwer", "wert", "erty", "rtyu", "tyui", "yuio", "uiop",
+    "zxcv", "xcvb", "cvbn", "vbnm",
+    "qwerty", "asdfg", "zxcvb",
+]
+
+
+def _is_gibberish_query(text: str) -> bool:
+    """
+    Heuristic prompt guard — returns True if the input looks like gibberish,
+    keyboard mashing, or a non-financial/rubbish prompt.
+
+    Checks applied (in order):
+    1. Too short (< 3 chars)
+    2. Keyboard row patterns (asdf, qwer, zxcv, etc.)
+    3. No real words (all tokens < 2 chars or all non-alpha)
+    4. Vowel ratio < 15% on single-word inputs (e.g. "gfxfjd", "bhjks")
+    5. Long consonant run (5+ consecutive consonants)
+    """
+    import re
+    q = text.strip()
+    if not q or len(q) < 3:
+        return True
+
+    q_lower = q.lower()
+
+    # 1. Keyboard patterns
+    if any(pat in q_lower for pat in _KEYBOARD_PATTERNS):
+        return True
+
+    # 2. Only consider alpha text for the next checks
+    alpha_only = re.sub(r"[^a-z]", "", q_lower)
+    if not alpha_only:
+        return False  # purely numeric/symbolic — let planner handle it
+
+    # 3. Vowel ratio on single-word or short inputs
+    words = q.split()
+    if len(words) <= 2:
+        vowels = sum(1 for c in alpha_only if c in "aeiou")
+        ratio = vowels / len(alpha_only) if alpha_only else 0
+        if len(alpha_only) >= 5 and ratio < 0.15:
+            return True
+
+    # 4. Consecutive consonant run >= 5 (e.g. "gfxfjd", "bhjkst")
+    consonants = re.sub(r"[aeiou]", "", alpha_only)
+    # Find longest run of consonants with no vowel break
+    runs = re.split(r"[aeiou]+", alpha_only)
+    if any(len(run) >= 5 for run in runs):
+        return True
+
+    return False
+
+
 @router.post("", response_model=EnrichedChatResponse, summary="Execute financial analysis query")
 async def process_chat_query(
     request_body: ExtendedChatRequest,
@@ -78,6 +138,13 @@ async def process_chat_query(
                 "Submit your purpose of visit (e.g. Retail Investor, Research, Trader, Academic) "
                 "via POST /api/v1/auth/guest/purpose."
             )
+
+    # Prompt Guard: Block gibberish / rubbish / non-financial input
+    if _is_gibberish_query(request_body.question):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_GIBBERISH_REJECT_MSG,
+        )
 
     # 1. Resolve or Create ChatThread
     chat_id = request_body.chat_id
@@ -190,6 +257,13 @@ async def process_chat_query_stream(
     """
     user, guest = auth_identity
     logger.info(f"Starting SSE chat stream for {'User:' + user.email if user else 'Guest:' + guest.session_id}")
+
+    # Prompt Guard: Block gibberish / rubbish / non-financial input
+    if _is_gibberish_query(request_body.question):
+        async def _error_stream():
+            error_event = json.dumps({"type": "error", "content": _GIBBERISH_REJECT_MSG})
+            yield f"data: {error_event}\n\n"
+        return StreamingResponse(_error_stream(), media_type="text/event-stream")
 
     async def sse_event_generator():
         event_stream = orchestrator.process_query_event_stream(request_body)
