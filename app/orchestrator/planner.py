@@ -259,14 +259,7 @@ class Planner:
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
 
         elif intent == "filing":
-            if is_explicit_filing_search and all_in_rag:
-                tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
-                tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
-            else:
-                # Fallback to comprehensive routing heavily reliant on recent News and Market data
-                tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
-                tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
-                tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
+            tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         return Plan(
             question=q,
