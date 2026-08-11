@@ -86,24 +86,26 @@ class MarketAgent(BaseAgent):
                     headquarters=comp.get("headquarters"),
                 )
 
+                metric_map = {m.get("key"): m.get("value") for m in deep_metrics}
+                
                 stats = KeyStatistics(
                     canonical_symbol=canonical,
-                    pe_ratio=val.get("trailingPE"),
-                    forward_pe=val.get("forwardPE"),
-                    peg_ratio=None,
-                    eps=recent_fin.get("eps"),
-                    beta=None,
-                    dividend_yield=None,
-                    roe=None,
-                    roce=None,
-                    pb_ratio=val.get("priceToBook"),
-                    profit_margins=None,
-                    gross_margins=None,
+                    pe_ratio=val.get("trailingPE") or metric_map.get("trailingPE"),
+                    forward_pe=val.get("forwardPE") or metric_map.get("forwardPE"),
+                    peg_ratio=metric_map.get("pegRatio"),
+                    eps=recent_fin.get("eps") or metric_map.get("eps"),
+                    beta=metric_map.get("beta"),
+                    dividend_yield=metric_map.get("dividendYield"),
+                    roe=metric_map.get("roe"),
+                    roce=metric_map.get("roce"),
+                    pb_ratio=val.get("priceToBook") or metric_map.get("priceToBook"),
+                    profit_margins=metric_map.get("netMargin"),
+                    gross_margins=metric_map.get("grossMargins"),
                     revenue=recent_fin.get("revenue"),
-                    ebitda=None,
-                    debt_to_equity=health.get("debtToEquity"),
-                    current_ratio=health.get("currentRatio"),
-                    target_price=None,
+                    ebitda=metric_map.get("ebitda"),
+                    debt_to_equity=health.get("debtToEquity") or metric_map.get("debtToEquity"),
+                    current_ratio=health.get("currentRatio") or metric_map.get("currentRatio"),
+                    target_price=metric_map.get("targetHighPrice") or metric_map.get("targetMeanPrice"),
                 )
 
                 # We still need the chart for visual rendering, but it has its own cache.
