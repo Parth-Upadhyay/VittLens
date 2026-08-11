@@ -172,15 +172,15 @@ export const DeepAnalyzePage: React.FC = () => {
   }, {} as Record<string, Metric[]>) || {};
 
   return (
-    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
+    <div className="flex-1 p-4 md:p-8 w-full max-w-[1400px] mx-auto space-y-6 md:space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
       {/* Header */}
       <div className="flex items-center space-x-3 pb-2">
         <div className="w-10 h-10 rounded-lg bg-accent-light border border-accent/20 flex items-center justify-center">
           <Activity className="w-5 h-5 text-accent" />
         </div>
         <div>
-          <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Deep Analysis</h1>
-          <p className="text-xs text-tx-secondary">AI-driven analytical narrative</p>
+          <h1 className="text-xl md:text-2xl font-heading font-semibold text-tx-primary tracking-tight">Deep Analysis</h1>
+          <p className="text-[10px] md:text-xs text-tx-secondary">AI-driven analytical narrative</p>
         </div>
       </div>
 

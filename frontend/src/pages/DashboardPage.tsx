@@ -131,15 +131,15 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-8 font-sans bg-bg-primary animate-page-in">
+    <div className="flex-1 p-4 md:p-8 w-full max-w-[1400px] mx-auto space-y-6 md:space-y-8 font-sans bg-bg-primary animate-page-in">
       {/* Title Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <LayoutDashboard className="w-5 h-5 text-accent" />
-          <h1 className="text-2xl font-heading font-semibold text-tx-primary tracking-tight">Market Watchlist</h1>
+          <LayoutDashboard className="w-5 h-5 text-accent flex-shrink-0" />
+          <h1 className="text-xl md:text-2xl font-heading font-semibold text-tx-primary tracking-tight">Market Watchlist</h1>
         </div>
 
-        <div className="w-64">
+        <div className="w-full sm:w-64">
           <SymbolSearch 
             onSelect={handleSelectSymbol} 
             placeholder="Search company (e.g. INFY, TCS)"

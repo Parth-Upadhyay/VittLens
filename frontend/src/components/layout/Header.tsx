@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
         <div className="flex items-center space-x-3">
           <button
             onClick={onToggleSidebar}
-            className="p-1.5 rounded-lg text-tx-secondary hover:text-tx-primary hover:bg-bg-hover nav-transition"
+            className="p-1.5 rounded-lg text-tx-secondary hover:text-tx-primary hover:bg-bg-hover nav-transition md:hidden"
             aria-label="Toggle Navigation Sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
           <Link to="/chat" className="flex items-center space-x-2">
             <span className="text-base font-heading font-semibold tracking-tight text-tx-primary">Vitt<span className="text-accent">Lens</span></span>
-            <span className="text-[10px] text-tx-tertiary border border-border px-1.5 py-0.5 rounded font-mono bg-bg-tertiary">NIFTY 20</span>
+            <span className="hidden sm:inline-block text-[10px] text-tx-tertiary border border-border px-1.5 py-0.5 rounded font-mono bg-bg-tertiary">NIFTY 20</span>
           </Link>
 
           {/* SEBI Legal Disclaimer Badge */}

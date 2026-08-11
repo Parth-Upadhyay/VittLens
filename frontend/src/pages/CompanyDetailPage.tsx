@@ -60,7 +60,7 @@ export const CompanyDetailPage: React.FC = () => {
   const quant = detail.quant_snapshot;
 
   return (
-    <div className="flex-1 p-8 w-full max-w-[1400px] mx-auto space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
+    <div className="flex-1 p-4 md:p-8 w-full max-w-[1400px] mx-auto space-y-6 md:space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
 
       {/* Back + Header */}
       <div className="space-y-4 pb-4 border-b border-border">
@@ -72,33 +72,33 @@ export const CompanyDetailPage: React.FC = () => {
           <span>Back</span>
         </button>
 
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <div className="flex items-center space-x-3">
-              <h1 className="text-3xl font-heading font-semibold text-tx-primary tracking-tight">{detail.profile?.name || targetSymbol}</h1>
-              <span className="font-mono text-xs text-accent bg-accent-light border border-accent/20 px-2 py-0.5 rounded">${targetSymbol}</span>
+              <h1 className="text-2xl md:text-3xl font-heading font-semibold text-tx-primary tracking-tight break-words">{detail.profile?.name || targetSymbol}</h1>
+              <span className="font-mono text-xs text-accent bg-accent-light border border-accent/20 px-2 py-0.5 rounded flex-shrink-0">${targetSymbol}</span>
             </div>
             <div className="text-sm text-tx-secondary mt-2 font-medium">
               Sector: {detail.profile?.sector || 'NIFTY'} • {detail.profile?.industry || 'Large-Cap'}
             </div>
           </div>
 
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
             {quote && quote.price > 0 ? (
-              <div className="text-right">
-                <div className="text-3xl font-semibold text-tx-primary font-mono tabular-nums tracking-tight">₹{quote.price.toLocaleString()}</div>
+              <div className="text-left sm:text-right">
+                <div className="text-2xl md:text-3xl font-semibold text-tx-primary font-mono tabular-nums tracking-tight">₹{quote.price.toLocaleString()}</div>
                 <div className={`text-sm font-mono tabular-nums font-medium ${quote.change >= 0 ? 'text-semantic-green' : 'text-semantic-red'}`}>
                   {quote.change >= 0 ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
                 </div>
               </div>
             ) : (
-              <div className="text-right max-w-[200px] text-xs text-tx-tertiary bg-bg-tertiary px-3 py-1.5 rounded-lg border border-border">
+              <div className="text-left sm:text-right max-w-[200px] text-xs text-tx-tertiary bg-bg-tertiary px-3 py-1.5 rounded-lg border border-border">
                 Stock data not available on data provider platform
               </div>
             )}
             <button
               onClick={() => navigate(`/deep-analyze?symbol=${targetSymbol}`)}
-              className="flex items-center space-x-2 text-sm font-medium bg-bg-secondary border border-border hover:border-accent hover:bg-bg-hover text-tx-primary px-5 py-3 rounded-xl nav-transition btn-press shadow-sm"
+              className="flex items-center space-x-2 text-sm font-medium bg-bg-secondary border border-border hover:border-accent hover:bg-bg-hover text-tx-primary px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl nav-transition btn-press shadow-sm"
             >
               <Microscope className="w-4 h-4 text-accent" />
               <span>Deep Analyze</span>

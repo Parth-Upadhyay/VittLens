@@ -59,7 +59,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
     .slice(0, 20); // Cap at 20 for UI performance
 
   return (
-    <div className="relative max-w-4xl mx-auto px-4 md:px-8 pt-4 pb-6 w-full bg-bg-primary">
+    <div className="relative max-w-4xl mx-auto px-2 md:px-8 pt-2 md:pt-4 pb-4 md:pb-6 w-full bg-bg-primary">
       {/* Quick-Access Symbol Chips */}
       {preferences.default_symbols && preferences.default_symbols.length > 0 && (
         <div className="flex items-center space-x-2 mb-3 overflow-x-auto text-xs text-tx-secondary no-scrollbar">
