@@ -113,14 +113,30 @@ class MarketAgent(BaseAgent):
                     chart = HistoricalData(canonical_symbol=canonical, ticker_symbol=ticker_symbol, period=period, interval=interval, series=[])
                 
             except Exception as e:
-                logger.warning(f"Failed to fetch deep analyze data for {symbol}: {e}")
+                logger.warning(f"Failed to fetch deep analyze data for {symbol}: {e}. Falling back to basic quotes.")
                 deep_metrics = []
                 canonical = self.market_service.mapper.to_canonical_symbol(symbol)
                 ticker_symbol = self.market_service.mapper.to_yfinance_ticker(symbol)
-                quote = StockQuote(symbol=ticker_symbol, canonical_symbol=canonical, price=0.0)
-                chart = HistoricalData(canonical_symbol=canonical, ticker_symbol=ticker_symbol, period=period, interval=interval, series=[])
-                profile = CompanyInfo(canonical_symbol=canonical, company_name=canonical)
-                stats = KeyStatistics(canonical_symbol=canonical)
+                
+                try:
+                    quote = await self.market_service.get_stock_quote(symbol)
+                except Exception:
+                    quote = StockQuote(symbol=ticker_symbol, canonical_symbol=canonical, price=0.0)
+                    
+                try:
+                    profile = await self.market_service.get_company_profile(symbol)
+                except Exception:
+                    profile = CompanyInfo(canonical_symbol=canonical, company_name=canonical)
+                    
+                try:
+                    stats = await self.market_service.get_key_stats(symbol)
+                except Exception:
+                    stats = KeyStatistics(canonical_symbol=canonical)
+                    
+                try:
+                    chart = await self.market_service.get_chart_data(symbol, period, interval)
+                except Exception:
+                    chart = HistoricalData(canonical_symbol=canonical, ticker_symbol=ticker_symbol, period=period, interval=interval, series=[])
 
             quotes[canonical] = quote
             charts[canonical] = chart
