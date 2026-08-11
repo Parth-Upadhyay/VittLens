@@ -45,6 +45,28 @@ class MarketService:
         """Get real-time price quote and market metrics for a company symbol."""
         ticker_symbol = self.mapper.to_yfinance_ticker(symbol)
         canonical_symbol = self.mapper.to_canonical_symbol(symbol)
+        
+        # Check the 24-hour deep metrics cache first (populated by pre-warmer or deep analyze)
+        from app.cache import CacheService
+        deep_key = f"market:deep_metrics:{ticker_symbol}"
+        cached_deep = await CacheService.get(deep_key)
+        
+        if cached_deep and "agent_data" in cached_deep:
+            curr = cached_deep["agent_data"].get("current", {})
+            return StockQuote(
+                symbol=ticker_symbol,
+                canonical_symbol=canonical_symbol,
+                price=curr.get("price") or 0.0,
+                change=curr.get("change") or 0.0,
+                change_percent=curr.get("change_percent") or 0.0,
+                volume=0,
+                market_cap=curr.get("marketCap"),
+                day_high=curr.get("dayHigh"),
+                day_low=curr.get("dayLow"),
+                fifty_two_week_high=None,
+                fifty_two_week_low=None,
+                currency=curr.get("currency", "INR"),
+            )
 
         raw_data = await asyncio.to_thread(self.repository.get_current_quote, ticker_symbol)
         quote = StockQuote(
