@@ -51,7 +51,7 @@ class MarketService:
         deep_key = f"market:deep_metrics:{ticker_symbol}"
         cached_deep = await CacheService.get(deep_key)
         
-        if cached_deep and "agent_data" in cached_deep:
+        if cached_deep and cached_deep.get("agent_data"):
             curr = cached_deep["agent_data"].get("current", {})
             return StockQuote(
                 symbol=ticker_symbol,

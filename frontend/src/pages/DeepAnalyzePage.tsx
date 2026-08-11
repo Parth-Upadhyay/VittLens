@@ -142,7 +142,7 @@ export const DeepAnalyzePage: React.FC = () => {
   const handleAnalyze = () => runAnalysis(selectedSymbol);
 
   // Group metrics by category
-  const metricsByCategory = metricsData?.metrics.reduce((acc, metric) => {
+  const metricsByCategory = (metricsData?.metrics || []).reduce((acc, metric) => {
     if (!acc[metric.category]) acc[metric.category] = [];
     acc[metric.category].push(metric);
     return acc;
