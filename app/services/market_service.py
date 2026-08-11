@@ -40,23 +40,40 @@ class MarketService:
         self.repository = repository or MarketRepository(self.settings)
         self.mapper = MarketSymbolMapper(self.settings)
 
-    @cache(ttl=300, key_builder=lambda self, symbol: market_quote_key(self.mapper.to_yfinance_ticker(symbol)), response_model=StockQuote)
     async def get_stock_quote(self, symbol: str) -> StockQuote:
-        """Get real-time price quote and market metrics for a company symbol."""
+        """Get real-time price quote and market metrics for a company symbol.
+        
+        NOTE: No @cache decorator — cache managed manually to skip poisoned price=0.0 entries.
+        """
         ticker_symbol = self.mapper.to_yfinance_ticker(symbol)
         canonical_symbol = self.mapper.to_canonical_symbol(symbol)
         
-        # Check the 24-hour deep metrics cache first (populated by pre-warmer or deep analyze)
-        from app.cache import CacheService
+        from app.cache import CacheService, market_quote_key
+        quote_cache_key = market_quote_key(ticker_symbol)
+        
+        # Check market:quote cache first — but skip if price is 0 or missing
+        cached_quote = await CacheService.get(quote_cache_key)
+        if cached_quote:
+            try:
+                cached_price = cached_quote.get("price") or 0
+                if cached_price > 0:
+                    logger.debug(f"Quote cache HIT with real price for {ticker_symbol}")
+                    return StockQuote.model_validate(cached_quote)
+                else:
+                    logger.warning(f"Poisoned quote cache for {ticker_symbol} (price={cached_price}). Deleting.")
+                    await CacheService.delete(quote_cache_key)
+            except Exception:
+                pass
+        
+        # Priority 1: Check deep_metrics cache (populated by warm_redis or Deep Analyze)
         deep_key = f"market:deep_metrics:{ticker_symbol}"
         cached_deep = await CacheService.get(deep_key)
         
         if cached_deep and cached_deep.get("agent_data"):
             curr = cached_deep["agent_data"].get("current", {})
             price = curr.get("price")
-            # Guard: skip poisoned cache entries where Yahoo returned 0.0 or None
             if price and price > 0:
-                return StockQuote(
+                sq = StockQuote(
                     symbol=ticker_symbol,
                     canonical_symbol=canonical_symbol,
                     price=price,
@@ -70,11 +87,13 @@ class MarketService:
                     fifty_two_week_low=curr.get("fiftyTwoWeekLow") or curr.get("yearLow"),
                     currency=curr.get("currency", "INR"),
                 )
+                await CacheService.set(quote_cache_key, sq, ttl=300)
+                return sq
             else:
-                # Poisoned cache — delete it so next call re-fetches
-                logger.warning(f"Poisoned deep_metrics cache for {ticker_symbol} (price=0.0). Deleting.")
+                logger.warning(f"Poisoned deep_metrics for {ticker_symbol} (price=0.0). Deleting.")
                 await CacheService.delete(deep_key)
 
+        # Priority 2: Live yfinance fetch
         raw_data = await asyncio.to_thread(self.repository.get_current_quote, ticker_symbol)
         quote = StockQuote(
             symbol=ticker_symbol,
@@ -90,6 +109,9 @@ class MarketService:
             fifty_two_week_low=raw_data.get("fifty_two_week_low"),
             currency=raw_data.get("currency", "INR"),
         )
+        # Only cache if we got a real price
+        if quote.price and quote.price > 0:
+            await CacheService.set(quote_cache_key, quote, ttl=300)
         return quote
 
     @cache(ttl=3600, key_builder=lambda self, symbol, period="1mo", interval="1d": market_chart_key(self.mapper.to_yfinance_ticker(symbol), period, interval), response_model=HistoricalData)
@@ -133,18 +155,36 @@ class MarketService:
             headquarters=raw.get("headquarters"),
         )
 
-    @cache(ttl=86400, key_builder=lambda self, symbol: market_stats_key(self.mapper.to_yfinance_ticker(symbol)), response_model=KeyStatistics)
     async def get_key_stats(self, symbol: str) -> KeyStatistics:
         """Get financial ratios, valuation metrics, and balance sheet statistics.
         
         Single source of truth: first checks deep_metrics Redis cache (populated by
         warm_redis.py or Deep Analyze), then falls back to live yfinance fetch.
+        
+        NOTE: No @cache decorator here — we manage the cache manually so stale empty
+        entries don't block fresh data from the deep_metrics cache.
         """
         ticker_symbol = self.mapper.to_yfinance_ticker(symbol)
         canonical_symbol = self.mapper.to_canonical_symbol(symbol)
         
-        # Single source of truth: extract rich metrics from deep_metrics cache
-        from app.cache import CacheService
+        # Check market:stats cache first — but only accept it if it has real data
+        from app.cache import CacheService, market_stats_key
+        stats_cache_key = market_stats_key(ticker_symbol)
+        cached_stats = await CacheService.get(stats_cache_key)
+        if cached_stats:
+            try:
+                ks = KeyStatistics.model_validate(cached_stats)
+                # Only use if it actually has meaningful data — skip poisoned empty entries
+                if any([ks.pe_ratio, ks.roe, ks.profit_margins, ks.debt_to_equity, ks.pb_ratio]):
+                    logger.debug(f"KeyStats cache HIT with real data for {ticker_symbol}")
+                    return ks
+                else:
+                    logger.warning(f"KeyStats cache has empty data for {ticker_symbol}, bypassing...")
+                    await CacheService.delete(stats_cache_key)
+            except Exception:
+                pass
+
+        # Priority 1: Extract rich metrics from deep_metrics cache (single source of truth)
         deep_key = f"market:deep_metrics:{ticker_symbol}"
         cached_deep = await CacheService.get(deep_key)
         
@@ -155,10 +195,10 @@ class MarketService:
             # Build a lookup from the metrics array: key -> value
             metric_map = {}
             for m in metrics_list:
-                key = m.get("key") or m.get("label", "").replace(" ", "").lower()
+                mk = m.get("key") or m.get("label", "").replace(" ", "").lower()
                 val = m.get("value")
                 if val is not None:
-                    metric_map[key] = val
+                    metric_map[mk] = val
             
             val_data = agent_data.get("valuation", {})
             health_data = agent_data.get("health", {})
@@ -175,7 +215,7 @@ class MarketService:
             
             stats = KeyStatistics(
                 canonical_symbol=canonical_symbol,
-                pe_ratio=val_data.get("trailingPE") or _find("trailingPE", "pe_ratio"),
+                pe_ratio=val_data.get("trailingPE") or _find("peRatio", "trailingPE", "pe_ratio"),
                 forward_pe=val_data.get("forwardPE") or _find("forwardPE", "forward_pe"),
                 peg_ratio=_find("pegRatio", "peg_ratio"),
                 eps=recent_fin.get("eps") or _find("eps", "basicEPS"),
@@ -183,7 +223,7 @@ class MarketService:
                 dividend_yield=_find("dividendYield", "dividend_yield"),
                 roe=_find("roe", "returnOnEquity"),
                 roce=_find("roce", "returnOnCapitalEmployed"),
-                pb_ratio=val_data.get("priceToBook") or _find("priceToBook", "pb_ratio"),
+                pb_ratio=val_data.get("priceToBook") or _find("priceToBook", "priceToBook", "pb_ratio"),
                 profit_margins=_find("netMargin", "profit_margins", "net_margin"),
                 gross_margins=_find("grossMargins", "gross_margins", "gross_margin"),
                 revenue=recent_fin.get("revenue") or _find("totalRevenue", "revenue"),
@@ -193,13 +233,15 @@ class MarketService:
                 target_price=_find("targetHighPrice", "targetMeanPrice", "target_price"),
             )
             
-            # Only return if we actually got meaningful data
-            has_data = any([stats.pe_ratio, stats.roe, stats.profit_margins, stats.debt_to_equity])
+            # Only cache and return if we actually got meaningful data
+            has_data = any([stats.pe_ratio, stats.roe, stats.profit_margins, stats.debt_to_equity, stats.pb_ratio])
             if has_data:
+                await CacheService.set(stats_cache_key, stats, ttl=86400)
                 return stats
 
+        # Priority 2: Live yfinance fetch as fallback
         raw = await asyncio.to_thread(self.repository.get_key_statistics, ticker_symbol)
-        return KeyStatistics(
+        result = KeyStatistics(
             canonical_symbol=canonical_symbol,
             pe_ratio=raw.get("pe_ratio"),
             forward_pe=raw.get("forward_pe"),
@@ -218,4 +260,8 @@ class MarketService:
             current_ratio=raw.get("current_ratio"),
             target_price=raw.get("target_price"),
         )
+        # Only cache if we got real data from yfinance
+        if any([result.pe_ratio, result.roe, result.profit_margins, result.debt_to_equity]):
+            await CacheService.set(stats_cache_key, result, ttl=3600)
+        return result
 
