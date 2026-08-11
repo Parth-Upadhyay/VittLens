@@ -55,9 +55,14 @@ def generate_thread_title(question: str, settings) -> str:
 
 
 _GIBBERISH_REJECT_MSG = (
-    "Your query doesn't seem to be related to stocks or finance. "
-    "Please ask a specific question about Indian equity markets, "
-    "company performance, ratios, or stock news."
+    "That doesn't look like a valid query. "
+    "Please type a question about Indian stocks, markets, or company financials."
+)
+
+_OFF_TOPIC_REJECT_MSG = (
+    "I can only answer questions about Indian equity markets, stocks, company financials, "
+    "and business news. Please ask something finance-related (e.g. 'What is the P/E ratio of TCS?', "
+    "'Compare RELIANCE vs INFY', 'Latest news on HDFCBANK')."
 )
 
 _KEYBOARD_PATTERNS = [
@@ -67,18 +72,57 @@ _KEYBOARD_PATTERNS = [
     "qwerty", "asdfg", "zxcvb",
 ]
 
+# Finance-related keywords — if ANY of these appear in the query, it passes the relevance check
+_FINANCE_KEYWORDS = {
+    # Market & trading
+    "stock", "stocks", "share", "shares", "equity", "market", "markets", "trading", "trade",
+    "invest", "investor", "investing", "investment", "portfolio", "watchlist",
+    "buy", "sell", "hold", "long", "short", "bullish", "bearish",
+    "nifty", "sensex", "bse", "nse", "index", "indices",
+    "ipo", "listing", "demat", "broker", "brokerage",
+    # Financial metrics
+    "price", "pe", "p/e", "ratio", "pb", "p/b", "roe", "roce", "eps",
+    "revenue", "profit", "loss", "margin", "ebitda", "ebit", "pat",
+    "earnings", "quarter", "quarterly", "annual", "results", "guidance",
+    "dividend", "yield", "payout", "bonus", "split", "buyback",
+    "debt", "equity", "leverage", "solvency", "liquidity", "capital",
+    "market cap", "marketcap", "valuation", "overvalued", "undervalued",
+    "pe ratio", "forward pe", "peg", "book value", "intrinsic",
+    # Company & sector terms
+    "company", "companies", "sector", "industry", "conglomerate",
+    "banking", "bank", "fintech", "nbfc", "insurance", "it sector",
+    "pharma", "pharmaceutical", "fmcg", "automobile", "auto", "energy",
+    "telecom", "infrastructure", "real estate", "realty", "retail",
+    # Macro & economy
+    "economy", "gdp", "inflation", "cpi", "wpi", "repo rate", "rbi",
+    "sebi", "fed", "federal reserve", "interest rate", "fiscal", "monetary",
+    "crude", "oil", "gold", "commodity", "forex", "rupee", "inr", "dollar",
+    "fii", "dii", "fpi", "mutual fund", "mf", "etf", "bond", "treasury",
+    # Chart / analysis
+    "analysis", "analyse", "analyze", "technical", "fundamental", "chart",
+    "support", "resistance", "trend", "momentum", "rsi", "macd", "moving average",
+    "52 week", "52-week", "high", "low", "target", "forecast", "prediction",
+    "outlook", "report", "filing", "annual report", "balance sheet",
+    "income statement", "cash flow", "news", "catalyst",
+    # Common Indian NIFTY companies & tickers (sampled)
+    "reliance", "tcs", "infosys", "infy", "hdfc", "icici", "sbi", "wipro",
+    "bhartiartl", "airtel", "hcltech", "kotak", "axisbank", "bajaj",
+    "tatasteel", "tata", "adani", "ongc", "ntpc", "hindunilvr", "hul",
+    "maruti", "suzuki", "sunpharma", "drreddy", "cipla", "ultracemco",
+    "titan", "nestle", "itc", "powergrid", "coalindia", "jswsteel",
+    "grasim", "hdfclife", "sbilife", "lici", "zomato", "nykaa", "paytm",
+    "dmart", "avenue", "pidilitind", "shreecem", "siemens", "havells",
+    "indigo", "interglobe", "irctc", "rail", "defence", "psu",
+    # Question words that in finance context are valid
+    "compare", "comparison", "vs", "versus", "difference", "best", "worst",
+    "which", "recommend", "should", "worth", "performance", "return",
+}
+
 
 def _is_gibberish_query(text: str) -> bool:
     """
-    Heuristic prompt guard — returns True if the input looks like gibberish,
-    keyboard mashing, or a non-financial/rubbish prompt.
-
-    Checks applied (in order):
-    1. Too short (< 3 chars)
-    2. Keyboard row patterns (asdf, qwer, zxcv, etc.)
-    3. No real words (all tokens < 2 chars or all non-alpha)
-    4. Vowel ratio < 15% on single-word inputs (e.g. "gfxfjd", "bhjks")
-    5. Long consonant run (5+ consecutive consonants)
+    Returns True if the input looks like gibberish or keyboard mashing.
+    Checks: too-short, keyboard patterns, vowel ratio, consonant runs.
     """
     import re
     q = text.strip()
@@ -91,12 +135,11 @@ def _is_gibberish_query(text: str) -> bool:
     if any(pat in q_lower for pat in _KEYBOARD_PATTERNS):
         return True
 
-    # 2. Only consider alpha text for the next checks
     alpha_only = re.sub(r"[^a-z]", "", q_lower)
     if not alpha_only:
         return False  # purely numeric/symbolic — let planner handle it
 
-    # 3. Vowel ratio on single-word or short inputs
+    # 2. Vowel ratio on single-word or very short inputs
     words = q.split()
     if len(words) <= 2:
         vowels = sum(1 for c in alpha_only if c in "aeiou")
@@ -104,14 +147,48 @@ def _is_gibberish_query(text: str) -> bool:
         if len(alpha_only) >= 5 and ratio < 0.15:
             return True
 
-    # 4. Consecutive consonant run >= 5 (e.g. "gfxfjd", "bhjkst")
-    consonants = re.sub(r"[aeiou]", "", alpha_only)
-    # Find longest run of consonants with no vowel break
+    # 3. Consecutive consonant run >= 5 (e.g. "gfxfjd", "bhjkst")
     runs = re.split(r"[aeiou]+", alpha_only)
     if any(len(run) >= 5 for run in runs):
         return True
 
     return False
+
+
+def _is_off_topic_query(text: str) -> bool:
+    """
+    Returns True if the query appears to have NO relation to finance, stocks,
+    or the Indian equity markets.
+
+    Strategy: tokenize the query and check if ANY word or bigram matches
+    the finance keyword set. If nothing matches, the query is off-topic.
+    This lets short but valid queries like 'TCS PE?' pass while blocking
+    'what do you think of cr7', 'tell me a joke', 'recipe for pasta', etc.
+    """
+    import re
+    q_lower = text.strip().lower()
+
+    # Tokenise into words
+    tokens = re.findall(r"[a-z0-9/]+", q_lower)
+
+    # Check individual tokens
+    for tok in tokens:
+        if tok in _FINANCE_KEYWORDS:
+            return False
+
+    # Check bigrams (e.g. "market cap", "pe ratio", "52 week")
+    bigrams = [f"{tokens[i]} {tokens[i+1]}" for i in range(len(tokens) - 1)]
+    for bg in bigrams:
+        if bg in _FINANCE_KEYWORDS:
+            return False
+
+    # Check if any finance keyword appears as a substring in the full text
+    # (catches tickers like HDFCBANK, BHARTIARTL embedded in sentences)
+    for kw in _FINANCE_KEYWORDS:
+        if len(kw) >= 4 and kw in q_lower:
+            return False
+
+    return True
 
 
 @router.post("", response_model=EnrichedChatResponse, summary="Execute financial analysis query")
@@ -144,6 +221,13 @@ async def process_chat_query(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=_GIBBERISH_REJECT_MSG,
+        )
+
+    # Relevance Guard: Block off-topic queries (no finance keywords detected)
+    if _is_off_topic_query(request_body.question):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_OFF_TOPIC_REJECT_MSG,
         )
 
     # 1. Resolve or Create ChatThread
@@ -259,9 +343,10 @@ async def process_chat_query_stream(
     logger.info(f"Starting SSE chat stream for {'User:' + user.email if user else 'Guest:' + guest.session_id}")
 
     # Prompt Guard: Block gibberish / rubbish / non-financial input
-    if _is_gibberish_query(request_body.question):
+    if _is_gibberish_query(request_body.question) or _is_off_topic_query(request_body.question):
+        reject_msg = _GIBBERISH_REJECT_MSG if _is_gibberish_query(request_body.question) else _OFF_TOPIC_REJECT_MSG
         async def _error_stream():
-            error_event = json.dumps({"type": "error", "content": _GIBBERISH_REJECT_MSG})
+            error_event = json.dumps({"type": "error", "content": reject_msg})
             yield f"data: {error_event}\n\n"
         return StreamingResponse(_error_stream(), media_type="text/event-stream")
 
