@@ -12,7 +12,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionFilter, setMentionFilter] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { preferences, marketSymbols } = useAppStore();
+  const { preferences, marketSymbols, queriesRemaining, guestSession } = useAppStore();
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -129,8 +129,18 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
       </form>
 
       {/* Persistent SEBI Disclaimer Notice Line */}
-      <div className="mt-3 text-[11px] text-tx-tertiary text-center font-sans tracking-wide font-medium">
-        SEBI Disclaimer: VittLens is an AI analytical tool for educational purposes only and not a SEBI-registered advisor.
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex-1"></div>
+        <div className="text-[11px] text-tx-tertiary text-center font-sans tracking-wide font-medium flex-1">
+          SEBI Disclaimer: VittLens is an AI analytical tool for educational purposes only and not a SEBI-registered advisor.
+        </div>
+        <div className="flex-1 flex justify-end">
+          {guestSession && (
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-bg-tertiary border border-border text-tx-secondary">
+              Guest Queries: {queriesRemaining >= 0 ? queriesRemaining : 15} left
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

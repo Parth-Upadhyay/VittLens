@@ -28,6 +28,8 @@ export const SettingsPage: React.FC = () => {
     const symList = symbols.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
 
     try {
+      localStorage.setItem('vittlens_theme', theme);
+      
       await PreferencesService.updatePreferences({
         answer_style: style as any,
         default_symbols: symList,
@@ -38,6 +40,9 @@ export const SettingsPage: React.FC = () => {
       setTimeout(() => setIsSaved(false), 2000);
     } catch (e) {
       console.error('Failed to save preferences:', e);
+      // For guest users where backend save might fail, still update UI state locally
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 2000);
     }
   };
 

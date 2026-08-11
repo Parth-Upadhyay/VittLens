@@ -170,6 +170,12 @@ Adhere strictly to the following principles:
 
 5. STRUCTURED MARKDOWN TABLES:
    - Ensure all tables are formatted as clean, multi-line GitHub Flavored Markdown tables with proper newlines.
+
+6. CONVERSATION CONTINUITY (CRITICAL):
+   - When the user asks a NEW question in an ongoing conversation, focus your ENTIRE response on the NEW question only.
+   - Do NOT repeat analysis or conclusions from earlier messages unless the user explicitly references them.
+   - If the user shifts sectors (e.g. from Oil to IT to Energy), analyze ONLY the new sector. Do NOT bring up the old sector again.
+   - Each response should feel like a fresh, standalone analysis for the latest question, informed by but not repeating prior context.
 """
 
 DEFAULT_SYSTEM_PROMPT: str = """\

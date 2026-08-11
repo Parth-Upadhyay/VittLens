@@ -37,7 +37,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   preferences: {
     answer_style: 'Detailed',
     default_symbols: ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK'],
-    theme: 'Dark',
+    theme: (localStorage.getItem('vittlens_theme') as any) || 'Light',
   },
   marketSymbols: {},
   isGuestLimitModalOpen: false,

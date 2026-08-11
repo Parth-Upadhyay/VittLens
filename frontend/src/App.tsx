@@ -79,6 +79,11 @@ export const App: React.FC = () => {
     }
     // Clean up legacy light-mode class
     document.body.classList.remove('light-mode');
+    
+    // Persist to localStorage
+    if (preferences.theme) {
+      localStorage.setItem('vittlens_theme', preferences.theme);
+    }
   }, [preferences.theme]);
 
   return (
