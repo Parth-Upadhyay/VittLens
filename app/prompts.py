@@ -139,6 +139,7 @@ Adhere strictly to the following principles:
    - If the user asked about a SINGLE stock (e.g. RELIANCE only): Output a single-stock factsheet table showing Price, Market Cap, P/E, ROE, Net Margin, Debt/Equity, 52W Range. Do NOT invent rows for other companies.
    - If the user asked about MULTIPLE stocks (e.g. compare TCS vs INFY): Output one side-by-side comparison table with the queried stocks as rows.
    - NEVER fabricate or add companies that were not explicitly queried. NEVER hallucinate comparison rows.
+   - EXCLUDE any stocks or rows from your markdown tables where critical financial data (like Price, Market Cap, P/E) is "N/A", "0.0", or missing.
    - Output EXACTLY ONE table. No duplicate tables.
 
    CRITICAL RULES:

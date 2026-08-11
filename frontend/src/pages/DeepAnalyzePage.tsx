@@ -311,12 +311,18 @@ export const DeepAnalyzePage: React.FC = () => {
                         </div>
                         <div className="space-y-4">
                           {synthesisData.deep_analysis.growth.map((item, i) => (
-                            <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
-                              <span className="font-mono text-tx-primary font-medium flex items-center mb-1">
-                                {item.metric}: {item.value} {renderStatusBadge(item.status)}
-                              </span>
-                              {item.interpretation}
-                            </div>
+                            typeof item === 'string' ? (
+                              <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
+                                {item}
+                              </div>
+                            ) : (
+                              <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
+                                <span className="font-mono text-tx-primary font-medium flex items-center mb-1">
+                                  {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                                </span>
+                                {item.interpretation}
+                              </div>
+                            )
                           ))}
                         </div>
                       </div>
@@ -329,12 +335,18 @@ export const DeepAnalyzePage: React.FC = () => {
                         </div>
                         <div className="space-y-4">
                           {synthesisData.deep_analysis.financial_strength.map((item, i) => (
-                            <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
-                              <span className="font-mono text-tx-primary font-medium flex items-center mb-1">
-                                {item.metric}: {item.value} {renderStatusBadge(item.status)}
-                              </span>
-                              {item.interpretation}
-                            </div>
+                            typeof item === 'string' ? (
+                              <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
+                                {item}
+                              </div>
+                            ) : (
+                              <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
+                                <span className="font-mono text-tx-primary font-medium flex items-center mb-1">
+                                  {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                                </span>
+                                {item.interpretation}
+                              </div>
+                            )
                           ))}
                         </div>
                       </div>
@@ -350,12 +362,18 @@ export const DeepAnalyzePage: React.FC = () => {
                       </div>
                       <div className="space-y-4">
                         {synthesisData.deep_analysis.risks.map((item, i) => (
-                          <div key={i} className="flex flex-col text-sm text-tx-primary ai-answer-serif leading-relaxed border-l-2 border-semantic-amber/30 pl-3">
-                            <span className="font-mono font-medium flex items-center mb-1">
-                              {item.metric}: {item.value} {renderStatusBadge(item.status)}
-                            </span>
-                            {item.interpretation}
-                          </div>
+                          typeof item === 'string' ? (
+                            <div key={i} className="flex flex-col text-sm text-tx-primary ai-answer-serif leading-relaxed border-l-2 border-semantic-amber/30 pl-3">
+                              {item}
+                            </div>
+                          ) : (
+                            <div key={i} className="flex flex-col text-sm text-tx-primary ai-answer-serif leading-relaxed border-l-2 border-semantic-amber/30 pl-3">
+                              <span className="font-mono font-medium flex items-center mb-1">
+                                {item.metric}: {item.value} {renderStatusBadge(item.status)}
+                              </span>
+                              {item.interpretation}
+                            </div>
+                          )
                         ))}
                       </div>
                     </div>
