@@ -145,16 +145,21 @@ class Planner:
             "THE", "THIS", "THAT", "WITH", "ABOUT", "OVER", "UNDER", "NIFTY", "SENSEX",
             "USA", "US", "US-", "GDP", "CPI", "FED", "RBI", "SEBI", "ECONOMY", "GLOBAL", 
             "WORLD", "MARKET", "MARKETS", "SECTOR", "INDUSTRY", "COMPANY", "COMPANIES", 
-            "INFO", "DATA", "RATE", "RATES", "INFLATION"
+            "INFO", "DATA", "RATE", "RATES", "INFLATION", "WAR", "IMPACT", "IMPACTED",
+            "OIL", "GOLD", "SILVER", "COMMODITY", "RUSSIA", "IRAN", "ISRAEL", "CHINA",
+            "INDIA", "UK", "EUROPE", "CRUDE", "BRENT"
         }
-        raw_tokens = re.findall(r"\b[A-Z0-9&\-]{2,12}\b", text)
-        for token in raw_tokens:
-            if token not in stop_words:
-                norm = self.normalizer.normalize(token)
-                if norm:
-                    found_symbols.add(norm)
-                elif len(token) >= 3 and not token.isdigit():
-                    found_symbols.add(token)
+        
+        # Only extract uppercase tokens if the user isn't just typing in ALL CAPS
+        if not text.isupper():
+            raw_tokens = re.findall(r"\b[A-Z0-9&\-]{2,12}\b", text)
+            for token in raw_tokens:
+                if token not in stop_words:
+                    norm = self.normalizer.normalize(token)
+                    if norm:
+                        found_symbols.add(norm)
+                    elif len(token) >= 3 and not token.isdigit():
+                        found_symbols.add(token)
 
         # Fallback: try sector-theme discovery if no company symbol found
         if not found_symbols:
