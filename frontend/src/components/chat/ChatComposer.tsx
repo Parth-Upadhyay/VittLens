@@ -129,12 +129,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
       </form>
 
       {/* Persistent SEBI Disclaimer Notice Line */}
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex-1"></div>
-        <div className="text-[11px] text-tx-tertiary text-center font-sans tracking-wide font-medium flex-1">
+      <div className="mt-3 flex flex-col md:flex-row items-center justify-between gap-2 px-1 text-center md:text-left">
+        <div className="text-[11px] text-tx-tertiary font-sans tracking-wide font-medium order-1 md:order-2">
           SEBI Disclaimer: VittLens is an AI analytical tool for educational purposes only and not a SEBI-registered advisor.
         </div>
-        <div className="flex-1 flex justify-end">
+        <div className="flex justify-center md:justify-end order-2 md:order-3 w-full md:w-auto">
           {guestSession && (
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-bg-tertiary border border-border text-tx-secondary">
               Guest Queries: {queriesRemaining >= 0 ? queriesRemaining : 15} left

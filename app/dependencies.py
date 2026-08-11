@@ -148,31 +148,61 @@ async def enforce_rate_limit(
         db.commit()
         return user, None
         
-    # IP Rate Limit for Guests (DDOS Protection)
+    # Daily Rate Limit for Guests (IP based tracking to prevent cookie clearing bypass)
     if not user:
         client_ip = request.client.host if request.client else "127.0.0.1"
-        ip_key = f"rate_limit:ip:{client_ip}"
+        today_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
         
+        # Use Redis if available, else count queries in user_rate_limits or memory
         redis = await RedisClient.get_client()
         if redis:
+            # Enforce 15 query limit per IP per day
+            ip_key = f"rate_limit:guest:ip:{client_ip}:{today_str}"
             current_count = await redis.incr(ip_key)
-            
             if current_count == 1:
-                await redis.expire(ip_key, 3600)  # 1 hour
-                
-            if current_count > 20:
-                logger.warning(f"IP {client_ip} exceeded 20 queries/hr limit.")
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="Too many requests from this IP. Please wait an hour or sign in to continue."
+                await redis.expire(ip_key, 86400)  # 24 hours
+            
+            # Send current queries remaining back via response header or cookie if needed
+            queries_left = max(0, 15 - current_count)
+            if guest:
+                guest.queries_used = current_count
+                guest.queries_remaining = queries_left
+                # Set guest queries_remaining in signed cookie value
+                handler = GuestCookieHandler()
+                signed_val = handler.sign_cookie_payload(guest)
+                response.set_cookie(
+                    key="guest_session",
+                    value=signed_val,
+                    max_age=60 * 60 * 24 * 30,
+                    httponly=True,
+                    samesite="lax",
                 )
-
-    if guest:
-        if guest.queries_used > 15:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="GUEST_LIMIT_REACHED"
-            )
+                
+            if current_count > 15:
+                logger.warning(f"Guest IP {client_ip} exceeded daily query limit of 15.")
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="GUEST_LIMIT_REACHED"
+                )
+        else:
+            # Fallback to guest session cookie if Redis is not running
+            if guest:
+                if guest.queries_used >= 15:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="GUEST_LIMIT_REACHED"
+                    )
+                guest.queries_used += 1
+                guest.queries_remaining = max(0, 15 - guest.queries_used)
+                handler = GuestCookieHandler()
+                signed_val = handler.sign_cookie_payload(guest)
+                response.set_cookie(
+                    key="guest_session",
+                    value=signed_val,
+                    max_age=60 * 60 * 24 * 30,
+                    httponly=True,
+                    samesite="lax",
+                )
         return None, guest
         
     return None, None

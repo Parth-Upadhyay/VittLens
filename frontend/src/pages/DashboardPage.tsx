@@ -86,8 +86,23 @@ export const DashboardPage: React.FC = () => {
     if (!canonical.trim()) return;
     setErrorMsg(null);
 
+    const isGuest = useAppStore.getState().user === null;
+
     try {
-      await WatchlistService.addSymbol(canonical);
+      if (isGuest) {
+        const stored = sessionStorage.getItem('vittlens_guest_watchlist');
+        const list = stored ? JSON.parse(stored) : [];
+        if (!list.some((item: any) => item.symbol === canonical)) {
+          list.push({
+            id: Date.now(),
+            symbol: canonical,
+            created_at: new Date().toISOString()
+          });
+          sessionStorage.setItem('vittlens_guest_watchlist', JSON.stringify(list));
+        }
+      } else {
+        await WatchlistService.addSymbol(canonical);
+      }
 
       try {
         const [quote, chart] = await Promise.all([
@@ -111,6 +126,8 @@ export const DashboardPage: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    const isGuest = useAppStore.getState().user === null;
+
     setQuotes((prev) => {
       const copy = { ...prev };
       delete copy[symbol];
@@ -123,7 +140,14 @@ export const DashboardPage: React.FC = () => {
     });
 
     try {
-      await WatchlistService.removeSymbol(symbol);
+      if (isGuest) {
+        const stored = sessionStorage.getItem('vittlens_guest_watchlist');
+        let list = stored ? JSON.parse(stored) : [];
+        list = list.filter((item: any) => item.symbol !== symbol);
+        sessionStorage.setItem('vittlens_guest_watchlist', JSON.stringify(list));
+      } else {
+        await WatchlistService.removeSymbol(symbol);
+      }
       await fetchWatchlist();
     } catch (err) {
       console.error('Failed to remove watchlist item:', err);
@@ -205,17 +229,27 @@ export const DashboardPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-baseline justify-between">
-                    <div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-baseline justify-between">
                       <span className="text-xl font-semibold text-tx-primary font-mono">
                         {quote.price != null ? `₹${quote.price.toLocaleString()}` : 'N/A'}
                       </span>
-                      <div className={`text-xs font-mono ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
-                        {quote.change >= 0 ? '+' : ''}{(quote.change || 0).toFixed(2)} ({(quote.change_percent || 0).toFixed(2)}%)
-                      </div>
+                      <MiniSparkline data={charts[sym]?.series ? charts[sym].series.map(b => b.close) : []} />
                     </div>
 
-                    <MiniSparkline data={charts[sym]?.series ? charts[sym].series.map(b => b.close) : []} />
+                    <div className="pt-2 border-t border-border flex justify-end">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigate(`/deep-analyze?symbol=${sym}`);
+                        }}
+                        className="flex items-center space-x-1 text-[11px] font-medium text-accent hover:text-accent-hover bg-bg-tertiary hover:bg-bg-hover px-2.5 py-1.5 rounded nav-transition"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Deep Analyze</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

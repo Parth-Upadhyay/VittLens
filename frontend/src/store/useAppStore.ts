@@ -82,6 +82,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   fetchWatchlist: async () => {
+    const isGuest = get().user === null;
+    if (isGuest) {
+      try {
+        const stored = sessionStorage.getItem('vittlens_guest_watchlist');
+        const list = stored ? JSON.parse(stored) : [];
+        set({ watchlist: list });
+      } catch (e) {
+        console.error('Failed to parse guest watchlist from sessionStorage:', e);
+      }
+      return;
+    }
+
     try {
       const watchlist = await WatchlistService.getWatchlist();
       set({ watchlist });
