@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CompanyService, MarketService, NewsService } from '../services/api';
-import { CompanyDetail, HistoricalData, NewsArticle } from '../types';
+import { CompanyDetail, HistoricalData, NewsArticle, KeyStatistics } from '../types';
 import { MetricCard } from '../components/common/MetricCard';
 import { ArrowLeft, ExternalLink, Microscope } from 'lucide-react';
 import { LineChart as ReLineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -58,6 +58,33 @@ export const CompanyDetailPage: React.FC = () => {
 
   const quote = detail.quote;
   const quant = detail.quant_snapshot;
+  const ks: KeyStatistics | undefined = detail.key_stats;
+
+  // Helper: get a formatted percent from key_stats or quant_snapshot fallback
+  const getPct = (ksVal?: number, quantVal?: number): string => {
+    const raw = ksVal ?? quantVal;
+    if (raw == null) return 'N/A';
+    // Already a percentage if > 1 (e.g. 45.88 = 45.88%), otherwise multiply by 100
+    const pct = Math.abs(raw) <= 1.5 ? raw * 100 : raw;
+    return `${pct.toFixed(2)}%`;
+  };
+
+  const getNum = (ksVal?: number, quantVal?: number): string => {
+    const raw = ksVal ?? quantVal;
+    return raw != null ? raw.toFixed(2) : 'N/A';
+  };
+
+  const getDivYield = (): string => {
+    let y = ks?.dividend_yield ?? quant?.dividend?.dividend_yield;
+    if (y == null) return 'N/A';
+    if (Math.abs(y) > 1.0) y = y / 100.0;
+    if (Math.abs(y) > 1.0) y = y / 100.0;
+    if (Math.abs(y) > 0.5) return 'N/A';
+    return `${(y * 100).toFixed(2)}%`;
+  };
+
+  // Show metrics section if we have either source
+  const hasMetrics = ks || quant;
 
   return (
     <div className="flex-1 p-4 md:p-8 w-full max-w-[1400px] mx-auto space-y-6 md:space-y-8 font-sans bg-bg-primary overflow-y-auto animate-page-in">
@@ -110,27 +137,18 @@ export const CompanyDetailPage: React.FC = () => {
       <div className="space-y-10 pb-16">
 
         {/* Section 1: Financial Ratio Metrics */}
-        {quant && (
+        {hasMetrics && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Financial Ratio Metrics</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-              <MetricCard label="Return on Equity (ROE)" value={quant.profitability.roe != null ? `${(quant.profitability.roe * 100).toFixed(2)}%` : 'N/A'} />
-              <MetricCard label="P/E Ratio" value={quant.valuation.pe_ratio != null ? quant.valuation.pe_ratio.toFixed(2) : 'N/A'} />
-              <MetricCard label="Net Profit Margin" value={quant.profitability.net_profit_margin != null ? `${(quant.profitability.net_profit_margin * 100).toFixed(2)}%` : 'N/A'} />
-              <MetricCard label="Debt to Equity" value={quant.leverage.debt_to_equity != null ? quant.leverage.debt_to_equity.toFixed(2) : 'N/A'} />
-              <MetricCard label="Return on Capital (ROCE)" value={quant.profitability.roce != null ? `${(quant.profitability.roce * 100).toFixed(2)}%` : 'N/A'} />
-              <MetricCard label="Price to Book (P/B)" value={quant.valuation.pb_ratio != null ? quant.valuation.pb_ratio.toFixed(2) : 'N/A'} />
-              <MetricCard 
-                label="Dividend Yield" 
-                value={quant.dividend.dividend_yield != null ? (() => {
-                  let y = quant.dividend.dividend_yield;
-                  if (Math.abs(y) > 1.0) y = y / 100.0;
-                  if (Math.abs(y) > 1.0) y = y / 100.0;
-                  if (Math.abs(y) > 0.5) return 'N/A';
-                  return `${(y * 100).toFixed(2)}%`;
-                })() : 'N/A'} 
-              />
-              <MetricCard label="PEG Ratio" value={quant.valuation.peg_ratio != null ? quant.valuation.peg_ratio.toFixed(2) : 'N/A'} />
+              <MetricCard label="Return on Equity (ROE)" value={getPct(ks?.roe, quant?.profitability.roe)} />
+              <MetricCard label="P/E Ratio" value={getNum(ks?.pe_ratio, quant?.valuation.pe_ratio)} />
+              <MetricCard label="Net Profit Margin" value={getPct(ks?.profit_margins, quant?.profitability.net_profit_margin)} />
+              <MetricCard label="Debt to Equity" value={getNum(ks?.debt_to_equity, quant?.leverage.debt_to_equity)} />
+              <MetricCard label="Return on Capital (ROCE)" value={getPct(ks?.roce, quant?.profitability.roce)} />
+              <MetricCard label="Price to Book (P/B)" value={getNum(ks?.pb_ratio, quant?.valuation.pb_ratio)} />
+              <MetricCard label="Dividend Yield" value={getDivYield()} />
+              <MetricCard label="PEG Ratio" value={getNum(ks?.peg_ratio, quant?.valuation.peg_ratio)} />
             </div>
           </div>
         )}

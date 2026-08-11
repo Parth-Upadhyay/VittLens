@@ -78,11 +78,32 @@ export interface RatioSnapshot {
   dividend: { dividend_yield?: number };
 }
 
+export interface KeyStatistics {
+  canonical_symbol?: string;
+  pe_ratio?: number;
+  forward_pe?: number;
+  peg_ratio?: number;
+  eps?: number;
+  beta?: number;
+  dividend_yield?: number;
+  roe?: number;
+  roce?: number;
+  pb_ratio?: number;
+  profit_margins?: number;
+  gross_margins?: number;
+  revenue?: number;
+  ebitda?: number;
+  debt_to_equity?: number;
+  current_ratio?: number;
+  target_price?: number;
+}
+
 export interface CompanyDetail {
   symbol: string;
   profile?: CompanyInfo;
   quote?: StockQuote;
   quant_snapshot?: RatioSnapshot;
+  key_stats?: KeyStatistics;
 }
 
 export interface NewsArticle {
