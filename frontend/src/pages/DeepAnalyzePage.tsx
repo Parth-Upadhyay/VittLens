@@ -120,8 +120,8 @@ export const DeepAnalyzePage: React.FC = () => {
       // Fetch sector stats in the background
       import('../services/api').then(({ CompanyService }) => {
         CompanyService.getDetail(sym).then(detail => {
-          if (detail.sector) {
-             MarketService.getSectorStats(detail.sector).then(setSectorStats).catch(() => {});
+          if (detail.profile?.sector) {
+             MarketService.getSectorStats(detail.profile.sector).then(setSectorStats).catch(() => {});
           }
         }).catch(() => {});
       });
