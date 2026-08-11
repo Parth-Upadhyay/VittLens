@@ -44,21 +44,84 @@ class MarketAgent(BaseAgent):
         interval = context.interval or "1d"
 
         for symbol in symbols:
-            # Execute async MarketService queries directly
-            quote = await self.market_service.get_stock_quote(symbol)
-            chart = await self.market_service.get_chart_data(symbol, period, interval)
-            profile = await self.market_service.get_company_profile(symbol)
-            stats = await self.market_service.get_key_stats(symbol)
-            
             try:
                 from app.api.v1.endpoints.market import get_deep_analyze_metrics
                 deep = await get_deep_analyze_metrics(symbol, self.market_service)
                 deep_metrics = deep.get("metrics", [])
+                ad = deep.get("agent_data", {})
+                canonical = self.market_service.mapper.to_canonical_symbol(symbol)
+                ticker_symbol = self.market_service.mapper.to_yfinance_ticker(symbol)
+                
+                curr = ad.get("current", {})
+                val = ad.get("valuation", {})
+                comp = ad.get("company", {})
+                health = ad.get("health", {})
+                fins = ad.get("financials", [])
+                recent_fin = fins[0] if fins else {}
+
+                quote = StockQuote(
+                    symbol=ticker_symbol,
+                    canonical_symbol=canonical,
+                    price=curr.get("price") or 0.0,
+                    change=0.0,
+                    change_percent=0.0,
+                    volume=0,
+                    market_cap=curr.get("marketCap"),
+                    day_high=curr.get("dayHigh"),
+                    day_low=curr.get("dayLow"),
+                    fifty_two_week_high=None,
+                    fifty_two_week_low=None,
+                    currency=curr.get("currency", "INR"),
+                )
+                
+                profile = CompanyInfo(
+                    canonical_symbol=canonical,
+                    company_name=comp.get("name") or canonical,
+                    sector=comp.get("sector"),
+                    industry=comp.get("industry"),
+                    description=comp.get("description"),
+                    website=comp.get("website"),
+                    employees=comp.get("employees"),
+                    country=comp.get("country"),
+                    headquarters=comp.get("headquarters"),
+                )
+
+                stats = KeyStatistics(
+                    canonical_symbol=canonical,
+                    pe_ratio=val.get("trailingPE"),
+                    forward_pe=val.get("forwardPE"),
+                    peg_ratio=None,
+                    eps=recent_fin.get("eps"),
+                    beta=None,
+                    dividend_yield=None,
+                    roe=None,
+                    roce=None,
+                    pb_ratio=val.get("priceToBook"),
+                    profit_margins=None,
+                    gross_margins=None,
+                    revenue=recent_fin.get("revenue"),
+                    ebitda=None,
+                    debt_to_equity=health.get("debtToEquity"),
+                    current_ratio=health.get("currentRatio"),
+                    target_price=None,
+                )
+
+                # We still need the chart for visual rendering, but it has its own cache.
+                try:
+                    chart = await self.market_service.get_chart_data(symbol, period, interval)
+                except Exception:
+                    chart = HistoricalData(canonical_symbol=canonical, ticker_symbol=ticker_symbol, period=period, interval=interval, series=[])
+                
             except Exception as e:
                 logger.warning(f"Failed to fetch deep analyze data for {symbol}: {e}")
                 deep_metrics = []
+                canonical = self.market_service.mapper.to_canonical_symbol(symbol)
+                ticker_symbol = self.market_service.mapper.to_yfinance_ticker(symbol)
+                quote = StockQuote(symbol=ticker_symbol, canonical_symbol=canonical, price=0.0)
+                chart = HistoricalData(canonical_symbol=canonical, ticker_symbol=ticker_symbol, period=period, interval=interval, series=[])
+                profile = CompanyInfo(canonical_symbol=canonical, company_name=canonical)
+                stats = KeyStatistics(canonical_symbol=canonical)
 
-            canonical = quote.canonical_symbol
             quotes[canonical] = quote
             charts[canonical] = chart
             profiles[canonical] = profile
