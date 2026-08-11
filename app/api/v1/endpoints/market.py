@@ -199,7 +199,7 @@ async def get_deep_analyze_metrics(
             }
         
         data = await asyncio.to_thread(_fetch_all)
-        await CacheService.set(cache_key, data, ttl=43200)  # 12 hours
+        await CacheService.set(cache_key, data, ttl=86400)  # 24 hours
         return {"symbol": symbol, "ticker": ticker_symbol, **data}
     except Exception as e:
         raise HTTPException(
