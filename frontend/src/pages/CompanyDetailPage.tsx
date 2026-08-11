@@ -141,14 +141,24 @@ export const CompanyDetailPage: React.FC = () => {
           <div className="space-y-5">
             <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Financial Ratio Metrics</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-              <MetricCard label="Return on Equity (ROE)" value={getPct(ks?.roe, quant?.profitability.roe)} />
-              <MetricCard label="P/E Ratio" value={getNum(ks?.pe_ratio, quant?.valuation.pe_ratio)} />
-              <MetricCard label="Net Profit Margin" value={getPct(ks?.profit_margins, quant?.profitability.net_profit_margin)} />
-              <MetricCard label="Debt to Equity" value={getNum(ks?.debt_to_equity, quant?.leverage.debt_to_equity)} />
-              <MetricCard label="Return on Capital (ROCE)" value={getPct(ks?.roce, quant?.profitability.roce)} />
-              <MetricCard label="Price to Book (P/B)" value={getNum(ks?.pb_ratio, quant?.valuation.pb_ratio)} />
-              <MetricCard label="Dividend Yield" value={getDivYield()} />
-              <MetricCard label="PEG Ratio" value={getNum(ks?.peg_ratio, quant?.valuation.peg_ratio)} />
+              {(() => {
+                const metrics = [
+                  { label: "Return on Equity (ROE)", value: getPct(ks?.roe, quant?.profitability.roe) },
+                  { label: "P/E Ratio", value: getNum(ks?.pe_ratio, quant?.valuation.pe_ratio) },
+                  { label: "Net Profit Margin", value: getPct(ks?.profit_margins, quant?.profitability.net_profit_margin) },
+                  { label: "Debt to Equity", value: getNum(ks?.debt_to_equity, quant?.leverage.debt_to_equity) },
+                  { label: "Return on Capital (ROCE)", value: getPct(ks?.roce, quant?.profitability.roce) },
+                  { label: "Price to Book (P/B)", value: getNum(ks?.pb_ratio, quant?.valuation.pb_ratio) },
+                  { label: "Dividend Yield", value: getDivYield() },
+                  { label: "PEG Ratio", value: getNum(ks?.peg_ratio, quant?.valuation.peg_ratio) },
+                ].filter(m => m.value !== "N/A");
+
+                if (metrics.length === 0) return <div className="text-xs text-tx-tertiary">No financial ratio metrics available.</div>;
+
+                return metrics.map((m, idx) => (
+                  <MetricCard key={idx} label={m.label} value={m.value} />
+                ));
+              })()}
             </div>
           </div>
         )}
