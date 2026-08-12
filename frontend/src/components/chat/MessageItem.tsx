@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown, User } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown, User, ChevronDown, ChevronRight, Loader2, Sparkles, Server } from 'lucide-react';
 import { MiniSparkline } from '../visual/MiniSparkline';
 import { ImageCarousel } from './ImageCarousel';
 import { useAppStore } from '../../store/useAppStore';
@@ -86,7 +86,61 @@ interface MessageItemProps {
   agents_used?: string[];
   symbols_queried?: string[];
   context_truncated?: boolean;
+  status_logs?: string[];
+  is_generating?: boolean;
 }
+
+const ThinkingBlock: React.FC<{ logs: string[]; isGenerating: boolean }> = ({ logs, isGenerating }) => {
+  const [expanded, setExpanded] = useState(isGenerating);
+  
+  // Auto-collapse when done generating
+  useEffect(() => {
+    if (!isGenerating && logs.length > 0) {
+      setExpanded(false);
+    }
+  }, [isGenerating]);
+
+  if (!logs || logs.length === 0) return null;
+
+  return (
+    <div className="mb-4 text-[13px] font-sans">
+      <button 
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center space-x-2 text-tx-secondary hover:text-tx-primary transition-colors py-1.5 focus:outline-none"
+      >
+        {isGenerating ? (
+          <Loader2 className="w-3.5 h-3.5 text-accent animate-spin" />
+        ) : (
+          <Sparkles className="w-3.5 h-3.5 text-tx-tertiary" />
+        )}
+        <span className="font-medium tracking-wide">
+          {isGenerating ? "Thinking Process" : `Thought for ${logs.length} steps`}
+        </span>
+        {expanded ? (
+          <ChevronDown className="w-3.5 h-3.5 opacity-50" />
+        ) : (
+          <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+        )}
+      </button>
+
+      {expanded && (
+        <div className="mt-2 pl-3 ml-[7px] border-l-2 border-border/60 space-y-2 py-1">
+          {logs.map((log, idx) => (
+            <div key={idx} className="flex items-start space-x-2 text-tx-secondary text-[12px] leading-relaxed">
+              <span className="opacity-40 mt-0.5">•</span>
+              <span>{log}</span>
+            </div>
+          ))}
+          {isGenerating && (
+            <div className="flex items-center space-x-2 text-tx-tertiary text-[12px] pt-1">
+              <span className="animate-pulse">...</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Helper to format text containing financial numbers with IBM Plex Mono tabular numbers
 const renderTextWithTabularNums = (text: string): React.ReactNode => {
@@ -168,6 +222,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   agents_used,
   symbols_queried,
   context_truncated,
+  status_logs,
+  is_generating,
 }) => {
   const isUser = role === 'user';
   const { user } = useAppStore();
@@ -263,6 +319,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             <p className="text-[15px] text-tx-primary whitespace-pre-wrap font-sans leading-relaxed break-words">{content}</p>
           ) : (
             <div className="space-y-5 min-w-0">
+              
+              {/* Claude-style Thinking Block */}
+              <ThinkingBlock logs={status_logs || []} isGenerating={!!is_generating} />
+
               {/* Synthesized 1-2 sentence takeaway in Fraunces font */}
               {openingTakeaway && (
                 <div className="p-5 bg-bg-tertiary border-l-4 border-accent rounded-r-lg space-y-2 shadow-sm">

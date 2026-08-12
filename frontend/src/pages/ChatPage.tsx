@@ -56,6 +56,8 @@ export const ChatPage: React.FC = () => {
         id: tempAssistantId,
         role: 'assistant',
         content: '',
+        status_logs: [],
+        is_generating: true,
         created_at: new Date().toISOString(),
       },
     ]);
@@ -70,15 +72,21 @@ export const ChatPage: React.FC = () => {
         } else if (event.type === 'error') {
            currentContent += `\n\n⚠️ **Error:** ${event.content}`;
            setMessages((prev) => prev.map(m => m.id === tempAssistantId ? { ...m, content: currentContent } : m));
-        } else if (event.type === 'status' || event.type === 'agent_start') {
-           // We can render a small status update if we want, but for now we append nothing to content
+        } else if (event.type === 'status' || event.type === 'agent_start' || event.type === 'agent_complete') {
+           if (event.message) {
+             setMessages((prev) => prev.map(m => m.id === tempAssistantId ? { 
+               ...m, 
+               status_logs: [...(m.status_logs || []), event.message]
+             } : m));
+           }
         } else if (event.type === 'done') {
            setMessages((prev) => prev.map(m => m.id === tempAssistantId ? { 
              ...m, 
              sources: event.sources, 
              images: event.images, 
              symbols_queried: event.symbols_queried,
-             agents_used: event.agents_used
+             agents_used: event.agents_used,
+             is_generating: false
            } : m));
         } else if (event.type === 'queries_remaining') {
            setQueriesRemaining(event.content);
@@ -140,6 +148,8 @@ export const ChatPage: React.FC = () => {
               agents_used={m.agents_used}
               symbols_queried={m.symbols_queried}
               context_truncated={m.context_truncated}
+              status_logs={m.status_logs}
+              is_generating={m.is_generating}
             />
           ))
         )}

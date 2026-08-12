@@ -164,6 +164,8 @@ export interface ChatMessage {
   agents_used?: string[];
   symbols_queried?: string[];
   context_truncated?: boolean;
+  status_logs?: string[];
+  is_generating?: boolean;
   created_at: string;
 }
 
