@@ -51,6 +51,19 @@ class MarketService:
         from app.cache import CacheService, market_quote_key
         quote_cache_key = market_quote_key(ticker_symbol)
         
+        async def _fill_missing_change(quote: StockQuote) -> None:
+            if quote.change == 0.0 or quote.change_percent == 0.0:
+                try:
+                    # Fetch 5 days of chart data to safely get the previous close
+                    chart = await self.get_chart_data(symbol, period="5d", interval="1d")
+                    if chart and chart.series and len(chart.series) >= 2:
+                        prev_close = chart.series[-2].close
+                        if prev_close and prev_close > 0:
+                            quote.change = quote.price - prev_close
+                            quote.change_percent = (quote.change / prev_close) * 100
+                except Exception as e:
+                    logger.warning(f"Failed to fill missing change data for {ticker_symbol}: {e}")
+
         # Check market:quote cache first — but skip if price is 0 or missing
         cached_quote = await CacheService.get(quote_cache_key)
         if cached_quote:
@@ -87,6 +100,7 @@ class MarketService:
                     fifty_two_week_low=curr.get("fiftyTwoWeekLow") or curr.get("yearLow"),
                     currency=curr.get("currency", "INR"),
                 )
+                await _fill_missing_change(sq)
                 await CacheService.set(quote_cache_key, sq, ttl=300)
                 return sq
             else:
@@ -109,6 +123,9 @@ class MarketService:
             fifty_two_week_low=raw_data.get("fifty_two_week_low"),
             currency=raw_data.get("currency", "INR"),
         )
+        
+        await _fill_missing_change(quote)
+
         # Only cache if we got a real price
         if quote.price and quote.price > 0:
             await CacheService.set(quote_cache_key, quote, ttl=300)

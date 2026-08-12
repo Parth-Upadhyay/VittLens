@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, AlertTriangle, ExternalLink, Globe, Triangle, TrendingUp, TrendingDown } from 'lucide-react';
+import { User, AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown } from 'lucide-react';
+import { MiniSparkline } from '../visual/MiniSparkline';
 import { ImageCarousel } from './ImageCarousel';
 import { SourcesPanel, getCleanSiteName } from './SourcesPanel';
 import { AgentChip } from './AgentChip';
@@ -67,12 +68,10 @@ const ChatChartBlock: React.FC<{ symbol: string }> = ({ symbol }) => {
           {isGain ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
         </div>
       </div>
-      <div className="w-full sm:w-1/3 flex justify-end items-center pr-4">
-        <Triangle 
-          className={`w-10 h-10 drop-shadow-sm transition-colors ${
-            isGain ? 'text-semantic-green fill-current' : 'text-semantic-red fill-current rotate-180'
-          }`}
-        />
+      <div className="w-full sm:w-2/3 h-[60px] flex justify-end">
+        <div className="w-full max-w-[200px]">
+          <MiniSparkline data={chart.series ? chart.series.map(b => b.close) : []} />
+        </div>
       </div>
     </div>
   );
