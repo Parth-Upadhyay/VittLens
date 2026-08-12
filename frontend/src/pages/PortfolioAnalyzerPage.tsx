@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PortfolioAnalyzerService } from '../services/api';
@@ -21,6 +22,7 @@ import {
   DollarSign,
   FileSpreadsheet,
   Award,
+  ExternalLink,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import {
@@ -39,6 +41,7 @@ import {
 const COLORS = ['#5B7D4F', '#2D5F5F', '#B8860B', '#C75050', '#8A7B66', '#526A7E', '#A09789'];
 
 export const PortfolioAnalyzerPage: React.FC = () => {
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
@@ -654,33 +657,61 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border font-mono text-[13px]">
-                  {sortedHoldings.map((h) => (
-                    <tr key={h.symbol} className="hover:bg-bg-hover nav-transition">
-                      <td className="px-4 py-3 font-semibold text-tx-primary">
-                        {h.symbol}
-                        <span className="block text-[11px] font-sans text-tx-tertiary font-normal truncate max-w-[200px]">{h.name}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="uppercase text-[10px] text-accent font-semibold bg-accent-light px-2 py-0.5 rounded">{h.asset_type}</span>
-                      </td>
-                      <td className="px-4 py-3 font-sans text-tx-secondary">{h.sector}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{h.quantity}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">₹{h.avg_buy_price}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">₹{h.current_price}</td>
-                      <td className="px-4 py-3 text-right tabular-nums font-semibold text-tx-primary">
-                        ₹{h.current_value.toLocaleString('en-IN')}
-                      </td>
-                      <td
-                        className={`px-4 py-3 text-right tabular-nums font-semibold ${
-                          h.pnl >= 0 ? 'text-semantic-green' : 'text-semantic-red'
-                        }`}
-                      >
-                        {h.pnl >= 0 ? '+' : ''}
-                        {h.pnl_percent}%
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums text-tx-primary">{h.weight_percent}%</td>
-                    </tr>
-                  ))}
+                  {sortedHoldings.map((h) => {
+                    const hasValidPrice = h.current_price && h.current_price > 0 && h.current_price !== h.avg_buy_price;
+                    const isGain = h.pnl >= 0;
+                    return (
+                      <tr key={h.symbol} className="hover:bg-bg-hover nav-transition">
+                        <td className="px-4 py-3 font-semibold text-tx-primary">
+                          <div className="flex items-center space-x-2">
+                            <span>{h.symbol}</span>
+                            {h.asset_type === 'stock' && (
+                              <button
+                                onClick={() => navigate(`/deep-analyze?symbol=${h.symbol}`)}
+                                className="text-[10px] font-sans font-medium text-accent hover:text-accent-hover bg-accent-light px-1.5 py-0.5 rounded border border-accent/20 nav-transition flex items-center space-x-1"
+                                title={`Run Deep Quantitative Analysis on ${h.symbol}`}
+                              >
+                                <ExternalLink className="w-2.5 h-2.5" />
+                                <span>Deep Analyze</span>
+                              </button>
+                            )}
+                          </div>
+                          <span className="block text-[11px] font-sans text-tx-tertiary font-normal truncate max-w-[200px]">{h.name}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="uppercase text-[10px] text-accent font-semibold bg-accent-light px-2 py-0.5 rounded">{h.asset_type}</span>
+                        </td>
+                        <td className="px-4 py-3 font-sans text-tx-secondary">{h.sector}</td>
+                        <td className="px-4 py-3 text-right tabular-nums">{h.quantity}</td>
+                        <td className="px-4 py-3 text-right tabular-nums">₹{h.avg_buy_price}</td>
+                        <td className="px-4 py-3 text-right tabular-nums">
+                          {hasValidPrice ? `₹${h.current_price}` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums font-semibold text-tx-primary">
+                          ₹{h.current_value.toLocaleString('en-IN')}
+                        </td>
+                        <td
+                          className={`px-4 py-3 text-right tabular-nums font-semibold ${
+                            !hasValidPrice
+                              ? 'text-tx-tertiary'
+                              : isGain
+                              ? 'text-semantic-green'
+                              : 'text-semantic-red'
+                          }`}
+                        >
+                          {hasValidPrice ? (
+                            <>
+                              {isGain ? '+' : ''}
+                              {h.pnl_percent}%
+                            </>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums text-tx-primary">{h.weight_percent}%</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

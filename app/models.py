@@ -255,7 +255,7 @@ class UserPreferences(Base):
     guest_session_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True, unique=True)
     answer_style: Mapped[str] = mapped_column(String(50), default="Detailed", nullable=False)  # Concise | Detailed | Beginner | Expert
     default_symbols: Mapped[List[str]] = mapped_column(JSON, default=lambda: ["RELIANCE", "TCS", "INFY", "HDFCBANK"], nullable=False)
-    theme: Mapped[str] = mapped_column(String(20), default="Dark", nullable=False)  # Dark | Light | System
+    theme: Mapped[str] = mapped_column(String(20), default="Light", nullable=False)  # Dark | Light | System
 
     updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),

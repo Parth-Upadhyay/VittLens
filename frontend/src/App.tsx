@@ -43,7 +43,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 export const App: React.FC = () => {
-  const { initSession, setGuestLimitModalOpen, preferences } = useAppStore();
+  const { initSession, setGuestLimitModalOpen, preferences, isInitializing } = useAppStore();
 
   useEffect(() => {
     // Check for Google OAuth callback token in URL query
@@ -72,7 +72,13 @@ export const App: React.FC = () => {
 
   // Theme Sync Effect: Toggle dark class on <html>
   useEffect(() => {
-    if (preferences.theme === 'Dark') {
+    let resolvedTheme = preferences.theme;
+    if (resolvedTheme === 'System') {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      resolvedTheme = systemPrefersDark ? 'Dark' : 'Light';
+    }
+
+    if (resolvedTheme === 'Dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
@@ -80,11 +86,27 @@ export const App: React.FC = () => {
     // Clean up legacy light-mode class
     document.body.classList.remove('light-mode');
     
-    // Persist to localStorage
+    // Persist based on guest vs user
     if (preferences.theme) {
-      localStorage.setItem('vittlens_theme', preferences.theme);
+      const hasToken = !!localStorage.getItem('auth_token');
+      if (!hasToken) {
+        sessionStorage.setItem('vittlens_theme_guest', preferences.theme);
+      } else {
+        localStorage.setItem('vittlens_theme', preferences.theme);
+      }
     }
   }, [preferences.theme]);
+
+  if (isInitializing) {
+    return (
+      <div className="h-screen w-screen bg-bg-primary flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-9 h-9 rounded-full border-2 border-accent border-t-transparent animate-spin"></div>
+          <span className="text-xs text-tx-secondary font-mono tracking-widest animate-pulse uppercase">Connecting to Server...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

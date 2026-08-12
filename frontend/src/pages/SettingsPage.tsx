@@ -28,7 +28,12 @@ export const SettingsPage: React.FC = () => {
     const symList = symbols.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
 
     try {
-      localStorage.setItem('vittlens_theme', theme);
+      const hasToken = !!localStorage.getItem('auth_token');
+      if (!hasToken) {
+        sessionStorage.setItem('vittlens_theme_guest', theme);
+      } else {
+        localStorage.setItem('vittlens_theme', theme);
+      }
       
       await PreferencesService.updatePreferences({
         answer_style: style as any,

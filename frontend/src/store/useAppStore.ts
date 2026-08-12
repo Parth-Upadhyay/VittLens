@@ -12,7 +12,7 @@ interface AppState {
   preferences: UserPreferences;
   marketSymbols: Record<string, string[]>;
   isGuestLimitModalOpen: boolean;
-  isGuestPurposeModalOpen: boolean;
+  isInitializing: boolean;
 
   // Actions
   initSession: () => Promise<void>;
@@ -37,36 +37,63 @@ export const useAppStore = create<AppState>((set, get) => ({
   preferences: {
     answer_style: 'Detailed',
     default_symbols: ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK'],
-    theme: (localStorage.getItem('vittlens_theme') as any) || 'Light',
+    theme: (() => {
+      const hasToken = !!localStorage.getItem('auth_token');
+      if (!hasToken) {
+        return (sessionStorage.getItem('vittlens_theme_guest') as any) || 'Light';
+      }
+      return (localStorage.getItem('vittlens_theme') as any) || 'Light';
+    })(),
   },
   marketSymbols: {},
   isGuestLimitModalOpen: false,
   isGuestPurposeModalOpen: false,
+  isInitializing: true,
 
   initSession: async () => {
-    try {
-      const data = await AuthService.getMe();
-      if (data.provider === 'google') {
-        set({ user: data, guestSession: null, queriesRemaining: -1 });
-      } else {
-        set({
-          user: null,
-          guestSession: data,
-          queriesRemaining: data.queries_remaining ?? -1,
-        });
+    set({ isInitializing: true });
+    let success = false;
+    let attempts = 0;
+    while (!success) {
+      try {
+        const data = await AuthService.getMe();
+        if (data.provider === 'google') {
+          set({ user: data, guestSession: null, queriesRemaining: -1 });
+        } else {
+          set({
+            user: null,
+            guestSession: data,
+            queriesRemaining: data.queries_remaining ?? -1,
+          });
 
-        // Prompt guest for purpose of visit if missing
-        if (!data.purpose_of_visit) {
-          set({ isGuestPurposeModalOpen: true });
+          // Prompt guest for purpose of visit if missing
+          if (!data.purpose_of_visit) {
+            set({ isGuestPurposeModalOpen: true });
+          }
+        }
+        success = true;
+      } catch (e: any) {
+        const isNetworkOrServerError = !e.response || e.response.status >= 500;
+        if (isNetworkOrServerError) {
+          attempts++;
+          console.log(`Server not ready, retrying in 2s (attempt ${attempts})...`);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        } else {
+          console.error('Failed to init session (server is up):', e);
+          success = true;
         }
       }
+    }
 
+    try {
       await get().fetchThreads();
       await get().fetchPreferences();
       await get().fetchWatchlist();
       await get().fetchMarketSymbols();
-    } catch (e) {
-      console.error('Failed to init session:', e);
+    } catch (err) {
+      console.error('Failed to fetch post-init resources:', err);
+    } finally {
+      set({ isInitializing: false });
     }
   },
 

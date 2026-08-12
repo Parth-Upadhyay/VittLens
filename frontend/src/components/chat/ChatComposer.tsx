@@ -64,15 +64,23 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
       {preferences.default_symbols && preferences.default_symbols.length > 0 && (
         <div className="flex items-center space-x-2 mb-3 overflow-x-auto text-xs text-tx-secondary no-scrollbar">
           <span className="text-[11px] text-tx-tertiary font-medium">Quick:</span>
-          {preferences.default_symbols.map((sym) => (
-            <button
-              key={sym}
-              onClick={() => setText((prev) => (prev ? `${prev} ${sym}` : `Compare ${sym}`))}
-              className="px-2.5 py-1 rounded-md bg-bg-tertiary border border-border text-tx-secondary hover:text-tx-primary hover:border-accent nav-transition font-medium shadow-sm"
-            >
-              {sym}
-            </button>
-          ))}
+          {preferences.default_symbols.map((sym) => {
+            const isTicked = new RegExp(`\\b${sym}\\b`, 'i').test(text);
+            return (
+              <button
+                key={sym}
+                onClick={() => setText((prev) => (prev ? `${prev} ${sym}` : `Compare ${sym}`))}
+                className={`px-2.5 py-1 rounded-md border nav-transition font-medium shadow-sm flex items-center space-x-1 ${
+                  isTicked
+                    ? 'bg-accent-light border-accent text-accent'
+                    : 'bg-bg-tertiary border-border text-tx-secondary hover:text-tx-primary hover:border-accent'
+                }`}
+              >
+                {isTicked && <span className="text-[10px]">✓</span>}
+                <span>{sym}</span>
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -128,15 +136,15 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({ onSend, isLoading })
         </button>
       </form>
 
-      {/* Persistent SEBI Disclaimer Notice Line */}
-      <div className="mt-3 flex flex-col md:flex-row items-center justify-between gap-2 px-1 text-center md:text-left">
-        <div className="text-[11px] text-tx-tertiary font-sans tracking-wide font-medium order-1 md:order-2">
-          SEBI Disclaimer: VittLens is an AI analytical tool for educational purposes only and not a SEBI-registered advisor.
+      {/* Compact SEBI Disclaimer Notice Line */}
+      <div className="mt-2 flex items-center justify-between gap-2 px-1">
+        <div className="text-[10px] text-tx-tertiary font-sans truncate max-w-[70%] sm:max-w-none">
+          SEBI Disclaimer: AI tool for educational use. Not registered.
         </div>
-        <div className="flex justify-center md:justify-end order-2 md:order-3 w-full md:w-auto">
+        <div className="flex-shrink-0">
           {guestSession && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-bg-tertiary border border-border text-tx-secondary">
-              Guest Queries: {queriesRemaining >= 0 ? queriesRemaining : 15} left
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-bg-tertiary border border-border text-tx-secondary whitespace-nowrap">
+              {queriesRemaining >= 0 ? queriesRemaining : 15} left
             </span>
           )}
         </div>

@@ -162,11 +162,15 @@ async def enforce_rate_limit(
             if current_count == 1:
                 await redis.expire(ip_key, 86400)  # 24 hours
             
-            # Send current queries remaining back via response header or cookie if needed
-            queries_left = max(0, 15 - current_count)
             if guest:
-                guest.queries_used = current_count
+                # Merge cookie queries_used + 1 with redis current_count to handle server/Redis restarts
+                guest.queries_used = max(guest.queries_used + 1, current_count)
+                if guest.queries_used > current_count:
+                    await redis.set(ip_key, guest.queries_used)
+                
+                queries_left = max(0, 15 - guest.queries_used)
                 guest.queries_remaining = queries_left
+                
                 # Set guest queries_remaining in signed cookie value
                 handler = GuestCookieHandler()
                 signed_val = handler.sign_cookie_payload(guest)
@@ -178,12 +182,19 @@ async def enforce_rate_limit(
                     samesite="lax",
                 )
                 
-            if current_count > 15:
-                logger.warning(f"Guest IP {client_ip} exceeded daily query limit of 15.")
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="GUEST_LIMIT_REACHED"
-                )
+                if guest.queries_used > 15:
+                    logger.warning(f"Guest IP {client_ip} / Cookie exceeded daily query limit of 15.")
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="GUEST_LIMIT_REACHED"
+                    )
+            else:
+                if current_count > 15:
+                    logger.warning(f"Guest IP {client_ip} exceeded daily query limit of 15.")
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="GUEST_LIMIT_REACHED"
+                    )
         else:
             # Fallback to guest session cookie if Redis is not running
             if guest:

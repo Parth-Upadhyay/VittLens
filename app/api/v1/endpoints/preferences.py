@@ -22,7 +22,7 @@ router = APIRouter(prefix="/preferences", tags=["User Preferences"])
 class PreferencesResponse(BaseModel):
     answer_style: str = Field("Detailed", description="Concise | Detailed | Beginner | Expert")
     default_symbols: List[str] = Field(default_factory=lambda: ["RELIANCE", "TCS", "INFY", "HDFCBANK"])
-    theme: str = Field("Dark", description="Dark | Light | System")
+    theme: str = Field("Light", description="Dark | Light | System")
 
 
 class PreferencesUpdateRequest(BaseModel):

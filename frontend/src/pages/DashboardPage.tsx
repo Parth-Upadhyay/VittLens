@@ -231,9 +231,16 @@ export const DashboardPage: React.FC = () => {
 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-baseline justify-between">
-                      <span className="text-xl font-semibold text-tx-primary font-mono">
-                        {quote.price != null ? `₹${quote.price.toLocaleString()}` : 'N/A'}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-xl font-semibold text-tx-primary font-mono">
+                          {quote.price != null ? `₹${quote.price.toLocaleString()}` : 'N/A'}
+                        </span>
+                        {quote.change != null && quote.change_percent != null && (
+                          <span className={`text-xs font-mono font-medium ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
+                            {isGain ? '+' : ''}{quote.change.toFixed(2)} ({isGain ? '+' : ''}{quote.change_percent.toFixed(2)}%)
+                          </span>
+                        )}
+                      </div>
                       <MiniSparkline data={charts[sym]?.series ? charts[sym].series.map(b => b.close) : []} />
                     </div>
 

@@ -99,17 +99,57 @@ class PortfolioAgent:
         # Build the yfinance ticker symbol
         ticker_symbol = self.mapper.to_yfinance_ticker(canonical)
 
-        # 1. Fetch Market Quote (synchronous — no asyncio.run)
+        # Try fetching from cache first
+        cached_quote = None
+        from app.cache import SyncCacheService
+        quote_cache_key = f"market:quote:{ticker_symbol}"
         try:
-            raw_quote = self.market_service.repository.get_current_quote(ticker_symbol)
+            cached_quote = SyncCacheService.get(quote_cache_key)
+            if cached_quote and cached_quote.get("price", 0) > 0:
+                logger.info(f"PortfolioAgent: Cache HIT for {ticker_symbol}")
+        except Exception as e:
+            logger.warning(f"PortfolioAgent cache read error: {e}")
+
+        # If cache missed, try deep_metrics cache
+        if not cached_quote:
+            try:
+                deep_key = f"market:deep_metrics:{ticker_symbol}"
+                cached_deep = SyncCacheService.get(deep_key)
+                if cached_deep and cached_deep.get("agent_data"):
+                    curr = cached_deep["agent_data"].get("current", {})
+                    price = curr.get("price")
+                    if price and price > 0:
+                        cached_quote = {
+                            "price": price,
+                            "change": curr.get("change") or 0.0,
+                            "change_percent": curr.get("change_percent") or 0.0,
+                            "volume": curr.get("volume") or 0,
+                            "market_cap": curr.get("marketCap"),
+                            "day_high": curr.get("dayHigh"),
+                            "day_low": curr.get("dayLow"),
+                            "fifty_two_week_high": curr.get("fiftyTwoWeekHigh") or curr.get("yearHigh"),
+                            "fifty_two_week_low": curr.get("fiftyTwoWeekLow") or curr.get("yearLow"),
+                            "previous_close": curr.get("previousClose"),
+                        }
+            except Exception as e:
+                logger.warning(f"PortfolioAgent deep_metrics cache read error: {e}")
+
+        # 1. Fetch Market Quote
+        try:
+            if cached_quote:
+                raw_quote = cached_quote
+            else:
+                raw_quote = self.market_service.repository.get_current_quote(ticker_symbol)
+                # Cache the fresh live quote for future use
+                if raw_quote and raw_quote.get("price", 0) > 0:
+                    SyncCacheService.set(quote_cache_key, raw_quote, ttl=300)
             
             # Robust fallback for price missing/None
             current_price = raw_quote.get("price")
             if current_price is None or current_price == 0:
-                # Some ETFs return previous close in other fields, but we fall back to avg_buy_price
                 current_price = h.avg_buy_price
                 
-            prev_close = raw_quote.get("price", current_price)
+            prev_close = raw_quote.get("previous_close") or raw_quote.get("price") or current_price
             change_val = raw_quote.get("change") or 0.0
             day_change = change_val
         except Exception:
