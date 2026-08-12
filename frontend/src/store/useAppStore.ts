@@ -12,6 +12,7 @@ interface AppState {
   preferences: UserPreferences;
   marketSymbols: Record<string, string[]>;
   isGuestLimitModalOpen: boolean;
+  isGuestPurposeModalOpen: boolean;
   isInitializing: boolean;
 
   // Actions
