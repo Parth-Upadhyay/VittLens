@@ -119,7 +119,7 @@ _FINANCE_KEYWORDS = {
 }
 
 
-from app.macro_agent.models import get_llm_provider
+from app.services.factory import get_llm_provider
 
 async def _is_valid_financial_query(text: str, settings) -> bool:
     """
