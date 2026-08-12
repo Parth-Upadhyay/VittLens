@@ -6,6 +6,7 @@ Supports chat thread persistence, AI title generation, and 50-message FIFO reten
 
 import json
 import uuid
+import re
 from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.responses import StreamingResponse
@@ -121,6 +122,20 @@ _FINANCE_KEYWORDS = {
 
 from app.services.factory import get_llm_provider
 
+_TICKERS_PATTERN = re.compile(
+    r'\b(?:' + '|'.join(re.escape(t) for t in {
+        "reliance", "tcs", "infosys", "infy", "hdfc", "icici", "sbi", "wipro",
+        "bhartiartl", "airtel", "hcltech", "kotak", "axisbank", "bajaj",
+        "tatasteel", "tata", "adani", "ongc", "ntpc", "hindunilvr", "hul",
+        "maruti", "suzuki", "sunpharma", "drreddy", "cipla", "ultracemco",
+        "titan", "nestle", "itc", "powergrid", "coalindia", "jswsteel",
+        "grasim", "hdfclife", "sbilife", "lici", "zomato", "nykaa", "paytm",
+        "dmart", "avenue", "pidilitind", "shreecem", "siemens", "havells",
+        "indigo", "interglobe", "irctc", "hdfcbank", "icicibank"
+    }) + r')\b',
+    re.IGNORECASE
+)
+
 async def _is_valid_financial_query(text: str, settings) -> bool:
     """
     Small LLM Intent Classifier (Prompt Guard).
@@ -130,6 +145,9 @@ async def _is_valid_financial_query(text: str, settings) -> bool:
     # Fast-pass heuristic: if explicit ticker symbols are present, immediately approve.
     q_lower = text.lower()
     if any(kw in q_lower for kw in ["compare", "vs", "stock", "price", "market"]):
+        return True
+        
+    if _TICKERS_PATTERN.search(q_lower):
         return True
         
     try:
