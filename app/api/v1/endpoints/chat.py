@@ -122,8 +122,8 @@ _FINANCE_KEYWORDS = {
 
 from app.services.factory import get_llm_provider
 
-_TICKERS_PATTERN = re.compile(
-    r'\b(?:' + '|'.join(re.escape(t) for t in {
+def _build_universe_tickers() -> set:
+    terms = {
         "reliance", "tcs", "infosys", "infy", "hdfc", "icici", "sbi", "wipro",
         "bhartiartl", "airtel", "hcltech", "kotak", "axisbank", "bajaj",
         "tatasteel", "tata", "adani", "ongc", "ntpc", "hindunilvr", "hul",
@@ -132,7 +132,28 @@ _TICKERS_PATTERN = re.compile(
         "grasim", "hdfclife", "sbilife", "lici", "zomato", "nykaa", "paytm",
         "dmart", "avenue", "pidilitind", "shreecem", "siemens", "havells",
         "indigo", "interglobe", "irctc", "hdfcbank", "icicibank"
-    }) + r')\b',
+    }
+    try:
+        from pathlib import Path
+        import json
+        universe_path = Path(__file__).resolve().parent.parent.parent.parent / "data" / "universe.json"
+        with open(universe_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            
+        for category in data.values():
+            for key, val in category.items():
+                if val.get("symbol"):
+                    terms.add(val["symbol"].lower())
+                if val.get("name"):
+                    terms.add(val["name"].lower())
+    except Exception as e:
+        logger.warning(f"Could not load universe terms for guardrail: {e}")
+        
+    # Sort by length descending so longer terms (full names) match before shorter ones
+    return sorted([t for t in terms if len(t) >= 2], key=len, reverse=True)
+
+_TICKERS_PATTERN = re.compile(
+    r'\b(?:' + '|'.join(re.escape(t) for t in _build_universe_tickers()) + r')\b',
     re.IGNORECASE
 )
 
