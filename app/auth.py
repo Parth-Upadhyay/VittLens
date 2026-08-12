@@ -56,7 +56,7 @@ class GuestCookieHandler:
     def __init__(self, secret_key: Optional[str] = None) -> None:
         self.settings = Settings()
         self.secret_key = secret_key or self.settings.secret_key or "finnai-guest-secret-2026"
-        self.limit = 15  # Daily guest query limit
+        self.limit = self.settings.guest_query_limit if self.settings.guest_query_limit is not None else 15
 
     @property
     def secret_bytes(self) -> bytes:
@@ -113,7 +113,7 @@ class GuestCookieHandler:
             return GuestSession(
                 session_id=data.get("sid", str(uuid.uuid4())),
                 queries_used=queries_used,
-                queries_remaining=self.limit - queries_used,
+                queries_remaining=-1 if self.limit == -1 else max(0, self.limit - queries_used),
                 purpose_of_visit=data.get("purpose"),
                 created_at=data.get("cat", datetime.datetime.now(datetime.timezone.utc).isoformat()),
                 last_reset_date=data.get("lrd", datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")),

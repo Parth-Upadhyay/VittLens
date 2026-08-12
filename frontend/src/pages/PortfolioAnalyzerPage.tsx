@@ -581,7 +581,6 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                       cx="50%"
                       cy="43%"
                       outerRadius={70}
-                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                     >
                       {sectorData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NewsService } from '../services/api';
 import { NewsArticle } from '../types';
 import { Newspaper, ExternalLink, Filter } from 'lucide-react';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 const SYMBOLS = [
   'ALL', 'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK',
@@ -96,7 +97,7 @@ export const NewsPage: React.FC = () => {
 
       {/* News Grid */}
       {isLoading ? (
-        <div className="py-12 text-center text-sm text-tx-secondary font-sans">Loading news articles...</div>
+        <LoadingSpinner message="Loading news articles..." />
       ) : articles.length === 0 ? (
         <div className="py-12 text-center text-sm text-tx-secondary font-sans">No news articles found.</div>
       ) : (

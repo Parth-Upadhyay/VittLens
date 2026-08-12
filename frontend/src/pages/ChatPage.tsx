@@ -5,57 +5,14 @@ import { ChatMessage, ChatResponse } from '../types';
 import { MessageItem } from '../components/chat/MessageItem';
 import { ChatComposer } from '../components/chat/ChatComposer';
 import { Sparkles, MessageSquare } from 'lucide-react';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const ChatPage: React.FC = () => {
   const { activeThreadId, setActiveThreadId, fetchThreads, setQueriesRemaining, setGuestLimitModalOpen } = useAppStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [processingStep, setProcessingStep] = useState(0);
-  const [isColdStart, setIsColdStart] = useState(false);
-  const [coldStartSeconds, setColdStartSeconds] = useState(45);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isSubmittingRef = useRef(false);
-
-  const processingSteps = [
-    'Analyzing prompt & identifying company tickers...',
-    'Fetching live stock quotes & technical valuation metrics...',
-    'Aggregating financial news & market sentiment...',
-    'Searching filing repository & annual report chunks...',
-    'Synthesizing multi-agent intelligence response...',
-  ];
-
-  // Cycle through agent processing steps when loading
-  useEffect(() => {
-    let interval: any;
-    let coldStartTimer: any;
-    let coldStartInterval: any;
-
-    if (isLoading) {
-      setProcessingStep(0);
-      setIsColdStart(false);
-      setColdStartSeconds(45);
-
-      interval = setInterval(() => {
-        setProcessingStep((prev) => (prev < processingSteps.length - 1 ? prev + 1 : prev));
-      }, 2200);
-
-      // If it takes more than 4 seconds, assume Render cold start
-      coldStartTimer = setTimeout(() => {
-        setIsColdStart(true);
-        coldStartInterval = setInterval(() => {
-          setColdStartSeconds((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
-      }, 4000);
-    } else {
-      setIsColdStart(false);
-    }
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(coldStartTimer);
-      clearInterval(coldStartInterval);
-    };
-  }, [isLoading]);
 
   // Load messages when activeThreadId changes (e.g. from sidebar selection)
   useEffect(() => {
@@ -74,12 +31,11 @@ export const ChatPage: React.FC = () => {
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading, processingStep]);
+  }, [messages, isLoading]);
 
   const handleSend = async (question: string) => {
     isSubmittingRef.current = true;
     setIsLoading(true);
-    setProcessingStep(0);
 
     // Optimistically append user message
     const tempUserMsg: ChatMessage = {
@@ -90,59 +46,71 @@ export const ChatPage: React.FC = () => {
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
-    try {
-      const res: ChatResponse = await ChatService.sendQuery({
-        question,
-        chat_id: activeThreadId || undefined,
-      });
-
-      if (res.queries_remaining !== undefined) {
-        setQueriesRemaining(res.queries_remaining);
-      }
-
-      const tempAssistantMsg: ChatMessage = {
-        id: Date.now() + 1,
+    // Create a temporary assistant message that will stream
+    const tempAssistantId = Date.now() + 1;
+    let currentContent = '';
+    
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: tempAssistantId,
         role: 'assistant',
-        content: res.answer,
-        images: res.images,
-        sources: res.sources,
-        agents_used: res.agents_used,
-        symbols_queried: res.symbols_queried,
-        context_truncated: res.context_truncated,
+        content: '',
         created_at: new Date().toISOString(),
-      };
+      },
+    ]);
 
-      setMessages((prev) => [...prev, tempAssistantMsg]);
-
-      if (!activeThreadId && res.chat_id) {
-        setActiveThreadId(res.chat_id);
-        await fetchThreads();
+    await ChatService.sendQueryStream(
+      { question, chat_id: activeThreadId || undefined },
+      (event) => {
+        setIsLoading(false); // Hide the main spinner once stream begins
+        if (event.type === 'token') {
+           currentContent += event.content;
+           setMessages((prev) => prev.map(m => m.id === tempAssistantId ? { ...m, content: currentContent } : m));
+        } else if (event.type === 'error') {
+           currentContent += `\n\n⚠️ **Error:** ${event.content}`;
+           setMessages((prev) => prev.map(m => m.id === tempAssistantId ? { ...m, content: currentContent } : m));
+        } else if (event.type === 'status' || event.type === 'agent_start') {
+           // We can render a small status update if we want, but for now we append nothing to content
+        } else if (event.type === 'done') {
+           setMessages((prev) => prev.map(m => m.id === tempAssistantId ? { 
+             ...m, 
+             sources: event.sources, 
+             images: event.images, 
+             symbols_queried: event.symbols_queried,
+             agents_used: event.agents_used
+           } : m));
+        } else if (event.type === 'queries_remaining') {
+           setQueriesRemaining(event.content);
+        } else if (event.type === 'chat_id' && !activeThreadId) {
+           setActiveThreadId(event.content);
+           fetchThreads();
+        }
+      },
+      () => {
+        setIsLoading(false);
+        setTimeout(() => { isSubmittingRef.current = false; }, 500);
+      },
+      (err: any) => {
+        console.error('Chat error:', err);
+        const errorMessage = err.message || 'An error occurred while connecting to the backend.';
+        
+        if (err.message && err.message.includes('403')) {
+          setGuestLimitModalOpen(true);
+        }
+        
+        const errorAssistantMsg: ChatMessage = {
+          id: Date.now() + 2,
+          role: 'assistant',
+          content: `⚠️ **Query Execution Error**\n\n${errorMessage}`,
+          created_at: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev.filter(m => m.id !== tempAssistantId), errorAssistantMsg]);
+        setIsLoading(false);
+        setTimeout(() => { isSubmittingRef.current = false; }, 500);
       }
-    } catch (err: any) {
-      console.error('Chat error:', err);
-      const errorMessage =
-        err?.response?.data?.detail ||
-        err?.response?.data?.error ||
-        err?.message ||
-        'An error occurred while connecting to the backend.';
+    );
 
-      if (err?.response?.status === 403) {
-        setGuestLimitModalOpen(true);
-      }
-
-      const errorAssistantMsg: ChatMessage = {
-        id: Date.now() + 1,
-        role: 'assistant',
-        content: `⚠️ **Query Execution Error**\n\n${errorMessage}`,
-        created_at: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, errorAssistantMsg]);
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => {
-        isSubmittingRef.current = false;
-      }, 500);
-    }
   };
 
   return (
@@ -176,33 +144,10 @@ export const ChatPage: React.FC = () => {
           ))
         )}
 
-        {/* Live Processing Indicator Banner */}
+        {/* Simple Loading Indicator */}
         {isLoading && (
-          <div className="py-4 px-5 my-4 surface-card max-w-4xl mx-auto transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2.5">
-                <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-sm font-semibold text-tx-primary font-heading tracking-wide">
-                  {isColdStart 
-                    ? `Waking up sleeping server (Render Free Tier)...` 
-                    : `VittLens Multi-Agent System Processing...`}
-                </span>
-              </div>
-              <span className="text-xs text-tx-secondary font-mono tabular-nums bg-bg-tertiary px-3 py-1 rounded border border-border">
-                {isColdStart ? `${coldStartSeconds}s` : `Step ${processingStep + 1} of ${processingSteps.length}`}
-              </span>
-            </div>
-            <div className="flex items-center space-x-3 py-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-accent flex-shrink-0 animate-pulse" />
-              <span className="text-[13px] text-tx-primary font-medium">{processingSteps[processingStep]}</span>
-            </div>
-            {/* Solid Progress Bar */}
-            <div className="w-full bg-bg-tertiary h-2 rounded-full mt-3 overflow-hidden border border-border/50">
-              <div
-                className="bg-accent h-full transition-all duration-500 rounded-full"
-                style={{ width: isColdStart ? `${((45 - coldStartSeconds) / 45) * 100}%` : `${((processingStep + 1) / processingSteps.length) * 100}%` }}
-              />
-            </div>
+          <div className="flex justify-start my-4 ml-6 sm:ml-12">
+            <LoadingSpinner message="Thinking..." className="p-4" />
           </div>
         )}
 

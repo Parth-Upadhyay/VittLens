@@ -21,6 +21,7 @@ interface AppState {
   fetchThreads: () => Promise<void>;
   fetchWatchlist: () => Promise<void>;
   fetchPreferences: () => Promise<void>;
+  setPreferences: (prefs: Partial<UserPreferences>) => void;
   fetchMarketSymbols: () => Promise<void>;
   setQueriesRemaining: (count: number) => void;
   setGuestLimitModalOpen: (open: boolean) => void;
@@ -138,6 +139,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       console.error('Failed to fetch preferences:', e);
     }
   },
+
+  setPreferences: (prefs) => set((state) => ({ preferences: { ...state.preferences, ...prefs } })),
 
   fetchMarketSymbols: async () => {
     try {

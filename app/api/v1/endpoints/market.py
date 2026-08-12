@@ -153,6 +153,7 @@ async def get_deep_analyze_metrics(
                 fast_info_obj = FastInfoProxy()
                 if isinstance(price_data, dict):
                     fast_info_obj.last_price = price_data.get("regularMarketPrice")
+                    fast_info_obj.previous_close = price_data.get("regularMarketPreviousClose")
                     fast_info_obj.market_cap = price_data.get("marketCap")
                     fast_info_obj.currency = price_data.get("currency", "INR")
                 if isinstance(stats, dict):

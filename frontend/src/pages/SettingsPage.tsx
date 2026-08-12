@@ -12,7 +12,7 @@ const ANSWER_STYLES = [
 ];
 
 export const SettingsPage: React.FC = () => {
-  const { preferences, fetchPreferences } = useAppStore();
+  const { preferences, fetchPreferences, setPreferences } = useAppStore();
   const [style, setStyle] = useState(preferences.answer_style || 'Detailed');
   const [symbols, setSymbols] = useState(preferences.default_symbols?.join(', ') || 'RELIANCE, TCS, INFY');
   const [theme, setTheme] = useState(preferences.theme || 'Light');
@@ -27,29 +27,22 @@ export const SettingsPage: React.FC = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const symList = symbols.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
+    const newPrefs = {
+      answer_style: style as any,
+      default_symbols: symList,
+      theme: theme as any,
+    };
 
     try {
       const hasToken = !!localStorage.getItem('auth_token');
       if (!hasToken) {
         sessionStorage.setItem('vittlens_theme_guest', theme);
-        toast('Please refresh the page to apply theme changes.', {
-          icon: '🔄',
-          style: {
-            borderRadius: '10px',
-            background: 'var(--bg-secondary)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border)',
-          },
-        });
+        setPreferences(newPrefs);
       } else {
         localStorage.setItem('vittlens_theme', theme);
       }
       
-      await PreferencesService.updatePreferences({
-        answer_style: style as any,
-        default_symbols: symList,
-        theme: theme as any,
-      });
+      await PreferencesService.updatePreferences(newPrefs);
       await fetchPreferences();
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
@@ -59,15 +52,7 @@ export const SettingsPage: React.FC = () => {
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
       if (!localStorage.getItem('auth_token')) {
-        toast('Please refresh the page to apply theme changes.', {
-          icon: '🔄',
-          style: {
-            borderRadius: '10px',
-            background: 'var(--bg-secondary)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border)',
-          },
-        });
+        setPreferences(newPrefs);
       }
     }
   };

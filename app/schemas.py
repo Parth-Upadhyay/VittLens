@@ -776,6 +776,8 @@ class QuantComparison(BaseModel):
 class AgentCurrent(BaseModel):
     price: float
     currency: str
+    change: Optional[float] = None
+    change_percent: Optional[float] = None
     marketCap: Optional[float]
     dayHigh: Optional[float]
     dayLow: Optional[float]

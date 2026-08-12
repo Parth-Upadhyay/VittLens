@@ -70,6 +70,65 @@ export const ChatService = {
     const res = await api.post('/chat', req);
     return res.data;
   },
+  sendQueryStream: async (
+    req: ChatRequest,
+    onEvent: (event: any) => void,
+    onDone: () => void,
+    onError: (err: any) => void
+  ) => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+    
+    try {
+      const response = await fetch(`${API_BASE}/chat/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req),
+        credentials: 'include', // Ensures guest cookies are sent and received
+      });
+
+      if (!response.ok) {
+        let errData = await response.text();
+        try {
+           errData = JSON.parse(errData).detail || errData;
+        } catch(e) {}
+        throw new Error(errData || `HTTP error ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.slice(6);
+              if (dataStr.trim() === '') continue;
+              try {
+                const event = JSON.parse(dataStr);
+                onEvent(event);
+              } catch (e) {
+                console.error("Failed to parse SSE event:", dataStr);
+              }
+            }
+          }
+        }
+      }
+      onDone();
+    } catch (e) {
+      onError(e);
+    }
+  },
   getThreads: async (): Promise<ChatThread[]> => {
     const res = await api.get('/chats');
     return res.data;

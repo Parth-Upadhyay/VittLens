@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PortfolioService } from '../services/api';
 import { PortfolioSummary } from '../types';
 import { MetricCard } from '../components/common/MetricCard';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { SymbolSearch } from '../components/common/SymbolSearch';
 import { PieChart as PieChartIcon, Plus, Trash2 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
@@ -61,7 +62,7 @@ export const PortfolioPage: React.FC = () => {
   };
 
   if (isLoading || !summary) {
-    return <div className="p-12 text-center text-xs text-cream-muted font-sans bg-[#060E0A]">Loading portfolio data...</div>;
+    return <LoadingSpinner message="Loading portfolio data..." className="bg-bg-primary h-full" />;
   }
 
   const pieData = summary.holdings.map((h) => ({

@@ -119,76 +119,38 @@ _FINANCE_KEYWORDS = {
 }
 
 
-def _is_gibberish_query(text: str) -> bool:
+from app.macro_agent.models import get_llm_provider
+
+async def _is_valid_financial_query(text: str, settings) -> bool:
     """
-    Returns True if the input looks like gibberish or keyboard mashing.
-    Checks: too-short, keyboard patterns, vowel ratio, consonant runs.
+    Small LLM Intent Classifier (Prompt Guard).
+    Uses a fast, low-parameter model to determine if the user query is a valid 
+    financial/stock/market question or command, preventing off-topic abuse.
     """
-    import re
-    q = text.strip()
-    if not q or len(q) < 3:
+    # Fast-pass heuristic: if explicit ticker symbols are present, immediately approve.
+    q_lower = text.lower()
+    if any(kw in q_lower for kw in ["compare", "vs", "stock", "price", "market"]):
         return True
-
-    q_lower = q.lower()
-
-    # 1. Keyboard patterns
-    if any(pat in q_lower for pat in _KEYBOARD_PATTERNS):
+        
+    try:
+        provider = get_llm_provider("groq", settings=settings)
+        # Use openai/gpt-oss-safeguard-20b as primary model; fallback models handle backups automatically
+        res = provider.generate(
+            model="openai/gpt-oss-safeguard-20b",
+            system_prompt=(
+                "You are a strict Prompt Guard for a financial AI assistant. "
+                "Classify if the user's query is related to finance, stocks, investing, companies, or macroeconomics. "
+                "Respond with EXACTLY 'YES' if it is valid, or 'NO' if it is off-topic (e.g. coding, recipes, general chat, gibberish)."
+            ),
+            user_prompt=f"Query: {text}",
+            max_tokens=4,
+            temperature=0.0
+        )
+        answer = res.content.strip().upper()
+        return "YES" in answer
+    except Exception:
+        # Fail open if the LLM guard fails
         return True
-
-    alpha_only = re.sub(r"[^a-z]", "", q_lower)
-    if not alpha_only:
-        return False  # purely numeric/symbolic — let planner handle it
-
-    # 2. Vowel ratio on single-word or very short inputs
-    words = q.split()
-    if len(words) <= 2:
-        vowels = sum(1 for c in alpha_only if c in "aeiou")
-        ratio = vowels / len(alpha_only) if alpha_only else 0
-        if len(alpha_only) >= 5 and ratio < 0.15:
-            return True
-
-    # 3. Consecutive consonant run >= 5 (e.g. "gfxfjd", "bhjkst")
-    runs = re.split(r"[aeiou]+", alpha_only)
-    if any(len(run) >= 5 for run in runs):
-        return True
-
-    return False
-
-
-def _is_off_topic_query(text: str) -> bool:
-    """
-    Returns True if the query appears to have NO relation to finance, stocks,
-    or the Indian equity markets.
-
-    Strategy: tokenize the query and check if ANY word or bigram matches
-    the finance keyword set. If nothing matches, the query is off-topic.
-    This lets short but valid queries like 'TCS PE?' pass while blocking
-    'what do you think of cr7', 'tell me a joke', 'recipe for pasta', etc.
-    """
-    import re
-    q_lower = text.strip().lower()
-
-    # Tokenise into words
-    tokens = re.findall(r"[a-z0-9/]+", q_lower)
-
-    # Check individual tokens
-    for tok in tokens:
-        if tok in _FINANCE_KEYWORDS:
-            return False
-
-    # Check bigrams (e.g. "market cap", "pe ratio", "52 week")
-    bigrams = [f"{tokens[i]} {tokens[i+1]}" for i in range(len(tokens) - 1)]
-    for bg in bigrams:
-        if bg in _FINANCE_KEYWORDS:
-            return False
-
-    # Check if any finance keyword appears as a substring in the full text
-    # (catches tickers like HDFCBANK, BHARTIARTL embedded in sentences)
-    for kw in _FINANCE_KEYWORDS:
-        if len(kw) >= 4 and kw in q_lower:
-            return False
-
-    return True
 
 
 @router.post("", response_model=EnrichedChatResponse, summary="Execute financial analysis query")
@@ -216,15 +178,9 @@ async def process_chat_query(
                 "via POST /api/v1/auth/guest/purpose."
             )
 
-    # Prompt Guard: Block gibberish / rubbish / non-financial input
-    if _is_gibberish_query(request_body.question):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_GIBBERISH_REJECT_MSG,
-        )
-
-    # Relevance Guard: Block off-topic queries (no finance keywords detected)
-    if _is_off_topic_query(request_body.question):
+    # Prompt Guard: Small LLM Classifier blocking non-financial queries
+    is_valid = await _is_valid_financial_query(request_body.question, settings)
+    if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=_OFF_TOPIC_REJECT_MSG,
@@ -343,11 +299,11 @@ async def process_chat_query_stream(
     user, guest = auth_identity
     logger.info(f"Starting SSE chat stream for {'User:' + user.email if user else 'Guest:' + guest.session_id}")
 
-    # Prompt Guard: Block gibberish / rubbish / non-financial input
-    if _is_gibberish_query(request_body.question) or _is_off_topic_query(request_body.question):
-        reject_msg = _GIBBERISH_REJECT_MSG if _is_gibberish_query(request_body.question) else _OFF_TOPIC_REJECT_MSG
+    # Prompt Guard: Small LLM Classifier blocking non-financial queries
+    is_valid = await _is_valid_financial_query(request_body.question, settings)
+    if not is_valid:
         async def _error_stream():
-            error_event = json.dumps({"type": "error", "content": reject_msg})
+            error_event = json.dumps({"type": "error", "content": _OFF_TOPIC_REJECT_MSG})
             yield f"data: {error_event}\n\n"
         stream_res = StreamingResponse(_error_stream(), media_type="text/event-stream")
         stream_res.raw_headers.extend(response.raw_headers)

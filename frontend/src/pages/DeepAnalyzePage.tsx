@@ -4,6 +4,7 @@ import { Microscope, Search, ChevronDown, ChevronUp, AlertTriangle, Lightbulb, A
 import { MarketService } from '../services/api';
 import { SymbolSearch } from '../components/common/SymbolSearch';
 import { toast } from 'react-hot-toast';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 interface Metric {
   category: string;
@@ -204,10 +205,8 @@ export const DeepAnalyzePage: React.FC = () => {
       </div>
 
       {isMetricsLoading && (
-        <div className="flex flex-col items-center py-20 space-y-4">
-          <Activity className="w-8 h-8 text-accent animate-pulse" />
-          <div className="text-sm font-medium text-tx-primary">Loading Company Data...</div>
-          <div className="text-xs text-tx-secondary">Fetching financials, balance sheet, and live market quotes.</div>
+        <div className="absolute inset-0 bg-bg-primary/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl">
+          <LoadingSpinner message="Loading Company Data..." />
         </div>
       )}
 

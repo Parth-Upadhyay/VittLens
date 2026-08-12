@@ -321,10 +321,19 @@ class FinancialIntelligenceService:
         market_cap = getattr(fast_info, "market_cap", None)
         day_high = getattr(fast_info, "year_high", None)  # Fallback to 52w high if day high missing
         day_low = getattr(fast_info, "year_low", None)
+        prev_close = getattr(fast_info, "previous_close", None)
+        
+        change = None
+        change_percent = None
+        if price is not None and prev_close is not None and prev_close > 0:
+            change = price - prev_close
+            change_percent = (change / prev_close) * 100.0
 
         current = AgentCurrent(
-            price=price,
+            price=price or 0.0,
             currency=currency,
+            change=change,
+            change_percent=change_percent,
             marketCap=market_cap,
             dayHigh=day_high,
             dayLow=day_low,

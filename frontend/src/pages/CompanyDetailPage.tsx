@@ -5,6 +5,7 @@ import { CompanyDetail, HistoricalData, NewsArticle, KeyStatistics } from '../ty
 import { MetricCard } from '../components/common/MetricCard';
 import { ArrowLeft, ExternalLink, Microscope } from 'lucide-react';
 import { LineChart as ReLineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const CompanyDetailPage: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
@@ -53,7 +54,7 @@ export const CompanyDetailPage: React.FC = () => {
   }, [targetSymbol, period]);
 
   if (isLoading || !detail) {
-    return <div className="p-16 text-center text-sm text-tx-secondary font-sans bg-bg-primary animate-page-in">Loading {targetSymbol} details...</div>;
+    return <LoadingSpinner message={`Loading ${targetSymbol} details...`} className="bg-bg-primary h-full" />;
   }
 
   const quote = detail.quote;

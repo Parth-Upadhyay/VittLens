@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
       return user.name.slice(0, 2).toUpperCase();
     }
-    return 'PU';
+    return 'GU';
   };
 
   return (

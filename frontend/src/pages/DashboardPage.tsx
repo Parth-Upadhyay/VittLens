@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { MarketService, WatchlistService, NewsService } from '../services/api';
 import { StockQuote, HistoricalData, NewsArticle } from '../types';
-import { MiniSparkline } from '../components/visual/MiniSparkline';
 import { SymbolSearch } from '../components/common/SymbolSearch';
-import { LayoutDashboard, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { LayoutDashboard, Plus, Trash2, ExternalLink, Triangle } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -182,7 +182,7 @@ export const DashboardPage: React.FC = () => {
         <h2 className="metric-label">Watchlist Overview</h2>
 
         {watchlist.length === 0 && isLoading ? (
-          <div className="py-12 text-center text-sm text-tx-secondary font-sans">Loading market quotes...</div>
+          <LoadingSpinner message="Loading market quotes..." />
         ) : watchlist.length === 0 ? (
           <div className="py-12 text-center text-sm text-tx-secondary font-sans">No symbols in watchlist. Add a symbol above.</div>
         ) : (
@@ -241,7 +241,15 @@ export const DashboardPage: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <MiniSparkline data={charts[sym]?.series ? charts[sym].series.map(b => b.close) : []} />
+                      {quote.change != null && (
+                        <div className="flex items-center justify-center pr-2">
+                          <Triangle 
+                            className={`w-7 h-7 drop-shadow-sm transition-colors ${
+                              isGain ? 'text-semantic-green fill-current' : 'text-semantic-red fill-current rotate-180'
+                            }`}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-2 border-t border-border flex justify-end">
