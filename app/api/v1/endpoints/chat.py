@@ -331,6 +331,7 @@ async def process_chat_query_stream(
     response: Response,
     auth_identity: tuple = Depends(enforce_rate_limit),
     orchestrator: FinancialOrchestrator = Depends(get_orchestrator),
+    settings = Depends(get_settings),
 ) -> StreamingResponse:
     """
     Streams Server-Sent Events (SSE) containing progress events and real-time LLM token chunks.
