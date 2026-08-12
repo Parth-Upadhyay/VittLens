@@ -8,7 +8,7 @@ import os
 from typing import Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.config.settings import Settings
-from app.dependencies import get_settings
+from app.dependencies import get_settings, enforce_rate_limit
 from app.schemas import CompanyInfo, HistoricalData, KeyStatistics, StockQuote
 from app.services.market_service import MarketService
 from app.cache import CacheService
@@ -211,7 +211,9 @@ async def get_deep_analyze_metrics(
 
 @router.get("/deep-analyze/{symbol}/synthesis", summary="Get LLM synthesis report for a company")
 async def get_deep_analyze_synthesis(
-    symbol: str, service: MarketService = Depends(get_market_service)
+    symbol: str, 
+    service: MarketService = Depends(get_market_service),
+    auth_identity: tuple = Depends(enforce_rate_limit)
 ) -> dict:
     """Return the LLM generated deep analysis report."""
     import asyncio
