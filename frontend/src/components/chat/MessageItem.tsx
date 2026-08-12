@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown } from 'lucide-react';
+import { User, AlertTriangle, ExternalLink, Globe, Triangle, TrendingUp, TrendingDown } from 'lucide-react';
 import { ImageCarousel } from './ImageCarousel';
 import { SourcesPanel, getCleanSiteName } from './SourcesPanel';
 import { AgentChip } from './AgentChip';
 import { MarketService } from '../../services/api';
-import { MiniSparkline } from '../visual/MiniSparkline';
 import { HistoricalData, StockQuote } from '../../types';
 
 // Custom component to render a rich chart directly in the chat bubble
@@ -68,10 +67,12 @@ const ChatChartBlock: React.FC<{ symbol: string }> = ({ symbol }) => {
           {isGain ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
         </div>
       </div>
-      <div className="w-full sm:w-2/3 h-[60px] flex justify-end">
-        <div className="w-full max-w-[200px]">
-          <MiniSparkline data={chart.series ? chart.series.map(b => b.close) : []} />
-        </div>
+      <div className="w-full sm:w-1/3 flex justify-end items-center pr-4">
+        <Triangle 
+          className={`w-10 h-10 drop-shadow-sm transition-colors ${
+            isGain ? 'text-semantic-green fill-current' : 'text-semantic-red fill-current rotate-180'
+          }`}
+        />
       </div>
     </div>
   );
@@ -179,7 +180,9 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   let openingTakeaway = '';
   let mainBody = cleanContent;
 
-  if (!isUser) {
+  const isErrorMsg = cleanContent.includes('⚠️');
+
+  if (!isUser && !isErrorMsg) {
     const headerMatch = cleanContent.search(/^#+\s+/m);
     if (headerMatch > 0) {
       openingTakeaway = cleanContent.slice(0, headerMatch).trim();
