@@ -176,7 +176,7 @@ def get_me(
             queries_remaining=guest.queries_remaining,
         )
 
-    return UserResponse(provider="guest", queries_used=0, queries_remaining=3)
+    return UserResponse(provider="guest", queries_used=0, queries_remaining=15)
 
 
 @router.post("/guest/purpose", summary="Submit guest purpose of visit")

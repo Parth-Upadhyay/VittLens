@@ -97,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               }`}
             >
               <Sparkles className="w-3 h-3 text-accent" />
-              <span>{queriesRemaining < 0 ? '∞' : `${queriesRemaining}/3`}</span>
+              <span>{queriesRemaining < 0 ? '∞' : `${queriesRemaining}/15`}</span>
             </button>
           )}
 

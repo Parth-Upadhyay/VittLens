@@ -781,6 +781,8 @@ class AgentCurrent(BaseModel):
     marketCap: Optional[float]
     dayHigh: Optional[float]
     dayLow: Optional[float]
+    fiftyTwoWeekHigh: Optional[float] = None
+    fiftyTwoWeekLow: Optional[float] = None
     timestamp: str
 
 class AgentValuation(BaseModel):

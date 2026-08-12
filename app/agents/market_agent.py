@@ -69,8 +69,8 @@ class MarketAgent(BaseAgent):
                     market_cap=curr.get("marketCap"),
                     day_high=curr.get("dayHigh"),
                     day_low=curr.get("dayLow"),
-                    fifty_two_week_high=None,
-                    fifty_two_week_low=None,
+                    fifty_two_week_high=curr.get("fiftyTwoWeekHigh"),
+                    fifty_two_week_low=curr.get("fiftyTwoWeekLow"),
                     currency=curr.get("currency", "INR"),
                 )
                 

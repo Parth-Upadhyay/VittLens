@@ -70,63 +70,34 @@ export const ChatService = {
     const res = await api.post('/chat', req);
     return res.data;
   },
-  sendQueryStream: async (
-    req: ChatRequest,
-    onEvent: (event: any) => void,
-    onDone: () => void,
-    onError: (err: any) => void
-  ) => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
-    
+  sendQueryStream: async (req: ChatRequest, onEvent: (e: any) => void, onDone: () => void, onError: (err: any) => void) => {
     try {
-      const response = await fetch(`${API_BASE}/chat/stream`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(req),
-        credentials: 'include',
+      const response = await api.post('/chat', req);
+      const data = response.data;
+
+      // Simulate stream events for the UI so we don't have to rewrite the ChatPage logic
+      if (data.chat_id) {
+        onEvent({ type: 'chat_id', content: data.chat_id });
+      }
+      if (data.queries_remaining !== undefined) {
+        onEvent({ type: 'queries_remaining', content: data.queries_remaining });
+      }
+
+      // Send the entire text as one token block
+      onEvent({ type: 'token', content: data.answer || "" });
+
+      // Send the done event with the metadata
+      onEvent({
+        type: 'done',
+        sources: data.sources || [],
+        images: data.images || [],
+        agents_used: data.agents_used || [],
+        symbols_queried: data.symbols_queried || []
       });
 
-      if (!response.ok) {
-        let errData = await response.text();
-        try {
-           errData = JSON.parse(errData).detail || errData;
-        } catch(e) {}
-        throw new Error(errData || `HTTP error ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          
-          buffer = lines.pop() || '';
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.slice(6);
-              if (dataStr.trim() === '') continue;
-              try {
-                const event = JSON.parse(dataStr);
-                onEvent(event);
-              } catch (e) {
-                console.error("Failed to parse SSE event:", dataStr);
-              }
-            }
-          }
-        }
-      }
       onDone();
-    } catch (e) {
-      onError(e);
+    } catch (e: any) {
+      onError(e.response?.data || e);
     }
   },
   getThreads: async (): Promise<ChatThread[]> => {

@@ -71,10 +71,27 @@ class OrchestratorPromptBuilder:
 
     @staticmethod
     def _sectors_overlap(impact_sectors_str: str, queried_sectors: Set[str]) -> bool:
-        """Check if a macro sector impact string overlaps with any queried sector."""
-        if not impact_sectors_str or not queried_sectors:
+        """Check if a macro sector impact string overlaps with any queried sector or contains universal macro terms."""
+        if not impact_sectors_str:
             return False
+            
         impact_lower = impact_sectors_str.lower()
+        
+        # Universal macro terms that should ALWAYS trigger a connection
+        universal_terms = [
+            "economy", "global", "india", "market", "finance", "macro", 
+            "geopolitics", "index", "nifty", "interest", "rate", "inflation", 
+            "war", "broad", "all", "general", "world", "crisis", "growth",
+            "gdp", "fdi", "export", "import", "currency", "rupee", "usd",
+            "rbi", "fed", "central bank", "policy", "treasury", "bond"
+        ]
+        
+        if any(term in impact_lower for term in universal_terms):
+            return True
+            
+        if not queried_sectors:
+            return False
+            
         for s in queried_sectors:
             if s.lower() in impact_lower or impact_lower in s.lower():
                 return True

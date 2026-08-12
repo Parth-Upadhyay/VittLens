@@ -165,7 +165,7 @@ async def _is_valid_financial_query(text: str, settings) -> bool:
     """
     # Fast-pass heuristic: if explicit ticker symbols are present, immediately approve.
     q_lower = text.lower()
-    if any(kw in q_lower for kw in ["compare", "vs", "stock", "price", "market"]):
+    if any(kw in q_lower for kw in ["compare", "vs", "stock", "price", "market", "economy", "indian", "india", "war", "global", "macro", "geopolitics", "rate", "gdp", "rbi", "fed"]):
         return True
         
     if _TICKERS_PATTERN.search(q_lower):

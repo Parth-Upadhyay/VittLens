@@ -282,58 +282,63 @@ class MarketRepository:
             t = Ticker(ticker_symbol)
             info = {}
             
-            profile = t.summary_profile.get(ticker_symbol, {})
-            if isinstance(profile, dict):
-                info["sector"] = profile.get("sector")
-                info["industry"] = profile.get("industry")
-                info["longBusinessSummary"] = profile.get("longBusinessSummary")
-                info["website"] = profile.get("website")
-                info["fullTimeEmployees"] = profile.get("fullTimeEmployees")
-                info["country"] = profile.get("country")
-                info["city"] = profile.get("city")
-                info["state"] = profile.get("state")
+            profile = t.summary_profile
+            if isinstance(profile, dict) and isinstance(profile.get(ticker_symbol), dict):
+                p_data = profile.get(ticker_symbol)
+                info["sector"] = p_data.get("sector")
+                info["industry"] = p_data.get("industry")
+                info["longBusinessSummary"] = p_data.get("longBusinessSummary")
+                info["website"] = p_data.get("website")
+                info["fullTimeEmployees"] = p_data.get("fullTimeEmployees")
+                info["country"] = p_data.get("country")
+                info["city"] = p_data.get("city")
+                info["state"] = p_data.get("state")
                 
-            q_type = t.quote_type.get(ticker_symbol, {})
-            if isinstance(q_type, dict):
-                info["longName"] = q_type.get("longName")
-                info["shortName"] = q_type.get("shortName")
+            q_type = t.quote_type
+            if isinstance(q_type, dict) and isinstance(q_type.get(ticker_symbol), dict):
+                qt_data = q_type.get(ticker_symbol)
+                info["longName"] = qt_data.get("longName")
+                info["shortName"] = qt_data.get("shortName")
                 
-            stats = t.key_stats.get(ticker_symbol, {})
-            if isinstance(stats, dict):
-                info["forwardPE"] = stats.get("forwardPE")
-                info["beta"] = stats.get("beta")
-                info["bookValue"] = stats.get("bookValue")
-                info["priceToBook"] = stats.get("priceToBook")
-                info["enterpriseToEbitda"] = stats.get("enterpriseToEbitda")
-                info["enterpriseToRevenue"] = stats.get("enterpriseToRevenue")
-                info["trailingEps"] = stats.get("trailingEps")
-                info["forwardEps"] = stats.get("forwardEps")
+            stats = t.key_stats
+            if isinstance(stats, dict) and isinstance(stats.get(ticker_symbol), dict):
+                s_data = stats.get(ticker_symbol)
+                info["forwardPE"] = s_data.get("forwardPE")
+                info["beta"] = s_data.get("beta")
+                info["bookValue"] = s_data.get("bookValue")
+                info["priceToBook"] = s_data.get("priceToBook")
+                info["enterpriseToEbitda"] = s_data.get("enterpriseToEbitda")
+                info["enterpriseToRevenue"] = s_data.get("enterpriseToRevenue")
+                info["trailingEps"] = s_data.get("trailingEps")
+                info["forwardEps"] = s_data.get("forwardEps")
                 
-            detail = t.summary_detail.get(ticker_symbol, {})
-            if isinstance(detail, dict):
-                info["trailingPE"] = detail.get("trailingPE")
-                info["dividendYield"] = detail.get("dividendYield")
-                info["marketCap"] = detail.get("marketCap")
-                info["previousClose"] = detail.get("previousClose")
-                info["regularMarketPrice"] = detail.get("regularMarketPrice")
-                info["dayHigh"] = detail.get("dayHigh")
-                info["dayLow"] = detail.get("dayLow")
-                info["fiftyTwoWeekHigh"] = detail.get("fiftyTwoWeekHigh")
-                info["fiftyTwoWeekLow"] = detail.get("fiftyTwoWeekLow")
-                info["volume"] = detail.get("volume")
-                info["currency"] = detail.get("currency")
+            detail = t.summary_detail
+            if isinstance(detail, dict) and isinstance(detail.get(ticker_symbol), dict):
+                d_data = detail.get(ticker_symbol)
+                info["trailingPE"] = d_data.get("trailingPE")
+                info["dividendYield"] = d_data.get("dividendYield")
+                info["marketCap"] = d_data.get("marketCap")
+                info["previousClose"] = d_data.get("previousClose")
+                info["regularMarketPrice"] = d_data.get("regularMarketPrice")
+                info["dayHigh"] = d_data.get("dayHigh")
+                info["dayLow"] = d_data.get("dayLow")
+                info["fiftyTwoWeekHigh"] = d_data.get("fiftyTwoWeekHigh")
+                info["fiftyTwoWeekLow"] = d_data.get("fiftyTwoWeekLow")
+                info["volume"] = d_data.get("volume")
+                info["currency"] = d_data.get("currency")
                 
-            financial_data = getattr(t, 'financial_data', {}).get(ticker_symbol, {})
-            if isinstance(financial_data, dict):
-                info["financialCurrency"] = financial_data.get("financialCurrency")
-                info["returnOnEquity"] = financial_data.get("returnOnEquity")
-                info["debtToEquity"] = financial_data.get("debtToEquity")
-                info["currentRatio"] = financial_data.get("currentRatio")
-                info["profitMargins"] = financial_data.get("profitMargins")
-                info["grossMargins"] = financial_data.get("grossMargins")
-                info["ebitda"] = financial_data.get("ebitda")
-                info["totalRevenue"] = financial_data.get("totalRevenue")
-                info["targetMeanPrice"] = financial_data.get("targetMeanPrice")
+            financial_data = getattr(t, 'financial_data', {})
+            if isinstance(financial_data, dict) and isinstance(financial_data.get(ticker_symbol), dict):
+                f_data = financial_data.get(ticker_symbol)
+                info["financialCurrency"] = f_data.get("financialCurrency")
+                info["returnOnEquity"] = f_data.get("returnOnEquity")
+                info["debtToEquity"] = f_data.get("debtToEquity")
+                info["currentRatio"] = f_data.get("currentRatio")
+                info["profitMargins"] = f_data.get("profitMargins")
+                info["grossMargins"] = f_data.get("grossMargins")
+                info["ebitda"] = f_data.get("ebitda")
+                info["totalRevenue"] = f_data.get("totalRevenue")
+                info["targetMeanPrice"] = f_data.get("targetMeanPrice")
                 
             return info
         except Exception as e:

@@ -337,6 +337,8 @@ class FinancialIntelligenceService:
             marketCap=market_cap,
             dayHigh=day_high,
             dayLow=day_low,
+            fiftyTwoWeekHigh=getattr(fast_info, "year_high", None),
+            fiftyTwoWeekLow=getattr(fast_info, "year_low", None),
             timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat()
         )
         
