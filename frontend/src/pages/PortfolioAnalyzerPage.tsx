@@ -30,6 +30,7 @@ import {
   Pie,
   Cell,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -578,8 +579,8 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                       dataKey="value"
                       nameKey="name"
                       cx="50%"
-                      cy="50%"
-                      outerRadius={90}
+                      cy="43%"
+                      outerRadius={70}
                       label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                     >
                       {sectorData.map((_, index) => (
@@ -588,6 +589,13 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                     </Pie>
                     <Tooltip
                       contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)', borderRadius: '8px', fontSize: '12px' }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={36}
+                      iconSize={10}
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: '11px', fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>

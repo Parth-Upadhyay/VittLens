@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { PreferencesService } from '../services/api';
 import { Settings as SettingsIcon, Check, Info } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const ANSWER_STYLES = [
   { id: 'Concise', title: 'Concise', desc: 'Direct, bulleted financial takeaways without preamble.' },
@@ -31,6 +32,15 @@ export const SettingsPage: React.FC = () => {
       const hasToken = !!localStorage.getItem('auth_token');
       if (!hasToken) {
         sessionStorage.setItem('vittlens_theme_guest', theme);
+        toast('Please refresh the page to apply theme changes.', {
+          icon: '🔄',
+          style: {
+            borderRadius: '10px',
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border)',
+          },
+        });
       } else {
         localStorage.setItem('vittlens_theme', theme);
       }
@@ -48,6 +58,17 @@ export const SettingsPage: React.FC = () => {
       // For guest users where backend save might fail, still update UI state locally
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
+      if (!localStorage.getItem('auth_token')) {
+        toast('Please refresh the page to apply theme changes.', {
+          icon: '🔄',
+          style: {
+            borderRadius: '10px',
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border)',
+          },
+        });
+      }
     }
   };
 

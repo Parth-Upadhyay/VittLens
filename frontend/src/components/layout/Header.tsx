@@ -54,6 +54,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </button>
 
           <Link to="/chat" className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-7 h-7 rounded-md bg-accent text-white font-bold text-sm tracking-tighter shadow-sm">
+              VL
+            </div>
             <span className="text-base font-heading font-semibold tracking-tight text-tx-primary">Vitt<span className="text-accent">Lens</span></span>
             <span className="hidden sm:inline-block text-[10px] text-tx-tertiary border border-border px-1.5 py-0.5 rounded font-mono bg-bg-tertiary">NIFTY 20</span>
           </Link>

@@ -138,11 +138,17 @@ class OrchestratorPromptBuilder:
         if context.market_data:
             prompt_parts.append("### 1. REAL-TIME MARKET DATA")
             for sym, quote in context.market_data.items():
+                if not quote.price or quote.price <= 0.0:
+                    prompt_parts.append(f"[{sym}]: No valid market data found. Do not include {sym} in your analysis.")
+                    continue
+                    
                 mcap_str = cls.format_market_cap(quote.market_cap)
+                low_val = f"₹{quote.fifty_two_week_low}" if quote.fifty_two_week_low is not None else "N/A"
+                high_val = f"₹{quote.fifty_two_week_high}" if quote.fifty_two_week_high is not None else "N/A"
                 prompt_parts.append(
                     f"[{sym}] ({quote.symbol}): Price: ₹{quote.price} INR | 24h Change: {quote.change:+.2f} ({quote.change_percent:+.2f}%) | "
                     f"Volume: {quote.volume:,} | Market Cap: {mcap_str} | "
-                    f"52-Week Range: ₹{quote.fifty_two_week_low} - ₹{quote.fifty_two_week_high}"
+                    f"52-Week Range: {low_val} - {high_val}"
                 )
                 
                 # Append key_stats if available (often fetched via MarketAgent)

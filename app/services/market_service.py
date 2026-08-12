@@ -212,6 +212,15 @@ class MarketService:
                     if v is not None:
                         return v
                 return None
+                
+            def _find_pct(*keys):
+                val = _find(*keys)
+                if val is not None:
+                    try:
+                        return float(val) / 100.0
+                    except (ValueError, TypeError):
+                        pass
+                return None
             
             stats = KeyStatistics(
                 canonical_symbol=canonical_symbol,
@@ -220,12 +229,12 @@ class MarketService:
                 peg_ratio=_find("pegRatio", "peg_ratio"),
                 eps=recent_fin.get("eps") or _find("eps", "basicEPS"),
                 beta=_find("beta"),
-                dividend_yield=_find("dividendYield", "dividend_yield"),
-                roe=_find("roe", "returnOnEquity"),
-                roce=_find("roce", "returnOnCapitalEmployed"),
+                dividend_yield=_find_pct("dividendYield", "dividend_yield"),
+                roe=_find_pct("roe", "returnOnEquity"),
+                roce=_find_pct("roce", "returnOnCapitalEmployed"),
                 pb_ratio=val_data.get("priceToBook") or _find("priceToBook", "priceToBook", "pb_ratio"),
-                profit_margins=_find("netMargin", "profit_margins", "net_margin"),
-                gross_margins=_find("grossMargins", "gross_margins", "gross_margin"),
+                profit_margins=_find_pct("netMargin", "profit_margins", "net_margin"),
+                gross_margins=_find_pct("grossMargins", "gross_margins", "gross_margin"),
                 revenue=recent_fin.get("revenue") or _find("totalRevenue", "revenue"),
                 ebitda=_find("ebitda"),
                 debt_to_equity=health_data.get("debtToEquity") or _find("debtToEquity", "debt_to_equity"),

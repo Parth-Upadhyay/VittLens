@@ -333,6 +333,7 @@ async def process_chat_query(
 @router.post("/stream", summary="Execute real-time streaming financial analysis query (SSE)")
 async def process_chat_query_stream(
     request_body: ExtendedChatRequest,
+    response: Response,
     auth_identity: tuple = Depends(enforce_rate_limit),
     orchestrator: FinancialOrchestrator = Depends(get_orchestrator),
 ) -> StreamingResponse:
@@ -348,7 +349,9 @@ async def process_chat_query_stream(
         async def _error_stream():
             error_event = json.dumps({"type": "error", "content": reject_msg})
             yield f"data: {error_event}\n\n"
-        return StreamingResponse(_error_stream(), media_type="text/event-stream")
+        stream_res = StreamingResponse(_error_stream(), media_type="text/event-stream")
+        stream_res.raw_headers.extend(response.raw_headers)
+        return stream_res
 
     async def sse_event_generator():
         event_stream = orchestrator.process_query_event_stream(request_body)
@@ -356,4 +359,6 @@ async def process_chat_query_stream(
             json_data = json.dumps(event)
             yield f"data: {json_data}\n\n"
 
-    return StreamingResponse(sse_event_generator(), media_type="text/event-stream")
+    stream_res = StreamingResponse(sse_event_generator(), media_type="text/event-stream")
+    stream_res.raw_headers.extend(response.raw_headers)
+    return stream_res

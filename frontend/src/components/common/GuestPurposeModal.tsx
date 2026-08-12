@@ -33,14 +33,14 @@ export const GuestPurposeModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-sans">
-      <div className="bg-[#0D1912] border border-hairline rounded-xl p-6 max-w-md w-full shadow-2xl space-y-5 text-left">
+      <div className="bg-bg-secondary border border-border rounded-xl p-6 max-w-md w-full shadow-2xl space-y-5 text-left">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-[#14251B] border border-hairline text-accent flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-bg-tertiary border border-border text-accent flex items-center justify-center">
             <Compass className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-medium text-cream">Welcome to VittLens!</h2>
-            <p className="text-xs text-cream-muted">What brings you to our platform today?</p>
+            <h2 className="text-lg font-medium text-tx-primary">Welcome to VittLens!</h2>
+            <p className="text-xs text-tx-secondary">What brings you to our platform today?</p>
           </div>
         </div>
 
@@ -53,8 +53,8 @@ export const GuestPurposeModal: React.FC = () => {
                 onClick={() => setSelected(p)}
                 className={`w-full flex items-center justify-between p-3 rounded-lg border text-sm transition-colors text-left ${
                   active
-                    ? 'border-accent bg-[#14251B] text-cream font-medium'
-                    : 'border-hairline bg-[#060E0A] text-cream-muted hover:bg-[#14251B]/50'
+                    ? 'border-accent bg-accent-light text-tx-primary font-medium'
+                    : 'border-border bg-bg-primary text-tx-secondary hover:bg-bg-hover'
                 }`}
               >
                 <span>{p}</span>
@@ -67,14 +67,14 @@ export const GuestPurposeModal: React.FC = () => {
         <div className="pt-2 flex items-center justify-end space-x-3">
           <button
             onClick={() => setGuestPurposeModalOpen(false)}
-            className="px-4 py-2 text-xs text-cream-muted hover:text-cream transition-colors"
+            className="px-4 py-2 text-xs text-tx-tertiary hover:text-tx-primary transition-colors"
           >
             Skip for now
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="bg-accent hover:bg-accent-hover text-cream text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-sm"
+            className="bg-accent hover:bg-accent-hover text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-sm"
           >
             {isSubmitting ? 'Saving...' : 'Continue'}
           </button>
