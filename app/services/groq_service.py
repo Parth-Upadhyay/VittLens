@@ -161,7 +161,10 @@ class GroqProvider(LLMProvider):
                 if "413" in err_str or "request_too_large" in err_str or "tpm" in err_str or "limit" in err_str:
                     try:
                         # Limit context to ~6000 chars to fit within 8k TPM limits
-                        truncated_prompt = current_user_prompt[:6000] + "\n\n[Context truncated to fit model token limits]"
+                        if len(current_user_prompt) > 6000:
+                            truncated_prompt = current_user_prompt[:3000] + "\n\n...[Context Evidence Truncated due to Rate Limit]...\n\n" + current_user_prompt[-3000:]
+                        else:
+                            truncated_prompt = current_user_prompt[:6000]
                         logger.info(f"Retrying Groq completion with model '{model_candidate}' using truncated prompt context...")
                         retry_messages = [
                             {"role": "system", "content": system_prompt},
@@ -249,12 +252,36 @@ class GroqProvider(LLMProvider):
 
                 return  # Stream completed cleanly
 
-            except groq.RateLimitError as e:
-                logger.warning(f"Groq stream rate limit hit for model '{model_candidate}'. Failing over...")
+            except (groq.RateLimitError, groq.APIStatusError) as e:
+                logger.warning(f"Groq stream rate limit hit for model '{model_candidate}': {e}. Failing over...")
+                err_str = str(e).lower()
+                if "413" in err_str or "request_too_large" in err_str or "tpm" in err_str or "limit" in err_str:
+                    try:
+                        if len(user_prompt) > 6000:
+                            truncated_prompt = user_prompt[:3000] + "\n\n...[Context Evidence Truncated due to Rate Limit]...\n\n" + user_prompt[-3000:]
+                        else:
+                            truncated_prompt = user_prompt[:6000]
+                            
+                        logger.info(f"Retrying Groq stream with model '{model_candidate}' using truncated prompt context...")
+                        kwargs["messages"] = [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": truncated_prompt},
+                        ]
+                        retry_stream = self.client.chat.completions.create(**kwargs)
+                        for chunk in retry_stream:
+                            delta = chunk.choices[0].delta
+                            if delta and delta.content:
+                                yield delta.content
+                        return  # Stream completed cleanly
+                    except Exception as retry_err:
+                        logger.warning(f"Retry after truncation failed for stream model '{model_candidate}': {retry_err}")
                 continue
             except Exception as e:
                 logger.error(f"Groq streaming error with model '{model_candidate}': {e}")
                 continue
+        
+        # If all candidates fail, we yield an error message so the user knows why it failed
+        yield "\n\n⚠️ **Warning**: The analysis was too large for the current model's context window. Please try narrowing your query."
 
     def test_connection(self) -> bool:
         """Test Groq connectivity using candidate models."""
