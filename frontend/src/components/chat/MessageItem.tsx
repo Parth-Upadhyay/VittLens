@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Globe, TrendingUp, TrendingDown, User } from 'lucide-react';
 import { MiniSparkline } from '../visual/MiniSparkline';
 import { ImageCarousel } from './ImageCarousel';
+import { useAppStore } from '../../store/useAppStore';
 import { SourcesPanel, getCleanSiteName } from './SourcesPanel';
 import { AgentChip } from './AgentChip';
 import { MarketService } from '../../services/api';
@@ -169,6 +170,19 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   context_truncated,
 }) => {
   const isUser = role === 'user';
+  const { user } = useAppStore();
+
+  const getAvatarContent = () => {
+    if (user?.avatar_url) {
+      return <img src={user.avatar_url} alt="User" className="w-full h-full rounded-full object-cover" />;
+    }
+    if (user?.name) {
+      const parts = user.name.split(' ');
+      if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      return user.name.slice(0, 2).toUpperCase();
+    }
+    return 'GU';
+  };
 
   // Clean inline citations like [1], [2], [source 3], raw debug chunk dumps, and trailing disclaimer blocks
   const cleanContent = isUser
@@ -201,8 +215,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         {/* Author Avatar */}
         <div className="flex-shrink-0 pt-0.5">
           {isUser ? (
-            <div className="w-9 h-9 rounded-full bg-bg-tertiary border border-border flex items-center justify-center text-tx-secondary font-sans text-xs shadow-sm">
-              <User className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-full bg-bg-tertiary border border-border flex items-center justify-center text-tx-secondary font-sans font-medium text-xs shadow-sm overflow-hidden">
+              {getAvatarContent()}
             </div>
           ) : (
             <div className="w-9 h-9 rounded-full bg-accent-light border border-accent/20 flex items-center justify-center text-accent font-sans font-bold text-xs shadow-sm">

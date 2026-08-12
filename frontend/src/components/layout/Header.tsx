@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { LogIn, Sparkles, Menu, User as UserIcon, ShieldAlert, X, Building2, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { LogIn, Sparkles, Menu, User as UserIcon, ShieldAlert, X, Building2, ExternalLink, CheckCircle2, Sun, Moon } from 'lucide-react';
+import { PreferencesService } from '../../services/api';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -30,7 +31,7 @@ const AVAILABLE_COMPANIES = [
 ];
 
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
-  const { user, queriesRemaining, setGuestLimitModalOpen, logout } = useAppStore();
+  const { user, queriesRemaining, setGuestLimitModalOpen, logout, preferences, setPreferences } = useAppStore();
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isCompaniesModalOpen, setIsCompaniesModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -99,6 +100,26 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               <span>{queriesRemaining < 0 ? '∞' : `${queriesRemaining}/3`}</span>
             </button>
           )}
+
+          {/* Theme Toggle */}
+          <button
+            onClick={() => {
+              const newTheme = preferences.theme === 'Dark' ? 'Light' : 'Dark';
+              const newPrefs = { ...preferences, theme: newTheme as any };
+              setPreferences(newPrefs);
+              const hasToken = !!localStorage.getItem('auth_token');
+              if (!hasToken) {
+                sessionStorage.setItem('vittlens_theme_guest', newTheme);
+              } else {
+                localStorage.setItem('vittlens_theme', newTheme);
+                PreferencesService.updatePreferences(newPrefs).catch(console.error);
+              }
+            }}
+            className="p-1.5 rounded-lg text-tx-secondary hover:text-tx-primary hover:bg-bg-hover nav-transition"
+            title="Toggle Theme"
+          >
+            {preferences.theme === 'Dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+          </button>
 
           {/* User Account / OAuth Login Button */}
           {user ? (
