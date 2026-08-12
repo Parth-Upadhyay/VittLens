@@ -30,17 +30,17 @@ export const DashboardPage: React.FC = () => {
         if (symbolsToFetch.length > 0) {
           const newsPromises = symbolsToFetch.map(sym => NewsService.getNews(sym, 3));
           const newsResults = await Promise.allSettled(newsPromises);
-          
+
           let combinedNews: NewsArticle[] = [];
           let hasSuccess = false;
-          
+
           newsResults.forEach(res => {
             if (res.status === 'fulfilled' && res.value) {
               combinedNews = [...combinedNews, ...res.value];
               hasSuccess = true;
             }
           });
-          
+
           if (isActive) {
             if (hasSuccess) {
               combinedNews.sort((a, b) => new Date(b.published_time || 0).getTime() - new Date(a.published_time || 0).getTime());
@@ -67,7 +67,7 @@ export const DashboardPage: React.FC = () => {
           console.error(`Failed to fetch data for ${sym}:`, e);
         }
       }
-      
+
       if (isActive) {
         setQuotes(dict);
         setCharts(chartDict);
@@ -76,7 +76,7 @@ export const DashboardPage: React.FC = () => {
     };
 
     loadQuotes();
-    
+
     return () => {
       isActive = false;
     };
@@ -164,8 +164,8 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="w-full sm:w-64">
-          <SymbolSearch 
-            onSelect={handleSelectSymbol} 
+          <SymbolSearch
+            onSelect={handleSelectSymbol}
             placeholder="Search company (e.g. INFY, TCS)"
           />
         </div>
@@ -190,14 +190,6 @@ export const DashboardPage: React.FC = () => {
             {watchlist.map((wItem) => {
               const sym = wItem.symbol;
               const quote = quotes[sym];
-
-              if (isLoading) {
-                return (
-                  <div key={sym} className="surface-card p-6 flex flex-col justify-center items-center h-full min-h-[140px] relative group">
-                    <LoadingSpinner />
-                  </div>
-                );
-              }
 
               if (!quote) {
                 return (
@@ -251,10 +243,9 @@ export const DashboardPage: React.FC = () => {
                       </div>
                       {quote.change != null && (
                         <div className="flex items-center justify-center pr-2">
-                          <Triangle 
-                            className={`w-7 h-7 drop-shadow-sm transition-colors ${
-                              isGain ? 'text-semantic-green fill-current' : 'text-semantic-red fill-current rotate-180'
-                            }`}
+                          <Triangle
+                            className={`w-7 h-7 drop-shadow-sm transition-colors ${isGain ? 'text-semantic-green fill-current' : 'text-semantic-red fill-current rotate-180'
+                              }`}
                           />
                         </div>
                       )}
@@ -311,11 +302,6 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
           ))}
-          {isLoading && (
-            <div className="col-span-full py-8 flex justify-center">
-              <LoadingSpinner message="Fetching latest market news..." />
-            </div>
-          )}
           {(!news || news.length === 0) && !isLoading && (
             <div className="col-span-full py-8 text-center text-sm text-tx-secondary font-sans">No recent news available.</div>
           )}
