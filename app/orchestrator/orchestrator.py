@@ -209,7 +209,7 @@ class FinancialOrchestrator:
         yield {
             "type": "status",
             "stage": "planning",
-            "message": f"🔍 Analyzing query intent & extracting company symbols...",
+            "message": f"Analyzing query intent & extracting company symbols...",
         }
         await asyncio.sleep(0.05)
 
@@ -220,7 +220,7 @@ class FinancialOrchestrator:
         yield {
             "type": "status",
             "stage": "planning_complete",
-            "message": f"📋 Target symbols identified: {symbols}. Dispatched {len(plan.tasks)} domain agents concurrently.",
+            "message": f"Target symbols identified: {symbols}. Dispatched {len(plan.tasks)} domain agents concurrently.",
             "symbols": symbols,
         }
         await asyncio.sleep(0.05)
@@ -234,7 +234,7 @@ class FinancialOrchestrator:
             yield {
                 "type": "agent_start",
                 "agent": task.agent_name,
-                "message": f"🚀 Launched {task.agent_name} for symbols {task.symbols}...",
+                "message": f"Launched {task.agent_name} for symbols {task.symbols}...",
             }
             metadata = {}
             if "google_rss" in task.params:
@@ -265,14 +265,14 @@ class FinancialOrchestrator:
                 "agent": res.agent_name,
                 "status": res.status,
                 "latency_ms": res.execution_time_ms,
-                "message": f"✅ {res.agent_name} finished in {res.execution_time_ms} ms.",
+                "message": f"{res.agent_name} finished in {res.execution_time_ms} ms.",
             }
 
         # Step 3: Context Building & Token Guard
         yield {
             "type": "status",
             "stage": "context_building",
-            "message": "📊 Aggregating agent context & enforcing Token Guard budget bounds (100k max tokens)...",
+            "message": "Aggregating agent context & enforcing Token Guard budget bounds (100k max tokens)...",
         }
         await asyncio.sleep(0.05)
 
@@ -284,7 +284,7 @@ class FinancialOrchestrator:
         yield {
             "type": "status",
             "stage": "synthesis_start",
-            "message": f"💡 Invoking Groq LLM synthesis model '{synthesis_model}'...",
+            "message": f"Invoking Groq LLM synthesis model '{synthesis_model}'...",
             "model": synthesis_model,
         }
         await asyncio.sleep(0.05)
