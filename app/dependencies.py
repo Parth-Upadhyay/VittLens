@@ -51,7 +51,7 @@ def get_orchestrator() -> FinancialOrchestrator:
     return _orchestrator_instance
 
 
-def get_current_user_or_guest(
+async def get_current_user_or_guest(
     request: Request,
     response: Response,
     auth: Optional[HTTPAuthorizationCredentials] = Depends(security),
@@ -79,17 +79,33 @@ def get_current_user_or_guest(
     # 2. Fallback to Guest Session Cookie
     logger.info("No valid Bearer JWT header found. Falling back to Guest Session cookie...")
     guest = get_guest_session(request, response)
+
+    if guest:
+        client_ip = request.client.host if request.client else "127.0.0.1"
+        today_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+        try:
+            redis = await RedisClient.get_client()
+            if redis:
+                ip_key = f"rate_limit:guest:ip:{client_ip}:{today_str}"
+                count_str = await redis.get(ip_key)
+                if count_str is not None:
+                    ip_count = int(count_str)
+                    guest.queries_used = max(guest.queries_used, ip_count)
+                    guest.queries_remaining = max(0, 15 - guest.queries_used)
+        except Exception as e:
+            logger.warning(f"Failed to sync guest session with Redis IP rate limit: {e}")
+
     return None, guest
 
 
-def get_current_user(
+async def get_current_user(
     request: Request,
     response: Response,
     auth: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: Session = Depends(get_db),
 ) -> User:
     """Dependency requiring an authenticated user, raising HTTP 401 if missing."""
-    user, _ = get_current_user_or_guest(request, response, auth, db)
+    user, _ = await get_current_user_or_guest(request, response, auth, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -98,14 +114,14 @@ def get_current_user(
     return user
 
 
-def get_optional_user(
+async def get_optional_user(
     request: Request,
     response: Response,
     auth: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: Session = Depends(get_db),
 ) -> Optional[User]:
     """Dependency returning User instance if authenticated, or None if guest."""
-    user, _ = get_current_user_or_guest(request, response, auth, db)
+    user, _ = await get_current_user_or_guest(request, response, auth, db)
     return user
 
 
@@ -124,7 +140,7 @@ async def enforce_rate_limit(
     - 45 queries for logged-in users
     - 15 queries for guests
     """
-    user, guest = get_current_user_or_guest(request, response, auth, db)
+    user, guest = await get_current_user_or_guest(request, response, auth, db)
     
     if user:
         today_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")

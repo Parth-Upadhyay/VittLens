@@ -316,11 +316,7 @@ class OrchestratorPromptBuilder:
             "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
             "5. STRICT NO HALLUCINATION: You MUST NOT invent, guess, or use external knowledge for any numbers (Price, Market Cap, P/E, Margins). Use ONLY the exact numbers provided in this prompt under 'REAL-TIME MARKET DATA' and 'FINANCIAL RATIOS'. If a metric is missing or 'N/A', state 'N/A'. DO NOT fill in gaps with pre-trained knowledge.\n"
             "6. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
-            "7. MACRO & NEWS WEIGHTAGE (CRITICAL): "
-            "Any macro events marked ⚡ DIRECTLY RELEVANT carry EQUAL weight to real-time market data — treat them as primary inputs in your analysis, not footnotes. "
-            "Reference specific event titles and their sector impacts when discussing the queried stock's outlook. "
-            "Other macro events (background context) should inform the broader market environment section only. "
-            "Do NOT let background macro watchlist companies become the primary subject — focus stays on the queried stock(s).\n"
+            "7. MACRO & NEWS WEIGHTAGE: Use the provided macro events and sector impacts to inform your overall analysis. However, ONLY explicitly mention them in your response if they have a clear, direct, and significant impact on the specific stocks the user queried. Do NOT summarize unrelated macro news just because it is present in the prompt. Focus entirely on the queried stock(s).\n"
             "8. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"
             "9. USE REAL NAMES: Always refer to the company by its real descriptive name (e.g. Hindustan Unilever) in your text instead of its raw ticker symbol. Do NOT invent parent companies."
         )

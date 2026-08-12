@@ -43,7 +43,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 export const App: React.FC = () => {
-  const { initSession, setGuestLimitModalOpen, preferences, isInitializing } = useAppStore();
+  const { initSession, setGuestLimitModalOpen, setQueriesRemaining, preferences, isInitializing } = useAppStore();
 
   useEffect(() => {
     // Check for Google OAuth callback token in URL query
@@ -58,7 +58,10 @@ export const App: React.FC = () => {
     initSession();
 
     // Listen for custom limit reached events
-    const handleGuestLimit = () => setGuestLimitModalOpen(true);
+    const handleGuestLimit = () => {
+      setQueriesRemaining(0);
+      setGuestLimitModalOpen(true);
+    };
     const handleUserLimit = () => alert("You have reached your daily limit of 45 queries. Please come back tomorrow!");
     
     window.addEventListener('guest_limit_reached', handleGuestLimit);
