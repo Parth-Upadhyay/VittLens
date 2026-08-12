@@ -168,7 +168,7 @@ export const CompanyDetailPage: React.FC = () => {
         {chartData && chartData.series && chartData.series.length > 0 && (
           <div className="surface-card p-6 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Historical Price Trend</h2>
+              <h2 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Historical Growth Trend</h2>
               <div className="flex space-x-1.5 p-1 bg-bg-tertiary rounded-lg border border-border">
                 {['1mo', '3mo', '1y'].map((p) => (
                   <button
@@ -184,14 +184,34 @@ export const CompanyDetailPage: React.FC = () => {
               </div>
             </div>
             <div className="h-96 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <ReLineChart data={chartData.series}>
-                  <XAxis dataKey="timestamp" stroke="var(--text-tertiary)" fontSize={11} tickLine={false} tickMargin={10} />
-                  <YAxis stroke="var(--text-tertiary)" fontSize={11} domain={['auto', 'auto']} tickLine={false} tickMargin={10} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)' }} />
-                  <Line type="monotone" dataKey="close" stroke="var(--accent)" strokeWidth={2.5} dot={false} activeDot={{ r: 6, fill: 'var(--accent)' }} />
-                </ReLineChart>
-              </ResponsiveContainer>
+              {(() => {
+                const firstClose = chartData.series[0].close;
+                const seriesWithPercent = chartData.series.map(point => ({
+                  ...point,
+                  percentChange: ((point.close - firstClose) / firstClose) * 100
+                }));
+                return (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ReLineChart data={seriesWithPercent}>
+                      <XAxis dataKey="timestamp" stroke="var(--text-tertiary)" fontSize={11} tickLine={false} tickMargin={10} />
+                      <YAxis 
+                        stroke="var(--text-tertiary)" 
+                        fontSize={11} 
+                        domain={['auto', 'auto']} 
+                        tickLine={false} 
+                        tickMargin={10}
+                        tickFormatter={(val) => `${val > 0 ? '+' : ''}${val.toFixed(2)}%`}
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => [`${value > 0 ? '+' : ''}${value.toFixed(2)}%`, 'Growth']}
+                        labelStyle={{ color: 'var(--text-secondary)', marginBottom: '4px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)' }} 
+                      />
+                      <Line type="monotone" dataKey="percentChange" stroke="var(--accent)" strokeWidth={2.5} dot={false} activeDot={{ r: 6, fill: 'var(--accent)' }} />
+                    </ReLineChart>
+                  </ResponsiveContainer>
+                );
+              })()}
             </div>
           </div>
         )}

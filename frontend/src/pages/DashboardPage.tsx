@@ -191,6 +191,14 @@ export const DashboardPage: React.FC = () => {
               const sym = wItem.symbol;
               const quote = quotes[sym];
 
+              if (isLoading) {
+                return (
+                  <div key={sym} className="surface-card p-6 flex flex-col justify-center items-center h-full min-h-[140px] relative group">
+                    <LoadingSpinner />
+                  </div>
+                );
+              }
+
               if (!quote) {
                 return (
                   <div key={sym} className="surface-card p-6 flex flex-col justify-center items-center h-full min-h-[140px] relative group">
@@ -303,6 +311,11 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="col-span-full py-8 flex justify-center">
+              <LoadingSpinner message="Fetching latest market news..." />
+            </div>
+          )}
           {(!news || news.length === 0) && !isLoading && (
             <div className="col-span-full py-8 text-center text-sm text-tx-secondary font-sans">No recent news available.</div>
           )}
