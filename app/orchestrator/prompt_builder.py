@@ -403,11 +403,11 @@ class OrchestratorPromptBuilder:
         elif not queried_symbols:
             prompt_parts.append(
                 "### SYNTHESIS INSTRUCTIONS:\n"
-                "1. DIRECT ANALYSIS: Directly and thoroughly answer the user's question with deep macroeconomic, geopolitical, and financial insight.\n"
-                "2. NO UNWANTED TABLES: Do NOT generate a stock comparison table or factsheet. Present your analysis using clear Markdown sections, bold text, and bullet points.\n"
-                "3. TRANSMISSION CHANNELS: For global/geopolitical events (like wars, oil shocks, inflation, monetary policy), explain the transmission channels to the Indian economy (crude prices, inflation, currency/rupee, trade deficit, fiscal impact, RBI policy response, FII flows, key sector impacts).\n"
-                "4. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
-                "5. STRICT ACCURACY: Use factual economic concepts and real market mechanisms without hallucinating fictitious data."
+                "1. DIRECT & FACTUAL ANALYSIS: Answer the user's specific macroeconomic or geopolitical question directly. Explain the concrete, real-world mechanisms and historical/geopolitical facts of the event (e.g. for US-Iran: Strait of Hormuz, Persian Gulf oil logistics, crude price shocks, India's >85% crude import dependence, inflation, currency depreciation, trade routes, fiscal impact, RBI policy response, and impacted sectors).\n"
+                "2. NO GENERIC BOILERPLATE: Avoid vague statements like 'Fluctuations can impact...'. Be concrete and analytical.\n"
+                "3. ZERO PREVIOUS CHAT BLEED-THROUGH: Do NOT mention or compare companies from previous conversation turns. Treat this as a fresh, standalone macroeconomic analysis.\n"
+                "4. NO TABLES: Do NOT generate stock comparison tables.\n"
+                "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs."
             )
         else:
             from app.utils import CompanyNormalizer
