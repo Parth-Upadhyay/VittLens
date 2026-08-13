@@ -403,9 +403,9 @@ class OrchestratorPromptBuilder:
         elif not queried_symbols:
             prompt_parts.append(
                 "### SYNTHESIS INSTRUCTIONS:\n"
-                "1. DIRECT & FACTUAL ANALYSIS: Answer the user's specific macroeconomic or geopolitical question directly. Explain the concrete, real-world mechanisms and historical/geopolitical facts of the event (e.g. for US-Iran: Strait of Hormuz, Persian Gulf oil logistics, crude price shocks, India's >85% crude import dependence, inflation, currency depreciation, trade routes, fiscal impact, RBI policy response, and impacted sectors).\n"
+                "1. DIRECT & FACTUAL ANALYSIS: Answer the user's specific macroeconomic, technology, or financial question directly. Explain the concrete, real-world mechanisms and implications.\n"
                 "2. NO GENERIC BOILERPLATE: Avoid vague statements like 'Fluctuations can impact...'. Be concrete and analytical.\n"
-                "3. ZERO PREVIOUS CHAT BLEED-THROUGH: Do NOT mention or compare companies from previous conversation turns. Treat this as a fresh, standalone macroeconomic analysis.\n"
+                "3. CONVERSATIONAL CONTINUITY: If the query is a follow-up (e.g. 'what about ai ?', 'how about interest rates?'), connect it intelligently to the themes, sectors, or companies discussed in previous turns (e.g. how AI adoption impacts Indian IT services like TCS & Infosys, client IT budgets, productivity, margins, and market dynamics). If it's a completely new topic, answer it directly.\n"
                 "4. NO TABLES: Do NOT generate stock comparison tables.\n"
                 "5. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs."
             )
