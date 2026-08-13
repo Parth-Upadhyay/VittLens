@@ -18,7 +18,7 @@ from app.orchestrator.context_builder import ContextBuilder
 from app.orchestrator.planner import Planner
 from app.orchestrator.prompt_builder import OrchestratorPromptBuilder
 from app.orchestrator.response_formatter import ResponseFormatter
-from app.prompts import FINANCIAL_ANALYST_SYSTEM_PROMPT
+from app.prompts import FINANCIAL_ANALYST_SYSTEM_PROMPT, FILING_AGENT_SYSTEM_PROMPT
 from app.schemas import AgentContext, AgentResult
 from app.schemas import ChatRequest, ChatResponse, InvestorContext
 from app.services.factory import get_llm_provider
@@ -112,13 +112,16 @@ class FinancialOrchestrator:
 
     async def _execute_plan_and_build_context(
         self, request: ChatRequest
-    ) -> tuple[InvestorContext, str, List[str], List[str], List[AgentResult]]:
+    ) -> tuple[InvestorContext, str, List[str], List[str], List[AgentResult], str]:
         """
         Helper executing Planner, dispatching agents concurrently, and building InvestorContext & prompt.
         """
         plan = self.planner.create_plan(request)
         symbols = plan.extracted_symbols
         q = request.question
+        
+        # Determine if we are purely doing a filing search
+        is_filing_intent = (plan.intent == "filing")
 
         agent_coroutines = []
         agent_names_used: List[str] = []
@@ -151,9 +154,16 @@ class FinancialOrchestrator:
 
         context = self.context_builder.build_context(agent_results)
         macro_summary = await self._get_latest_macro_summary()
-        synthesis_prompt = self.prompt_builder.build_prompt(request.question, context, request.chat_history, macro_summary=macro_summary, queried_symbols=symbols)
+        
+        # Build prompt using filing specific mode if intent is filing
+        synthesis_prompt = self.prompt_builder.build_prompt(
+            request.question, context, request.chat_history, 
+            macro_summary=macro_summary if not is_filing_intent else None, 
+            queried_symbols=symbols,
+            is_filing_intent=is_filing_intent
+        )
 
-        return context, synthesis_prompt, agent_names_used, symbols, agent_results
+        return context, synthesis_prompt, agent_names_used, symbols, agent_results, plan.intent
 
     async def process_query(self, request: ChatRequest) -> ChatResponse:
         """
@@ -162,16 +172,18 @@ class FinancialOrchestrator:
         overall_start = time.perf_counter()
         logger.info(f"=== FinancialOrchestrator processing query: '{request.question[:50]}...' ===")
 
-        context, synthesis_prompt, agent_names_used, symbols, _ = (
+        context, synthesis_prompt, agent_names_used, symbols, _, intent = (
             await self._execute_plan_and_build_context(request)
         )
 
         synthesis_model = self.settings.synthesis_model
         logger.info(f"Invoking Groq LLM synthesis model '{synthesis_model}' (EXACTLY 1 CALL)...")
 
+        system_prompt = FILING_AGENT_SYSTEM_PROMPT if intent == "filing" else FINANCIAL_ANALYST_SYSTEM_PROMPT
+
         start_llm = time.perf_counter()
         llm_response = self.llm_provider.generate(
-            system_prompt=FINANCIAL_ANALYST_SYSTEM_PROMPT,
+            system_prompt=system_prompt,
             user_prompt=synthesis_prompt,
             temperature=0.2,
             model=synthesis_model,
@@ -290,8 +302,10 @@ class FinancialOrchestrator:
         await asyncio.sleep(0.05)
 
         # Step 4: Token Streaming
+        system_prompt = FILING_AGENT_SYSTEM_PROMPT if plan.intent == "filing" else FINANCIAL_ANALYST_SYSTEM_PROMPT
+        
         token_gen = self.llm_provider.generate_stream(
-            system_prompt=FINANCIAL_ANALYST_SYSTEM_PROMPT,
+            system_prompt=system_prompt,
             user_prompt=synthesis_prompt,
             temperature=0.2,
             model=synthesis_model,
