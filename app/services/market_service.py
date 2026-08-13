@@ -163,6 +163,27 @@ class MarketService:
         )
         series = [OHLCV.model_validate(b) for b in raw_bars]
 
+        try:
+            import datetime
+            today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+            last_date = series[-1].timestamp[:10] if series else ""
+            if last_date != today_str:
+                curr_quote = await asyncio.to_thread(self.repository.get_current_quote, ticker_symbol)
+                if curr_quote and curr_quote.get("price") and curr_quote["price"] > 0:
+                    price = curr_quote["price"]
+                    # Ensure timestamp format matches timezone-aware ISO if needed
+                    now = datetime.datetime.now(datetime.timezone.utc)
+                    series.append(OHLCV(
+                        timestamp=now.isoformat(),
+                        open=curr_quote.get("day_open") or price,
+                        high=curr_quote.get("day_high") or price,
+                        low=curr_quote.get("day_low") or price,
+                        close=price,
+                        volume=curr_quote.get("volume") or 0
+                    ))
+        except Exception as e:
+            logger.warning(f"Failed to append live quote to chart for {ticker_symbol}: {e}")
+
         return HistoricalData(
             canonical_symbol=canonical_symbol,
             ticker_symbol=ticker_symbol,
