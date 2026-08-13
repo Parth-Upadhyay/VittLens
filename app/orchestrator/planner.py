@@ -105,21 +105,20 @@ class Planner:
         # Cap at max_companies
         return sorted(matched_symbols)[:max_companies]
 
-    def extract_symbols(self, text: str, explicit_symbols: Optional[List[str]] = None) -> List[str]:
+    def extract_symbols(
+        self,
+        text: str,
+        explicit_symbols: Optional[List[str]] = None,
+        chat_history: Optional[List[Dict[str, str]]] = None,
+    ) -> List[str]:
         """
-        Extract canonical company symbols from text query and merge with explicit request symbols.
-        Supports NIFTY 500 tickers dynamically.
-
-        Args:
-            text: Question text string.
-            explicit_symbols: Optional explicit symbol list passed in ChatRequest.
-
-        Returns:
-            List of unique canonical ticker symbols.
+        Extract canonical company symbols from text query, co-references in chat history,
+        and explicit request symbols.
+        Supports NIFTY 500 tickers dynamically without false-positive bluechip fallbacks.
         """
         found_symbols: Set[str] = set()
 
-        # Add explicit symbols if provided
+        # 1. Add explicit symbols if provided
         if explicit_symbols:
             for sym in explicit_symbols:
                 norm = self.normalizer.normalize(sym)
@@ -128,16 +127,14 @@ class Planner:
                 else:
                     found_symbols.add(sym.strip().upper())
 
-        # Extract symbols matching alias mappings in question
+        # 2. Extract symbols matching alias mappings in question
         text_lower = text.lower()
-
-        # Match against loaded NIFTY alias dictionary
         for alias, canonical in self.normalizer.alias_map.items():
             pattern = r"\b" + re.escape(alias) + r"\b"
             if re.search(pattern, text_lower):
                 found_symbols.add(canonical)
 
-        # Dynamic uppercase ticker extraction (e.g. 'WIPRO', 'ZOMATO', 'ADANIENT', 'PAYTM', 'JIOFIN')
+        # 3. Dynamic uppercase ticker extraction (e.g. 'WIPRO', 'ZOMATO', 'ADANIENT', 'PAYTM', 'JIOFIN')
         stop_words = {
             "WHAT", "WHY", "HOW", "WHEN", "WHERE", "WHO", "CAN", "YOU", "THINK", "WILL",
             "STOCK", "PRICE", "QUOTE", "NEWS", "RATIO", "BUY", "SELL", "HOLD", "FOR",
@@ -147,10 +144,9 @@ class Planner:
             "WORLD", "MARKET", "MARKETS", "SECTOR", "INDUSTRY", "COMPANY", "COMPANIES", 
             "INFO", "DATA", "RATE", "RATES", "INFLATION", "WAR", "IMPACT", "IMPACTED",
             "OIL", "GOLD", "SILVER", "COMMODITY", "RUSSIA", "IRAN", "ISRAEL", "CHINA",
-            "INDIA", "UK", "EUROPE", "CRUDE", "BRENT"
+            "INDIA", "UK", "EUROPE", "CRUDE", "BRENT", "NOW", "ALL", "BOTH", "FOUR", "COMPARE"
         }
         
-        # Only extract uppercase tokens if the user isn't just typing in ALL CAPS
         if not text.isupper():
             raw_tokens = re.findall(r"\b[A-Z0-9&\-]{2,12}\b", text)
             for token in raw_tokens:
@@ -161,25 +157,83 @@ class Planner:
                     elif len(token) >= 3 and not token.isdigit():
                         found_symbols.add(token)
 
-        # Fallback: try sector-theme discovery if no company symbol found
+        # 4. Chat history co-reference resolution (e.g., "compare all 4", "compare both", "them", "these companies")
+        coref_patterns = [
+            r"\ball\s+(\d+|four|three|two|both)\b",
+            r"\b(all\s+of\s+them|all\s+4|all\s+four|all\s+3|all\s+three|both|these|them|those|all\s+of\s+these|compare\s+all)\b",
+            r"\b(the\s+first\s+one|the\s+second\s+one|the\s+former|the\s+latter)\b"
+        ]
+        has_coref = any(re.search(pat, text_lower) for pat in coref_patterns)
+
+        if (not found_symbols or has_coref) and chat_history:
+            history_symbols: List[str] = []
+            # Scan chat history messages in reverse order to collect recent symbols
+            for msg in reversed(chat_history):
+                content = msg.get("content", "")
+                # Check for $SYMBOL tags or tickers
+                dollar_syms = re.findall(r"\$([A-Z0-9&\-]{2,12})\b", content)
+                for s in dollar_syms:
+                    norm = self.normalizer.normalize(s) or s
+                    if norm not in history_symbols and norm not in stop_words:
+                        history_symbols.append(norm)
+
+                # Check for aliases in content
+                c_lower = content.lower()
+                for alias, canonical in self.normalizer.alias_map.items():
+                    if re.search(r"\b" + re.escape(alias) + r"\b", c_lower):
+                        if canonical not in history_symbols:
+                            history_symbols.append(canonical)
+
+            if history_symbols:
+                # Check if user specified a count like "all 4", "all 3", "both"
+                count_match = re.search(r"\b(\d+|four|three|two|both)\b", text_lower)
+                count_limit = None
+                if count_match:
+                    w = count_match.group(1).lower()
+                    word_to_num = {"two": 2, "both": 2, "three": 3, "four": 4, "2": 2, "3": 3, "4": 4, "5": 5}
+                    count_limit = word_to_num.get(w)
+
+                if has_coref:
+                    target_syms = history_symbols[:count_limit] if count_limit else history_symbols[:8]
+                    found_symbols.update(target_syms)
+
+        # 5. Sector-theme discovery if query explicitly asks for a sector
         if not found_symbols:
-            discovered = self._discover_companies_by_sector(text_lower)
-            if discovered:
-                found_symbols.update(discovered)
-            else:
-                # Last resort: NIFTY 50 broad query — return top blue-chips
+            sector_query_keywords = ["sector", "industry", "stocks", "companies", "players", "space", "theme"]
+            if any(k in text_lower for k in sector_query_keywords):
+                discovered = self._discover_companies_by_sector(text_lower)
+                if discovered:
+                    found_symbols.update(discovered)
+
+        # 6. Broad NIFTY index overview ONLY if explicitly requested
+        if not found_symbols:
+            broad_index_keywords = ["nifty 50 overview", "top stocks in india", "indian stock market overview", "nifty index overview"]
+            if any(k in text_lower for k in broad_index_keywords):
                 found_symbols.update(["RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY", "BHARTIARTL", "SBIN"])
 
-        return sorted(list(found_symbols))[:8]  # Cap at 8 symbols max
+        # Return found symbols (can be empty for macro/general questions!)
+        return sorted(list(found_symbols))[:8]
 
     def detect_intent(self, question: str, symbols: List[str]) -> str:
         """
-        Detect question intent category based on keyword matching.
+        Detect question intent category based on keyword matching and extracted symbols.
         """
         q_lower = question.lower()
 
+        # If no specific company symbols were identified, categorize as macro or general
+        if not symbols:
+            macro_keywords = [
+                "war", "economy", "gdp", "cpi", "inflation", "rbi", "fed", "interest rate",
+                "rate hike", "repo", "budget", "deficit", "crude", "oil", "rupee", "usd",
+                "dollar", "currency", "trade", "import", "export", "geopolitics", "iran",
+                "israel", "russia", "china", "usa", "recession", "fiscal", "policy", "sanction"
+            ]
+            if any(kw in q_lower for kw in macro_keywords):
+                return "macro"
+            return "general"
+
         # Multi-symbol comparison keywords
-        if len(symbols) > 1 or any(kw in q_lower for kw in ["compare", "vs", "versus", "which is better", "should i buy", "difference"]):
+        if len(symbols) > 1 or any(kw in q_lower for kw in ["compare", "vs", "versus", "which is better", "should i buy", "difference", "all 4", "all four", "both"]):
             return "comparison"
 
         # Stock price prediction, price movement, and forward outlook keywords
@@ -221,7 +275,7 @@ class Planner:
         Returns:
             Plan Pydantic model.
         """
-        symbols = self.extract_symbols(request.question, request.symbols)
+        symbols = self.extract_symbols(request.question, request.symbols, request.chat_history)
         intent = self.detect_intent(request.question, symbols)
 
         tasks: List[AgentTask] = []
@@ -229,30 +283,29 @@ class Planner:
 
         logger.info(f"Planner created plan for query: '{q[:40]}...' | Intent: '{intent}' | Symbols: {symbols}")
 
-        all_in_rag = all(sym in self.rag_symbols for sym in symbols)
-
-        is_explicit_filing_search = "search the annual report filing" in q.lower() or "search annual report filings" in q.lower()
         all_agents_requested = any(kw in q.lower() for kw in ["all agents", "every agent", "full analysis", "run all agents"])
         google_rss_requested = any(kw in q.lower() for kw in ["rss", "google rss", "live news"])
 
         news_params = {"limit": 5}
         if google_rss_requested:
-            # Pass google_rss parameter to agent context metadata
             news_params["google_rss"] = True
 
-        if all_agents_requested:
+        if intent in ["macro", "general"]:
+            # For macro/economic/general questions without specific stocks,
+            # query live news with the full question to bring recent geopolitical/macro context
+            tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols or [], query=q, params={"google_rss": True, "limit": 5}))
+
+        elif all_agents_requested:
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
 
         elif intent in ["comparison", "comprehensive"]:
-            # Dispatch to Market, News, and Quant for complete context (No FilingAgent/RAG)
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
 
         elif intent == "prediction":
-            # Dispatch Market, News, and Quant agents for comprehensive forward analysis
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))

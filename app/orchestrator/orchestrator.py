@@ -18,7 +18,11 @@ from app.orchestrator.context_builder import ContextBuilder
 from app.orchestrator.planner import Planner
 from app.orchestrator.prompt_builder import OrchestratorPromptBuilder
 from app.orchestrator.response_formatter import ResponseFormatter
-from app.prompts import FINANCIAL_ANALYST_SYSTEM_PROMPT, FILING_AGENT_SYSTEM_PROMPT
+from app.prompts import (
+    FINANCIAL_ANALYST_SYSTEM_PROMPT,
+    FILING_AGENT_SYSTEM_PROMPT,
+    MACRO_GENERAL_SYSTEM_PROMPT,
+)
 from app.schemas import AgentContext, AgentResult
 from app.schemas import ChatRequest, ChatResponse, InvestorContext
 from app.services.factory import get_llm_provider
@@ -179,7 +183,12 @@ class FinancialOrchestrator:
         synthesis_model = self.settings.synthesis_model
         logger.info(f"Invoking Groq LLM synthesis model '{synthesis_model}' (EXACTLY 1 CALL)...")
 
-        system_prompt = FILING_AGENT_SYSTEM_PROMPT if intent == "filing" else FINANCIAL_ANALYST_SYSTEM_PROMPT
+        if intent == "filing":
+            system_prompt = FILING_AGENT_SYSTEM_PROMPT
+        elif intent in ["macro", "general"] or not symbols:
+            system_prompt = MACRO_GENERAL_SYSTEM_PROMPT
+        else:
+            system_prompt = FINANCIAL_ANALYST_SYSTEM_PROMPT
 
         start_llm = time.perf_counter()
         llm_response = self.llm_provider.generate(
@@ -228,11 +237,12 @@ class FinancialOrchestrator:
         plan = self.planner.create_plan(request)
         symbols = plan.extracted_symbols
         q = request.question
+        is_filing_intent = (plan.intent == "filing")
 
         yield {
             "type": "status",
             "stage": "planning_complete",
-            "message": f"Target symbols identified: {symbols}. Dispatched {len(plan.tasks)} domain agents concurrently.",
+            "message": f"Target symbols identified: {symbols or 'Macro / General Query'}. Dispatched {len(plan.tasks)} domain agents concurrently.",
             "symbols": symbols,
         }
         await asyncio.sleep(0.05)
@@ -246,7 +256,7 @@ class FinancialOrchestrator:
             yield {
                 "type": "agent_start",
                 "agent": task.agent_name,
-                "message": f"Launched {task.agent_name} for symbols {task.symbols}...",
+                "message": f"Launched {task.agent_name}...",
             }
             metadata = {}
             if "google_rss" in task.params:
@@ -290,7 +300,14 @@ class FinancialOrchestrator:
 
         context = self.context_builder.build_context(agent_results)
         macro_summary = await self._get_latest_macro_summary()
-        synthesis_prompt = self.prompt_builder.build_prompt(request.question, context, request.chat_history, macro_summary=macro_summary)
+        synthesis_prompt = self.prompt_builder.build_prompt(
+            request.question,
+            context,
+            request.chat_history,
+            macro_summary=macro_summary if not is_filing_intent else None,
+            queried_symbols=symbols,
+            is_filing_intent=is_filing_intent
+        )
 
         synthesis_model = self.settings.synthesis_model
         yield {
@@ -302,7 +319,12 @@ class FinancialOrchestrator:
         await asyncio.sleep(0.05)
 
         # Step 4: Token Streaming
-        system_prompt = FILING_AGENT_SYSTEM_PROMPT if plan.intent == "filing" else FINANCIAL_ANALYST_SYSTEM_PROMPT
+        if plan.intent == "filing":
+            system_prompt = FILING_AGENT_SYSTEM_PROMPT
+        elif plan.intent in ["macro", "general"] or not symbols:
+            system_prompt = MACRO_GENERAL_SYSTEM_PROMPT
+        else:
+            system_prompt = FINANCIAL_ANALYST_SYSTEM_PROMPT
         
         token_gen = self.llm_provider.generate_stream(
             system_prompt=system_prompt,

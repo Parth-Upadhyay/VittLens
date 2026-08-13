@@ -89,6 +89,97 @@ class OrchestratorPromptBuilder:
         if any(term in impact_lower for term in universal_terms):
             return True
             
+"""
+Orchestrator Prompt Builder for FinnAI Platform.
+Converts InvestorContext into a structured, highly formatted prompt string for Groq LLM.
+Supports single-symbol deep dives and multi-symbol side-by-side comparison layouts.
+Includes automated Lakh Crore currency conversion and sector metadata injection.
+"""
+
+from typing import List, Optional, Dict, Any, Set
+from pathlib import Path
+import json
+from app.schemas import InvestorContext
+
+_COMPANY_META_PATH = Path(__file__).parent.parent / "macro_agent" / "rules" / "company_metadata.json"
+try:
+    with open(_COMPANY_META_PATH, encoding="utf-8") as _f:
+        _COMPANY_META: Dict[str, Any] = json.load(_f)
+except Exception:
+    _COMPANY_META: Dict[str, Any] = {}
+
+
+class OrchestratorPromptBuilder:
+    """
+    Constructs comprehensive multi-agent financial prompts for single LLM synthesis calls.
+    """
+
+    @staticmethod
+    def format_pct(val: Optional[float]) -> str:
+        """Format raw decimal float into clean percentage string (e.g. 0.1384 -> 13.84%)."""
+        if val is None:
+            return "N/A"
+        return f"{val * 100.0:.2f}%"
+
+    @staticmethod
+    def format_num(val: Optional[float], suffix: str = "") -> str:
+        """Format ratio or numeric float cleanly."""
+        if val is None:
+            return "N/A"
+        return f"{val:.2f}{suffix}"
+
+    @staticmethod
+    def format_market_cap(raw_cap: Optional[int]) -> str:
+        """
+        Format raw market cap in INR into clean Lakh Crores and Crores.
+
+        1 Crore = 10,000,000 INR (10^7)
+        1 Lakh Crore = 10,000,000,000,000 INR (10^12)
+        """
+        if not raw_cap or raw_cap <= 0:
+            return "N/A"
+
+        cap_in_crores = raw_cap / 10_000_000.0
+        cap_in_lakh_crores = raw_cap / 1_000_000_000_000.0
+
+        if cap_in_lakh_crores >= 1.0:
+            return f"₹{cap_in_lakh_crores:.2f} Lakh Crores (₹{cap_in_crores:,.0f} Crores)"
+        else:
+            return f"₹{cap_in_crores:,.0f} Crores"
+
+    @staticmethod
+    def _get_queried_sectors(symbols: List[str]) -> Set[str]:
+        """Return all sectors/subsectors for the queried symbols using company_metadata.json."""
+        sectors: Set[str] = set()
+        for sym in symbols:
+            meta = _COMPANY_META.get(sym)
+            if meta:
+                if meta.get("sector"):
+                    sectors.add(meta["sector"])
+                for sub in meta.get("subsectors", []):
+                    sectors.add(sub)
+        return sectors
+
+    @staticmethod
+    def _sectors_overlap(impact_sectors_str: str, queried_sectors: Set[str]) -> bool:
+        """Check if a macro sector impact string overlaps with any queried sector or contains universal macro terms."""
+        if not impact_sectors_str:
+            return False
+            
+        impact_lower = impact_sectors_str.lower()
+        
+        # Universal macro terms that should ALWAYS trigger a connection
+        universal_terms = [
+            "economy", "global", "india", "market", "finance", "macro", 
+            "geopolitics", "index", "nifty", "interest", "rate", "inflation", 
+            "war", "broad", "all", "general", "world", "crisis", "growth",
+            "gdp", "fdi", "export", "import", "currency", "rupee", "usd",
+            "rbi", "fed", "central bank", "policy", "treasury", "bond"
+        ]
+        
+        if any(term in impact_lower for term in universal_terms):
+            return True
+            
         if not queried_sectors:
             return False
             
@@ -104,7 +195,8 @@ class OrchestratorPromptBuilder:
         context: InvestorContext,
         chat_history: Optional[List[Dict[str, str]]] = None,
         macro_summary: Optional[Dict[str, Any]] = None,
-        queried_symbols: Optional[List[str]] = None
+        queried_symbols: Optional[List[str]] = None,
+        is_filing_intent: bool = False
     ) -> str:
         """
         Build complete prompt string from question, InvestorContext, and chat history.
@@ -114,14 +206,16 @@ class OrchestratorPromptBuilder:
             context: Compiled InvestorContext model.
             chat_history: Optional list of previous conversation turns.
             macro_summary: Optional latest macro intelligence agent summary.
+            queried_symbols: Optional list of extracted company symbols.
+            is_filing_intent: Whether the intent is pure filing/RAG search.
 
         Returns:
             Formatted prompt string.
         """
         prompt_parts: List[str] = []
 
-        # Inject queried symbols banner at the very top so the LLM knows what the user asked about
-        if queried_symbols:
+        # Inject queried symbols banner only if specific companies are queried and not filing intent
+        if queried_symbols and not is_filing_intent:
             from app.utils import CompanyNormalizer
             normalizer = CompanyNormalizer()
             named_symbols = [f"{sym} ({normalizer.get_primary_name(sym)})" for sym in queried_symbols]
@@ -151,8 +245,8 @@ class OrchestratorPromptBuilder:
         # Header & User Question
         prompt_parts.append(f"USER QUESTION: {question}\n")
 
-        # 1. Market Data Section (Clean formatted Market Cap)
-        if context.market_data:
+        # 1. Market Data Section
+        if context.market_data and not is_filing_intent:
             prompt_parts.append("### 1. REAL-TIME MARKET DATA")
             for sym, quote in context.market_data.items():
                 if not quote.price or quote.price <= 0.0:
@@ -168,7 +262,6 @@ class OrchestratorPromptBuilder:
                     f"52-Week Range: {low_val} - {high_val}"
                 )
                 
-                # Append key_stats if available (often fetched via MarketAgent)
                 if hasattr(context, "key_stats") and context.key_stats and sym in context.key_stats:
                     stat = context.key_stats[sym]
                     prompt_parts.append(
@@ -178,8 +271,8 @@ class OrchestratorPromptBuilder:
                     )
             prompt_parts.append("")
 
-        # 2. Financial Statements & Quantitative Ratios Section (Pre-formatted clean ratios)
-        if context.ratios:
+        # 2. Financial Statements & Quantitative Ratios Section
+        if context.ratios and not is_filing_intent:
             prompt_parts.append("### 2. FINANCIAL RATIOS & QUANTITATIVE METRICS")
             for sym, snap in context.ratios.items():
                 prof = snap.profitability
@@ -195,8 +288,8 @@ class OrchestratorPromptBuilder:
                 )
             prompt_parts.append("")
 
-        # 2b. Supporting Evidence (Raw Metrics)
-        if getattr(context, "raw_metrics", None):
+        # 2b. Supporting Evidence
+        if getattr(context, "raw_metrics", None) and not is_filing_intent:
             prompt_parts.append("### 2b. SUPPORTING EVIDENCE (RAW METRICS)")
             for sym, metrics_list in context.raw_metrics.items():
                 if metrics_list:
@@ -207,7 +300,7 @@ class OrchestratorPromptBuilder:
             prompt_parts.append("")
 
         # 3. Macro Intelligence Context
-        if macro_summary:
+        if macro_summary and not is_filing_intent:
             prompt_parts.append("### 3. MACRO INTELLIGENCE SUMMARY (MACRO AGENT)")
             sum_data = macro_summary.get("summary", {}) if "summary" in macro_summary else macro_summary
             prompt_parts.append(
@@ -217,7 +310,6 @@ class OrchestratorPromptBuilder:
                 f"Global Watchlist Sectors: {', '.join(sum_data.get('watchlist', []))}"
             )
 
-            # All major macro events (LLM gets full picture)
             events = macro_summary.get("events", [])
             if events:
                 prompt_parts.append("\nMajor Macro Events (Global Context):")
@@ -229,7 +321,6 @@ class OrchestratorPromptBuilder:
                         f"    Source: {ev.get('source', 'N/A')}"
                     )
 
-            # Sector impacts — split into RELEVANT (for queried symbols) vs OTHER
             sector_impacts = macro_summary.get("sector_impacts", [])
             if sector_impacts:
                 queried_sectors = cls._get_queried_sectors(queried_symbols or [])
@@ -243,14 +334,14 @@ class OrchestratorPromptBuilder:
                         other.append(si)
 
                 if relevant:
-                    prompt_parts.append("\n⚡ DIRECTLY RELEVANT Sector Impacts (for queried stocks):")
+                    prompt_parts.append("\n⚡ DIRECTLY RELEVANT Sector Impacts:")
                     for si in relevant:
                         prompt_parts.append(
                             f"  ★ Sector: {si.get('sector')} | Impact: {si.get('impact')}\n"
                             f"    Reason: {si.get('reason')}"
                         )
                 if other:
-                    prompt_parts.append("\nOther Macro Sector Impacts (background context only):")
+                    prompt_parts.append("\nOther Macro Sector Impacts:")
                     for si in other:
                         prompt_parts.append(
                             f"  • Sector: {si.get('sector')} | Impact: {si.get('impact')}\n"
@@ -259,10 +350,11 @@ class OrchestratorPromptBuilder:
             prompt_parts.append("")
 
         # 4. News Timeline & AI Sentiment Section
-        if context.news:
+        if context.news and not is_filing_intent:
             prompt_parts.append("### 4. RECENT NEWS TIMELINE & SENTIMENT")
             for sym, articles in context.news.items():
-                prompt_parts.append(f"[{sym}] News Articles ({len(articles)} items):")
+                header_sym = f"[{sym}] " if sym else ""
+                prompt_parts.append(f"{header_sym}News Articles ({len(articles)} items):")
                 for a in articles:
                     imp = f"[Impact: {a.importance_score}/10]" if a.importance_score else ""
                     prompt_parts.append(
@@ -287,38 +379,58 @@ class OrchestratorPromptBuilder:
             prompt_parts.append("")
 
         # 6. Visual Chart References
-        if context.image_urls:
+        if context.image_urls and not is_filing_intent:
             prompt_parts.append("### 6. VISUAL CHART & DIAGRAM REFERENCES")
             prompt_parts.append("The following visual figures are available in the context:")
             for idx, url in enumerate(context.image_urls, 1):
                 prompt_parts.append(f"  • [Figure {idx}]: {url}")
             prompt_parts.append("")
 
-        # 7. Truncation Warning Flag
+        # 7. Truncation Warning
         if context.context_truncated:
             prompt_parts.append(
                 "NOTE: Context evidence was ranked and compressed to fit prompt budget bounds.\n"
             )
 
         # 8. Synthesis Instructions
-        is_multi = queried_symbols and len(queried_symbols) > 1
-        table_rule = (
-            "Output ONE side-by-side Markdown table comparing prices, market caps, P/E, ROE, and margins "
-            f"for ONLY these stocks: {sym_list if queried_symbols else ''}." if is_multi
-            else f"Output ONE single-stock factsheet table for ONLY {sym_list if queried_symbols else 'the queried stock'}. "
-                 "Do NOT add rows for other companies."
-        )
-        prompt_parts.append(
-            "### SYNTHESIS INSTRUCTIONS:\n"
-            f"1. STRUCTURE: Organize into: ### Executive Takeaway, ### Market Data & Valuation, ### Financial Performance & Sector Analysis, ### News & Macro Catalysts.\n"
-            f"2. TABLE: {table_rule}\n"
-            "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or '[Evidence Chunk...' tags. Extract clear factual points as narrative.\n"
-            "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
-            "5. STRICT NO HALLUCINATION: You MUST NOT invent, guess, or use external knowledge for any numbers (Price, Market Cap, P/E, Margins). Use ONLY the exact numbers provided in this prompt under 'REAL-TIME MARKET DATA' and 'FINANCIAL RATIOS'. If a metric is missing or 'N/A', state 'N/A'. DO NOT fill in gaps with pre-trained knowledge.\n"
-            "6. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
-            "7. MACRO & NEWS WEIGHTAGE: Use the provided macro events and sector impacts to inform your overall analysis. However, ONLY explicitly mention them in your response if they have a clear, direct, and significant impact on the specific stocks the user queried. Do NOT summarize unrelated macro news just because it is present in the prompt. Focus entirely on the queried stock(s).\n"
-            "8. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"
-            "9. USE REAL NAMES: Always refer to the company by its real descriptive name (e.g. Hindustan Unilever) in your text instead of its raw ticker symbol. Do NOT invent parent companies."
-        )
+        if is_filing_intent:
+            prompt_parts.append(
+                "### SYNTHESIS INSTRUCTIONS:\n"
+                "1. STRICT RAG: Answer ONLY using the SEC & ANNUAL REPORT FILING EVIDENCE above.\n"
+                "2. NO EXTERNAL KNOWLEDGE: Do not use news, live market data, or pre-trained knowledge.\n"
+                "3. CHARTS: Refer to Figure numbers if images are relevant."
+            )
+        elif not queried_symbols:
+            prompt_parts.append(
+                "### SYNTHESIS INSTRUCTIONS:\n"
+                "1. DIRECT ANALYSIS: Directly and thoroughly answer the user's question with deep macroeconomic, geopolitical, and financial insight.\n"
+                "2. NO UNWANTED TABLES: Do NOT generate a stock comparison table or factsheet. Present your analysis using clear Markdown sections, bold text, and bullet points.\n"
+                "3. TRANSMISSION CHANNELS: For global/geopolitical events (like wars, oil shocks, inflation, monetary policy), explain the transmission channels to the Indian economy (crude prices, inflation, currency/rupee, trade deficit, fiscal impact, RBI policy response, FII flows, key sector impacts).\n"
+                "4. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
+                "5. STRICT ACCURACY: Use factual economic concepts and real market mechanisms without hallucinating fictitious data."
+            )
+        else:
+            from app.utils import CompanyNormalizer
+            is_multi = len(queried_symbols) > 1
+            named_symbols = [f"{sym} ({CompanyNormalizer().get_primary_name(sym)})" for sym in queried_symbols]
+            sym_list = ", ".join(named_symbols)
+            table_rule = (
+                "Output ONE side-by-side Markdown table comparing prices, market caps, P/E, ROE, and margins "
+                f"for ONLY these stocks: {sym_list}." if is_multi
+                else f"Output ONE single-stock factsheet table for ONLY {sym_list}. "
+                     "Do NOT add rows for other companies."
+            )
+            prompt_parts.append(
+                "### SYNTHESIS INSTRUCTIONS:\n"
+                f"1. STRUCTURE: Organize into: ### Executive Takeaway, ### Market Data & Valuation, ### Financial Performance & Sector Analysis, ### News & Macro Catalysts.\n"
+                f"2. TABLE: {table_rule}\n"
+                "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or '[Evidence Chunk...' tags. Extract clear factual points as narrative.\n"
+                "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
+                "5. STRICT NO HALLUCINATION: You MUST NOT invent, guess, or use external knowledge for any numbers (Price, Market Cap, P/E, Margins). Use ONLY the exact numbers provided in this prompt under 'REAL-TIME MARKET DATA' and 'FINANCIAL RATIOS'. If a metric is missing or 'N/A', state 'N/A'. DO NOT fill in gaps with pre-trained knowledge.\n"
+                "6. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
+                "7. MACRO & NEWS WEIGHTAGE: Use the provided macro events and sector impacts to inform your overall analysis. However, ONLY explicitly mention them in your response if they have a clear, direct, and significant impact on the specific stocks the user queried. Do NOT summarize unrelated macro news just because it is present in the prompt. Focus entirely on the queried stock(s).\n"
+                "8. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"
+                "9. USE REAL NAMES: Always refer to the company by its real descriptive name (e.g. Hindustan Unilever) in your text instead of its raw ticker symbol. Do NOT invent parent companies."
+            )
 
         return "\n".join(prompt_parts)
