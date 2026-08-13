@@ -656,28 +656,25 @@ class MarketRepository:
                     # Price from yahooquery
                     price_data = yq.price.get(ticker_symbol, {})
                     if isinstance(price_data, dict):
-                    price = price_data.get("regularMarketPrice")
-                    market_cap = price_data.get("marketCap")
+                        price = price_data.get("regularMarketPrice")
+                        market_cap = price_data.get("marketCap")
                     
-                # Shares from yahooquery key_stats
-                stats = yq.key_stats.get(ticker_symbol, {})
-                if isinstance(stats, dict):
-                    shares = stats.get("sharesOutstanding")
+                    # Shares from yahooquery key_stats
+                    stats = yq.key_stats.get(ticker_symbol, {})
+                    if isinstance(stats, dict):
+                        shares = stats.get("sharesOutstanding")
+                        
+                except Exception as e:
+                    logger.warning(f"yahooquery financial statements failed for '{ticker_symbol}': {e}")
                     
-            except Exception as e:
-                logger.warning(f"yahooquery financial statements failed for '{ticker_symbol}': {e}. Trying yfinance...")
-                # Fallback to yfinance for statements
+            if price is None or shares is None:
                 try:
-                    ticker = yf.Ticker(ticker_symbol, session=self.session)
                     fast_info = getattr(ticker, "fast_info", {})
-                    financials = ticker.financials
-                    balance_sheet = ticker.balance_sheet
-                    price = getattr(fast_info, "last_price", None)
-                    market_cap = getattr(fast_info, "market_cap", None)
-                    shares = getattr(fast_info, "shares", None)
-                except Exception as e2:
-                    logger.warning(f"yfinance financial statements also failed for '{ticker_symbol}': {e2}")
-
+                    if price is None: price = getattr(fast_info, "last_price", None)
+                    if market_cap is None: market_cap = getattr(fast_info, "market_cap", None)
+                    if shares is None: shares = getattr(fast_info, "shares", None)
+                except Exception:
+                    pass
             def get_series_val(df, *keys):
                 if df is None or df.empty: return None
                 for key in keys:
