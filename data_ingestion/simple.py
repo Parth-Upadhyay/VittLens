@@ -39,7 +39,7 @@ def _ocr(img_pil: Image.Image) -> str:
 def groq_classify_page(ocr_text: str, page_num: int) -> str:
     """
     Returns: TABLE, CHART, MIXED, or TEXT
-    Uses Groq llama-3.1-8b-instant — ~0.5s per call, no rate limit issues at this volume.
+    Uses Groq gpt-oss-20b — ~0.5s per call, no rate limit issues at this volume.
     """
     # Pre-filter: obvious text pages (no need to waste API call)
     lines = [l.strip() for l in ocr_text.split('\n') if l.strip()]
@@ -363,7 +363,7 @@ def process_all(base_folder=C.BASE_FOLDER, db_path=C.DB_PATH, chroma_path=C.CHRO
     print(f"\nFound {len(pdf_files)} PDFs, {len(pending)} pending")
     print(f"Processing SEQUENTIALLY (one file at a time)")
     print(f"Visual detection: sampled every 3rd page + boundary expansion")
-    print(f"Classification: Groq llama-3.1-8b-instant")
+    print(f"Classification: Groq gpt-oss-20b")
     print(f"Embeddings: phi4-mini (qwen3-embedding)")
     print(f"{'─'*60}")
 

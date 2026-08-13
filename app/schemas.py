@@ -388,8 +388,10 @@ class StockQuote(BaseModel):
     change_percent: float = Field(default=0.0, description="Percentage price change.")
     volume: int = Field(default=0, description="Trading volume.")
     market_cap: Optional[int] = Field(default=None, description="Market capitalization.")
+    day_open: Optional[float] = Field(default=None, description="Day open price.")
     day_high: Optional[float] = Field(default=None, description="Day high price.")
     day_low: Optional[float] = Field(default=None, description="Day low price.")
+    previous_close: Optional[float] = Field(default=None, description="Previous close price.")
     fifty_two_week_high: Optional[float] = Field(default=None, description="52-week high price.")
     fifty_two_week_low: Optional[float] = Field(default=None, description="52-week low price.")
     currency: str = Field(default="INR", description="Trading currency.")
@@ -779,8 +781,10 @@ class AgentCurrent(BaseModel):
     change: Optional[float] = None
     change_percent: Optional[float] = None
     marketCap: Optional[float]
+    dayOpen: Optional[float] = None
     dayHigh: Optional[float]
     dayLow: Optional[float]
+    previousClose: Optional[float] = None
     fiftyTwoWeekHigh: Optional[float] = None
     fiftyTwoWeekLow: Optional[float] = None
     timestamp: str

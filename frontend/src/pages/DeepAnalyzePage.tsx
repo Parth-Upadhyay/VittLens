@@ -25,7 +25,7 @@ interface DeepAnalysisMetric {
 
 interface AgentData {
   company: string;
-  current: { price: number; currency: string; marketCap?: number; dayHigh?: number; dayLow?: number; timestamp: string };
+  current: { price: number; currency: string; marketCap?: number; dayOpen?: number; dayHigh?: number; dayLow?: number; previousClose?: number; timestamp: string };
   valuation: { forwardPE?: number; trailingPE?: number; priceToBook?: number; enterpriseValue?: number };
   financials: { year: number; revenue?: number; netIncome?: number; eps?: number; operatingMargin?: number }[];
   health: { totalDebt?: number; cash?: number; netDebt?: number; debtToEquity?: number; currentRatio?: number };

@@ -21,6 +21,10 @@ export interface StockQuote {
   change_percent: number;
   volume: number;
   market_cap: number;
+  day_open?: number;
+  day_high?: number;
+  day_low?: number;
+  previous_close?: number;
   fifty_two_week_low?: number;
   fifty_two_week_high?: number;
 }

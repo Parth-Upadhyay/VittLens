@@ -69,6 +69,8 @@ class FinancialIntelligenceService:
         shares = getattr(fast_info, "shares", None)
         year_high = getattr(fast_info, "year_high", None)
         year_low = getattr(fast_info, "year_low", None)
+        day_open = getattr(fast_info, "open", None)
+        prev_close = getattr(fast_info, "previous_close", None)
         volume = getattr(fast_info, "last_volume", None)
 
         def add_metric(category, key, label, value, unit="", format_rule="standard"):
@@ -89,6 +91,8 @@ class FinancialIntelligenceService:
         add_metric("Market Snapshot", "marketCap", "Market Cap", market_cap, "₹", "large_currency")
         add_metric("Market Snapshot", "yearHigh", "52W High", year_high, "₹", "currency")
         add_metric("Market Snapshot", "yearLow", "52W Low", year_low, "₹", "currency")
+        add_metric("Market Snapshot", "dayOpen", "Day Open", day_open, "₹", "currency")
+        add_metric("Market Snapshot", "previousClose", "Previous Close", prev_close, "₹", "currency")
         add_metric("Market Snapshot", "volume", "Volume", volume, "", "large_number")
         
         if price and year_high and year_low and year_high > year_low:
@@ -335,8 +339,10 @@ class FinancialIntelligenceService:
             change=change,
             change_percent=change_percent,
             marketCap=market_cap,
+            dayOpen=getattr(fast_info, "open", None),
             dayHigh=day_high,
             dayLow=day_low,
+            previousClose=prev_close,
             fiftyTwoWeekHigh=getattr(fast_info, "year_high", None),
             fiftyTwoWeekLow=getattr(fast_info, "year_low", None),
             timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat()

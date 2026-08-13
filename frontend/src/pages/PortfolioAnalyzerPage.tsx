@@ -659,7 +659,8 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                     <th className="px-4 py-3 font-semibold text-right">Avg Price</th>
                     <th className="px-4 py-3 font-semibold text-right">Current Price</th>
                     <th className="px-4 py-3 font-semibold text-right">Current Value</th>
-                    <th className="px-4 py-3 font-semibold text-right">P&L (%)</th>
+                    <th className="px-4 py-3 font-semibold text-right">1D P&L</th>
+                    <th className="px-4 py-3 font-semibold text-right">Total P&L</th>
                     <th className="px-4 py-3 font-semibold text-right">Weight</th>
                   </tr>
                 </thead>
@@ -701,6 +702,24 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                           className={`px-4 py-3 text-right tabular-nums font-semibold ${
                             !hasValidPrice
                               ? 'text-tx-tertiary'
+                              : h.day_change >= 0
+                              ? 'text-semantic-green'
+                              : 'text-semantic-red'
+                          }`}
+                        >
+                          {hasValidPrice ? (
+                            <>
+                              {h.day_change >= 0 ? '+' : ''}
+                              ₹{(h.day_change * h.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                            </>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td
+                          className={`px-4 py-3 text-right tabular-nums font-semibold ${
+                            !hasValidPrice
+                              ? 'text-tx-tertiary'
                               : isGain
                               ? 'text-semantic-green'
                               : 'text-semantic-red'
@@ -709,7 +728,7 @@ GOLDBEES,Nippon India ETF Gold BeES,200,105.00,2024-02-01`}
                           {hasValidPrice ? (
                             <>
                               {isGain ? '+' : ''}
-                              {h.pnl_percent}%
+                              ₹{h.pnl.toLocaleString('en-IN', { maximumFractionDigits: 2 })} ({h.pnl_percent}%)
                             </>
                           ) : (
                             '—'

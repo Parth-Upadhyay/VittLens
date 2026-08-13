@@ -54,7 +54,7 @@ PREFIX_BUDGET  = 200
 OVERLAP_SENTENCES = 1
 
 VALIDATOR_MODEL = "phi4-mini:latest"
-GROQ_MODEL      = "llama-3.1-8b-instant"
+GROQ_MODEL      = "gpt-oss-20b"
 
 TEXT_PIPELINE_WORKERS  = int(os.getenv("TEXT_WORKERS", "6"))
 CHART_PIPELINE_WORKERS = int(os.getenv("CHART_WORKERS", "4"))

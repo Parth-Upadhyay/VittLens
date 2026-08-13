@@ -103,7 +103,10 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
           {/* Theme Toggle */}
           <button
-            onClick={() => {
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               const newTheme = preferences.theme === 'Dark' ? 'Light' : 'Dark';
               const newPrefs = { ...preferences, theme: newTheme as any };
               setPreferences(newPrefs);

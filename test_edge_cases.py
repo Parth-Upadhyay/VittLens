@@ -112,7 +112,7 @@ class TestFinnAIEdgeCases(unittest.TestCase):
         provider = GroqProvider(self.settings)
         chain = provider._get_model_candidate_chain("llama-3.3-70b-versatile")
         self.assertIn("llama-3.3-70b-versatile", chain)
-        self.assertIn("llama-3.1-8b-instant", chain)
+        self.assertIn("gpt-oss-20b", chain)
         self.assertIn("groq/compound", chain)
         print(f"  [PASSED] Candidate Chain: {chain}")
 

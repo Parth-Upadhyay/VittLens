@@ -52,15 +52,27 @@ class MarketService:
         quote_cache_key = market_quote_key(ticker_symbol)
         
         async def _fill_missing_change(quote: StockQuote) -> None:
-            if quote.change == 0.0 or quote.change_percent == 0.0:
+            needs_fill = (
+                not quote.previous_close or quote.previous_close == 0.0 or 
+                quote.change == 0.0 or quote.change_percent == 0.0 or 
+                not quote.day_open or quote.day_open == 0.0
+            )
+            if needs_fill:
                 try:
-                    # Fetch 5 days of chart data to safely get the previous close
+                    # Fetch 5 days of chart data to safely get the previous close and open
                     chart = await self.get_chart_data(symbol, period="5d", interval="1d")
                     if chart and chart.series and len(chart.series) >= 2:
                         prev_close = chart.series[-2].close
                         if prev_close and prev_close > 0:
+                            if not quote.previous_close or quote.previous_close == 0.0:
+                                quote.previous_close = prev_close
                             quote.change = quote.price - prev_close
                             quote.change_percent = (quote.change / prev_close) * 100
+                            
+                        last_open = chart.series[-1].open
+                        if last_open and last_open > 0:
+                            if not quote.day_open or quote.day_open == 0.0:
+                                quote.day_open = last_open
                 except Exception as e:
                     logger.warning(f"Failed to fill missing change data for {ticker_symbol}: {e}")
 
@@ -94,8 +106,10 @@ class MarketService:
                     change_percent=curr.get("change_percent") or 0.0,
                     volume=curr.get("volume") or 0,
                     market_cap=curr.get("marketCap"),
+                    day_open=curr.get("dayOpen"),
                     day_high=curr.get("dayHigh"),
                     day_low=curr.get("dayLow"),
+                    previous_close=curr.get("previousClose"),
                     fifty_two_week_high=curr.get("fiftyTwoWeekHigh") or curr.get("yearHigh"),
                     fifty_two_week_low=curr.get("fiftyTwoWeekLow") or curr.get("yearLow"),
                     currency=curr.get("currency", "INR"),
@@ -117,8 +131,10 @@ class MarketService:
             change_percent=raw_data.get("change_percent") or 0.0,
             volume=raw_data.get("volume") or 0,
             market_cap=raw_data.get("market_cap"),
+            day_open=raw_data.get("day_open"),
             day_high=raw_data.get("day_high"),
             day_low=raw_data.get("day_low"),
+            previous_close=raw_data.get("previous_close"),
             fifty_two_week_high=raw_data.get("fifty_two_week_high"),
             fifty_two_week_low=raw_data.get("fifty_two_week_low"),
             currency=raw_data.get("currency", "INR"),
