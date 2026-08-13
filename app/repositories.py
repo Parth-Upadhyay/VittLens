@@ -419,19 +419,19 @@ class MarketRepository:
         Uses yahooquery (curl-cffi, bypasses Cloudflare) as primary source.
         Falls back to yfinance only if yahooquery fails.
         """
-        # Attempt 1: yahooquery (primary — no rate-limit issues)
+        # Attempt 1: yfinance (primary)
         try:
-            result = self._yahooquery_quote(ticker_symbol)
+            result = self._execute_with_retry("get_current_quote", ticker_symbol, lambda: self._yf_quote(ticker_symbol))
             if result and result.get("price"):
                 return result
         except Exception as e:
-            logger.warning(f"yahooquery quote failed for '{ticker_symbol}': {e}. Trying yfinance fallback...")
+            logger.warning(f"yfinance quote failed for '{ticker_symbol}': {e}. Trying yahooquery fallback...")
 
-        # Attempt 2: yfinance fallback
+        # Attempt 2: yahooquery fallback
         try:
-            return self._execute_with_retry("get_current_quote", ticker_symbol, lambda: self._yf_quote(ticker_symbol))
+            return self._yahooquery_quote(ticker_symbol)
         except Exception as e2:
-            logger.error(f"Both yahooquery and yfinance failed for '{ticker_symbol}': {e2}")
+            logger.error(f"Both yfinance and yahooquery failed for '{ticker_symbol}': {e2}")
             return {
                 "symbol": ticker_symbol, "price": None, "change": 0.0,
                 "change_percent": 0.0, "volume": 0, "market_cap": None,
@@ -538,7 +538,23 @@ class MarketRepository:
                 })
             return bars
 
-        # Attempt 1: yahooquery (primary)
+        # Attempt 1: yfinance (primary)
+        def _yf_fetch():
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
+            df = ticker.history(period=period, interval=interval)
+            if df.empty:
+                logger.warning(f"yfinance returned empty historical dataframe for '{ticker_symbol}' (period={period}).")
+                return []
+            return _parse_df(df)
+            
+        try:
+            bars = self._execute_with_retry("get_historical_data", ticker_symbol, _yf_fetch)
+            if bars:
+                return bars
+        except Exception as e:
+            logger.warning(f"yfinance history failed for '{ticker_symbol}': {e}. Trying yahooquery...")
+
+        # Attempt 2: yahooquery fallback
         try:
             from yahooquery import Ticker as YQTicker
             t = YQTicker(ticker_symbol)
@@ -551,26 +567,27 @@ class MarketRepository:
                 if bars:
                     return bars
         except Exception as e:
-            logger.warning(f"yahooquery history failed for '{ticker_symbol}': {e}. Trying yfinance...")
-
-        # Attempt 2: yfinance fallback
-        def _yf_fetch():
-            ticker = yf.Ticker(ticker_symbol, session=self.session)
-            df = ticker.history(period=period, interval=interval)
-            if df.empty:
-                logger.warning(f"yfinance returned empty historical dataframe for '{ticker_symbol}' (period={period}).")
-                return []
-            return _parse_df(df)
-
-        return self._execute_with_retry("get_historical_data", ticker_symbol, _yf_fetch)
+            logger.error(f"Both yfinance and yahooquery failed for historical data '{ticker_symbol}': {e}")
+            
+        return []
 
     def get_company_info(self, ticker_symbol: str) -> Dict[str, Any]:
         """
         Retrieve company profile and business information from yfinance.
         """
         def _fetch():
-            # Fetch info exclusively using yahooquery since yfinance is consistently rate-limited
-            info = self._fetch_info_with_yahooquery(ticker_symbol)
+            # Attempt 1: yfinance (primary)
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
+            info = {}
+            try:
+                # fast_info is fast but doesn't have company summary/website, so we need .info
+                info = ticker.info
+            except Exception as e:
+                logger.warning(f"yfinance info failed for '{ticker_symbol}': {e}. Trying yahooquery...")
+                
+            # Attempt 2: yahooquery fallback
+            if not info or not info.get("sector"):
+                info = self._fetch_info_with_yahooquery(ticker_symbol)
                 
             return {
                 "company_name": info.get("longName") or info.get("shortName") or ticker_symbol,
@@ -588,10 +605,20 @@ class MarketRepository:
     def get_key_statistics(self, ticker_symbol: str) -> Dict[str, Any]:
         """
         Retrieve financial ratios, valuation metrics, and balance sheet statistics.
-        Uses yahooquery as primary data source for all metrics.
+        Uses yfinance as primary data source for all metrics.
         """
         def _fetch():
-            info = self._fetch_info_with_yahooquery(ticker_symbol)
+            # Attempt 1: yfinance (primary)
+            ticker = yf.Ticker(ticker_symbol, session=self.session)
+            info = {}
+            try:
+                info = ticker.info
+            except Exception as e:
+                logger.warning(f"yfinance info failed for '{ticker_symbol}': {e}. Trying yahooquery...")
+                
+            # Attempt 2: yahooquery fallback for info
+            if not info or not info.get("sector"):
+                info = self._fetch_info_with_yahooquery(ticker_symbol)
             
             # Try yahooquery for financial statements first
             financials = None
@@ -601,26 +628,34 @@ class MarketRepository:
             shares = None
             
             try:
-                from yahooquery import Ticker as YQTicker
-                yq = YQTicker(ticker_symbol)
+                # Try yfinance financials first
+                financials = ticker.financials.T
+                balance_sheet = ticker.balance_sheet.T
+            except Exception as e:
+                logger.warning(f"yfinance financials failed for '{ticker_symbol}': {e}")
                 
-                # Financial statements from yahooquery
-                inc = yq.income_statement(frequency="a")
-                bs = yq.balance_sheet(frequency="a")
-                
-                if isinstance(inc, pd.DataFrame) and not inc.empty:
-                    if isinstance(inc.index, pd.MultiIndex):
-                        inc = inc.droplevel(0)
-                    financials = inc
+            if (financials is None or financials.empty) or (balance_sheet is None or balance_sheet.empty):
+                try:
+                    from yahooquery import Ticker as YQTicker
+                    yq = YQTicker(ticker_symbol)
                     
-                if isinstance(bs, pd.DataFrame) and not bs.empty:
-                    if isinstance(bs.index, pd.MultiIndex):
-                        bs = bs.droplevel(0)
-                    balance_sheet = bs
+                    # Financial statements from yahooquery
+                    inc = yq.income_statement(frequency="a")
+                    bs = yq.balance_sheet(frequency="a")
                     
-                # Price from yahooquery
-                price_data = yq.price.get(ticker_symbol, {})
-                if isinstance(price_data, dict):
+                    if isinstance(inc, pd.DataFrame) and not inc.empty:
+                        if isinstance(inc.index, pd.MultiIndex):
+                            inc = inc.droplevel(0)
+                        financials = inc
+                        
+                    if isinstance(bs, pd.DataFrame) and not bs.empty:
+                        if isinstance(bs.index, pd.MultiIndex):
+                            bs = bs.droplevel(0)
+                        balance_sheet = bs
+                        
+                    # Price from yahooquery
+                    price_data = yq.price.get(ticker_symbol, {})
+                    if isinstance(price_data, dict):
                     price = price_data.get("regularMarketPrice")
                     market_cap = price_data.get("marketCap")
                     
