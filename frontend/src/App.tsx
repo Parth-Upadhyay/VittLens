@@ -106,6 +106,9 @@ export const App: React.FC = () => {
         <div className="flex flex-col items-center space-y-4">
           <div className="w-9 h-9 rounded-full border-2 border-accent border-t-transparent animate-spin"></div>
           <span className="text-xs text-tx-secondary font-mono tracking-widest animate-pulse uppercase">Connecting to Server...</span>
+          <span className="text-xs text-tx-tertiary text-center max-w-xs px-4">
+            (I am a student on Render's free tier, so it'll take 20-40 seconds to wake the server up from sleep)
+          </span>
         </div>
       </div>
     );
