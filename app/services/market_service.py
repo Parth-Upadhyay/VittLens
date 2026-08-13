@@ -59,10 +59,12 @@ class MarketService:
             )
             if needs_fill:
                 try:
-                    # Fetch 5 days of chart data to safely get the previous close and open
+                    # Fetch 5 days of chart data to safely get the previous close
                     chart = await self.get_chart_data(symbol, period="5d", interval="1d")
-                    if chart and chart.series and len(chart.series) >= 2:
-                        prev_close = chart.series[-2].close
+                    if chart and chart.series and len(chart.series) >= 1:
+                        # The last available bar is the previous close if it's from a prior day,
+                        # or it's the current day's latest data. For fallback, data[-1] is the best guess.
+                        prev_close = chart.series[-1].close
                         if prev_close and prev_close > 0:
                             if not quote.previous_close or quote.previous_close == 0.0:
                                 quote.previous_close = prev_close
