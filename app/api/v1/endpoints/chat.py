@@ -159,37 +159,24 @@ _TICKERS_PATTERN = re.compile(
 
 async def _is_valid_financial_query(text: str, settings) -> bool:
     """
-    Small LLM Intent Classifier (Prompt Guard).
-    Uses a fast, low-parameter model to determine if the user query is a valid 
-    financial/stock/market question or command, preventing off-topic abuse.
+    Prompt Guard checking for empty queries or obvious gibberish keyboard smash.
+    Allows all financial, business, tech, macro, and general conversational queries through.
     """
-    # Fast-pass heuristic: if explicit ticker symbols are present, immediately approve.
-    q_lower = text.lower()
-    if any(kw in q_lower for kw in ["compare", "vs", "stock", "price", "market", "economy", "indian", "india", "war", "global", "macro", "geopolitics", "rate", "gdp", "rbi", "fed"]):
-        return True
+    cleaned = text.strip()
+    if not cleaned or len(cleaned) < 2:
+        return False
         
-    if _TICKERS_PATTERN.search(q_lower):
-        return True
+    q_lower = cleaned.lower()
+    
+    # Block obvious repetitive keyboard smash patterns (e.g. "asdfghjkl", "qwertyuiop")
+    if any(pat in q_lower for pat in ["asdfgh", "zxcvbn", "qwertyui"]):
+        return False
         
-    try:
-        provider = get_llm_provider("groq", settings=settings)
-        # Use openai/gpt-oss-safeguard-20b as primary model; fallback models handle backups automatically
-        res = provider.generate(
-            model="openai/gpt-oss-safeguard-20b",
-            system_prompt=(
-                "You are a strict Prompt Guard for a financial AI assistant. "
-                "Classify if the user's query is related to finance, stocks, investing, companies, or macroeconomics. "
-                "Respond with EXACTLY 'YES' if it is valid, or 'NO' if it is off-topic (e.g. coding, recipes, general chat, gibberish)."
-            ),
-            user_prompt=f"Query: {text}",
-            max_tokens=4,
-            temperature=0.0
-        )
-        answer = res.content.strip().upper()
-        return "YES" in answer
-    except Exception:
-        # Fail open if the LLM guard fails
-        return True
+    # Check for non-word character gibberish or repeated same character
+    if re.match(r"^(.)\1{4,}$", q_lower):
+        return False
+
+    return True
 
 
 @router.post("", response_model=EnrichedChatResponse, summary="Execute financial analysis query")

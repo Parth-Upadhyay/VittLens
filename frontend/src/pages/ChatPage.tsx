@@ -101,9 +101,11 @@ export const ChatPage: React.FC = () => {
       },
       (err: any) => {
         console.error('Chat error:', err);
-        const errorMessage = err.message || 'An error occurred while connecting to the backend.';
+        const errorMessage = typeof err === 'string' 
+          ? err 
+          : err.detail || err.message || 'An error occurred while connecting to the backend.';
         
-        if (err.message && err.message.includes('403')) {
+        if (typeof errorMessage === 'string' && (errorMessage.includes('403') || errorMessage.includes('limit'))) {
           setGuestLimitModalOpen(true);
         }
         
