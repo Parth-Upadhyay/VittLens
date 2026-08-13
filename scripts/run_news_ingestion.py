@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from app.db.database import init_db
 from app.workers.news_worker import NewsWorker
-from app.utils.logger import get_logger
+from app.utils import get_logger
 
 logger = get_logger("finnai.scripts.news_ingestion")
 
