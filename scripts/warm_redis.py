@@ -11,7 +11,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.api.v1.endpoints.market import get_deep_analyze_metrics
 from app.services.market_service import MarketService
+from app.cache import CacheService, market_quote_key
 from app.utils import get_logger
+from scripts.run_news_ingestion import main as run_news_ingestion_main
 
 logger = get_logger("finnai.scripts.warm_redis")
 
@@ -40,8 +42,13 @@ ETFS = [
 
 async def main():
     print("="*60)
-    print(" FinnAI Redis Pre-Warming Script")
+    print(" FinnAI Redis Pre-Warming & News Ingestion Script")
     print("="*60)
+    
+    print("\n[1/2] Running News Ingestion...")
+    await asyncio.to_thread(run_news_ingestion_main)
+    print("\n[2/2] Starting Redis Pre-Warming for Market Data...")
+    
     print(f"Loaded {len(ETFS)} Indian ETFs.")
     
     # Load Nifty500
@@ -71,6 +78,11 @@ async def main():
     
     for symbol in tqdm(all_symbols, desc="Warming Redis"):
         try:
+            # Force refresh: Delete cache keys so get_deep_analyze_metrics generates fresh data
+            ticker_symbol = market_service.mapper.to_yfinance_ticker(symbol)
+            await CacheService.delete(f"market:deep_metrics:{ticker_symbol}")
+            await CacheService.delete(market_quote_key(ticker_symbol))
+            
             await get_deep_analyze_metrics(symbol, market_service)
             success += 1
         except Exception as e:
