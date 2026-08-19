@@ -20,10 +20,9 @@ load_dotenv()
 
 # Verified active models on Groq
 DEFAULT_FALLBACK_MODELS = [
-    "llama-3.3-70b-versatile",
-    "gpt-oss-20b",
-    "qwen-2.5-72b-instruct",
-    "gemma2-9b-it"
+    "llama3-70b-8192",
+    "llama3-8b-8192",
+    "mixtral-8x7b-32768"
 ]
 
 
@@ -39,12 +38,12 @@ class Settings(BaseSettings):
         description="API Key for authenticating with Groq service.",
     )
     groq_model: str = Field(
-        default_factory=lambda: os.getenv("GROQ_MODEL", "gpt-oss-20b"),
+        default_factory=lambda: os.getenv("GROQ_MODEL", "llama3-8b-8192"),
         alias="GROQ_MODEL",
-        description="Groq LLM primary model name to use for general chat completions.",
+        description="Primary Groq model identifier.",
     )
     synthesis_model: str = Field(
-        default_factory=lambda: os.getenv("SYNTHESIS_MODEL", "gpt-oss-20b"),
+        default_factory=lambda: os.getenv("SYNTHESIS_MODEL", "llama3-8b-8192"),
         alias="SYNTHESIS_MODEL",
         description="High-capacity Groq LLM model name used for multi-agent financial synthesis.",
     )
