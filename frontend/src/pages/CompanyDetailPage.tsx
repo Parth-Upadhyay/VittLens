@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CompanyService, MarketService, NewsService } from '../services/api';
 import { CompanyDetail, HistoricalData, NewsArticle, KeyStatistics } from '../types';
 import { MetricCard } from '../components/common/MetricCard';
-import { ArrowLeft, ExternalLink, Microscope } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Microscope, Triangle } from 'lucide-react';
 import { LineChart as ReLineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
@@ -113,10 +113,15 @@ export const CompanyDetailPage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
             {quote && quote.price > 0 ? (
-              <div className="text-left sm:text-right">
-                <div className="text-2xl md:text-3xl font-semibold text-tx-primary font-mono tabular-nums tracking-tight">₹{quote.price.toLocaleString()}</div>
-                <div className={`text-sm font-mono tabular-nums font-medium ${quote.change >= 0 ? 'text-semantic-green' : 'text-semantic-red'}`}>
-                  {quote.change >= 0 ? '+' : ''}{quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
+              <div className="flex items-center gap-3 text-left sm:text-right sm:justify-end">
+                <div>
+                  <div className="text-2xl md:text-3xl font-semibold text-tx-primary font-mono tabular-nums tracking-tight">₹{quote.price.toLocaleString()}</div>
+                  {quote.change != null && quote.change_percent != null && (
+                    <div className={`text-sm font-mono tabular-nums font-medium flex items-center sm:justify-end gap-1.5 ${quote.change >= 0 ? 'text-semantic-green' : 'text-semantic-red'}`}>
+                      <Triangle className={`w-4 h-4 drop-shadow-sm transition-colors ${quote.change >= 0 ? 'fill-current' : 'fill-current rotate-180'}`} />
+                      <span>{Math.abs(quote.change).toFixed(2)} ({Math.abs(quote.change_percent).toFixed(2)}%)</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

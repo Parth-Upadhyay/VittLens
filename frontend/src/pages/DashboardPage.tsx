@@ -237,7 +237,7 @@ export const DashboardPage: React.FC = () => {
                         </span>
                         {quote.change != null && quote.change_percent != null && (
                           <span className={`text-xs font-mono font-medium ${isGain ? 'text-semantic-green' : 'text-semantic-red'}`}>
-                            {isGain ? '+' : ''}{quote.change.toFixed(2)} ({isGain ? '+' : ''}{quote.change_percent.toFixed(2)}%)
+                            {Math.abs(quote.change).toFixed(2)} ({Math.abs(quote.change_percent).toFixed(2)}%)
                           </span>
                         )}
                       </div>

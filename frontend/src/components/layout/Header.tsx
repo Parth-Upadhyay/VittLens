@@ -105,8 +105,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <button
             type="button"
             onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
               const newTheme = preferences.theme === 'Dark' ? 'Light' : 'Dark';
               const newPrefs = { ...preferences, theme: newTheme as any };
               setPreferences(newPrefs);
@@ -118,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 PreferencesService.updatePreferences(newPrefs).catch(console.error);
               }
             }}
-            className="p-1.5 rounded-lg text-tx-secondary hover:text-tx-primary hover:bg-bg-hover nav-transition"
+            className="p-1.5 rounded-lg text-tx-secondary hover:text-tx-primary hover:bg-bg-hover nav-transition cursor-pointer"
             title="Toggle Theme"
           >
             {preferences.theme === 'Dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
