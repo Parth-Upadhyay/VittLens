@@ -387,7 +387,7 @@ class StockQuote(BaseModel):
     change: float = Field(default=0.0, description="Absolute price change.")
     change_percent: float = Field(default=0.0, description="Percentage price change.")
     volume: int = Field(default=0, description="Trading volume.")
-    market_cap: Optional[int] = Field(default=None, description="Market capitalization.")
+    market_cap: Optional[float] = Field(default=None, description="Market capitalization.")
     day_open: Optional[float] = Field(default=None, description="Day open price.")
     day_high: Optional[float] = Field(default=None, description="Day high price.")
     day_low: Optional[float] = Field(default=None, description="Day low price.")
