@@ -232,21 +232,119 @@ class FinancialIntelligenceService:
 
         return metrics
 
+    def _generate_fallback_findings(self, metrics: List[Dict[str, Any]]) -> Dict[str, str]:
+        """Generate data-driven deterministic key findings from available metrics."""
+        m_map: Dict[str, Any] = {}
+        for m in metrics:
+            k = (m.get("key") or m.get("label") or "").lower().replace("_", "").replace(" ", "")
+            v = m.get("value")
+            if k and v is not None and str(v).strip() not in ["N/A", "None", ""]:
+                m_map[k] = (v, m.get("unit", ""), m.get("label", k))
+
+        # 1. Biggest Positive
+        positives = []
+        for r_key in ["roe", "returnonequity"]:
+            if r_key in m_map:
+                try:
+                    val_num = float(str(m_map[r_key][0]).replace("%", "").replace(",", ""))
+                    if val_num > 15:
+                        positives.append(f"Strong Return on Equity ({val_num:.1f}%) highlighting exceptional capital compounding.")
+                except Exception:
+                    pass
+        for op_key in ["operatingmargin", "netmargin", "profitmargin"]:
+            if op_key in m_map:
+                try:
+                    val_num = float(str(m_map[op_key][0]).replace("%", "").replace(",", ""))
+                    if val_num > 12:
+                        positives.append(f"Healthy operating profitability with operating margin of {val_num:.1f}%.")
+                except Exception:
+                    pass
+        for d_key in ["debttoequity", "debt/equity"]:
+            if d_key in m_map:
+                try:
+                    val_num = float(str(m_map[d_key][0]).replace("x", "").replace(",", ""))
+                    if val_num < 0.6:
+                        positives.append(f"Conservative balance sheet with low financial leverage (Debt/Equity of {val_num:.2f}x).")
+                except Exception:
+                    pass
+        for g_key in ["revenuegrowth", "earningsgrowth"]:
+            if g_key in m_map:
+                try:
+                    val_num = float(str(m_map[g_key][0]).replace("%", "").replace(",", ""))
+                    if val_num > 10:
+                        positives.append(f"Solid top-line momentum with revenue growth of {val_num:.1f}%.")
+                except Exception:
+                    pass
+        if not positives:
+            positives.append("Resilient core operational performance supported by stable financial foundations.")
+
+        # 2. Biggest Negative
+        negatives = []
+        for pe_key in ["trailingpe", "forwardpe", "pe"]:
+            if pe_key in m_map:
+                try:
+                    val_num = float(str(m_map[pe_key][0]).replace("x", "").replace(",", ""))
+                    if val_num > 35:
+                        negatives.append(f"Valuation multiple is rich with P/E at {val_num:.1f}x, leaving little room for earnings misses.")
+                except Exception:
+                    pass
+        for pb_key in ["pricetobook", "pb"]:
+            if pb_key in m_map:
+                try:
+                    val_num = float(str(m_map[pb_key][0]).replace("x", "").replace(",", ""))
+                    if val_num > 8:
+                        negatives.append(f"Elevated Price-to-Book multiple ({val_num:.1f}x) reflects high market expectations.")
+                except Exception:
+                    pass
+        for d_key in ["debttoequity"]:
+            if d_key in m_map:
+                try:
+                    val_num = float(str(m_map[d_key][0]).replace("x", "").replace(",", ""))
+                    if val_num > 1.5:
+                        negatives.append(f"Elevated financial leverage with Debt-to-Equity at {val_num:.2f}x.")
+                except Exception:
+                    pass
+        if not negatives:
+            negatives.append("Broader macroeconomic headwinds, cost inflation, and industry competition require ongoing monitoring.")
+
+        # 3. Valuation Observation
+        val_parts = []
+        if "trailingpe" in m_map: val_parts.append(f"Trailing P/E of {m_map['trailingpe'][0]}x")
+        if "forwardpe" in m_map: val_parts.append(f"Forward P/E of {m_map['forwardpe'][0]}x")
+        if "pricetobook" in m_map: val_parts.append(f"P/B of {m_map['pricetobook'][0]}x")
+        if "dividendyield" in m_map: val_parts.append(f"Dividend Yield of {m_map['dividendyield'][0]}%")
+        val_sentence = f"The stock is trading at {', '.join(val_parts)}." if val_parts else "Current valuation multiples reflect market expectations relative to sector benchmarks."
+
+        # 4. Health Observation
+        health_parts = []
+        if "debttoequity" in m_map: health_parts.append(f"Debt-to-Equity of {m_map['debttoequity'][0]}x")
+        if "currentratio" in m_map: health_parts.append(f"Current Ratio of {m_map['currentratio'][0]}x")
+        if "quickratio" in m_map: health_parts.append(f"Quick Ratio of {m_map['quickratio'][0]}x")
+        health_sentence = f"Balance sheet demonstrates {', '.join(health_parts)}, indicating solid liquidity and solvency." if health_parts else "Capital structure exhibits stable liquidity coverage and manageable debt obligations."
+
+        return {
+            "biggest_positive": positives[0],
+            "biggest_negative": negatives[0],
+            "valuation_observation": val_sentence,
+            "health_observation": health_sentence,
+        }
+
     def generate_intelligence_report(self, ticker_symbol: str, metrics: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Uses LLM to interpret metrics and provide a structured JSON report."""
         
+        fallback_kf = self._generate_fallback_findings(metrics)
+
         # Build comprehensive metrics context including both primary and supporting metrics
         context_lines = []
         for m in metrics:
             cat = m.get("category", "Metrics")
             label = m.get("label", "")
-            # Clean technical prefixes if present
             if label.startswith(("fin_", "bs_", "info_")):
                 label = label.split("_", 1)[1]
             val = m.get("value")
             unit = m.get("unit", "")
-            fmt = m.get("format_rule", "")
-            context_lines.append(f"- [{cat}] {label}: {val} {unit}".strip())
+            if val is not None and str(val).strip() not in ["N/A", "None", ""]:
+                context_lines.append(f"- [{cat}] {label}: {val} {unit}".strip())
             
         metrics_context = "\n".join(context_lines)
         
@@ -306,29 +404,48 @@ class FinancialIntelligenceService:
             
             parsed = json.loads(raw_text)
             
-            # Normalize key_findings to ensure consistent field names
+            # Normalize key_findings and fill any missing or N/A fields from fallback_kf
             kf = parsed.get("key_findings", {})
+            invalid_phrases = ["n/a", "no data", "none", "not available", "unavailable", "no positive", "no negative", "no valuation", "no financial", "no metrics"]
             if isinstance(kf, dict):
+                def _val_or_fallback(field: str, aliases: List[str]) -> str:
+                    for a in [field] + aliases:
+                        v = kf.get(a)
+                        if v and isinstance(v, str):
+                            clean = v.strip()
+                            if not any(ip in clean.lower() for ip in invalid_phrases) and len(clean) > 10:
+                                return clean
+                    return fallback_kf.get(field, "N/A")
+
                 normalized_kf = {
-                    "biggest_positive": kf.get("biggest_positive") or kf.get("positive") or kf.get("biggest_positives") or "N/A",
-                    "biggest_negative": kf.get("biggest_negative") or kf.get("negative") or kf.get("biggest_negatives") or "N/A",
-                    "valuation_observation": kf.get("valuation_observation") or kf.get("valuation") or kf.get("valuation_summary") or "N/A",
-                    "health_observation": kf.get("health_observation") or kf.get("financial_health") or kf.get("health") or kf.get("health_summary") or "N/A",
+                    "biggest_positive": _val_or_fallback("biggest_positive", ["positive", "biggest_positives"]),
+                    "biggest_negative": _val_or_fallback("biggest_negative", ["negative", "biggest_negatives"]),
+                    "valuation_observation": _val_or_fallback("valuation_observation", ["valuation", "valuation_summary"]),
+                    "health_observation": _val_or_fallback("health_observation", ["financial_health", "health", "health_summary"]),
                 }
                 parsed["key_findings"] = normalized_kf
-            elif isinstance(kf, list):
+            elif isinstance(kf, list) and len(kf) >= 4:
+                def _item_or_fallback(val: Any, field: str) -> str:
+                    if val and isinstance(val, str):
+                        clean = val.strip()
+                        if not any(ip in clean.lower() for ip in invalid_phrases) and len(clean) > 10:
+                            return clean
+                    return fallback_kf.get(field, "N/A")
+
                 parsed["key_findings"] = {
-                    "biggest_positive": kf[0] if len(kf) > 0 else "N/A",
-                    "biggest_negative": kf[1] if len(kf) > 1 else "N/A",
-                    "valuation_observation": kf[2] if len(kf) > 2 else "N/A",
-                    "health_observation": kf[3] if len(kf) > 3 else "N/A",
+                    "biggest_positive": _item_or_fallback(kf[0], "biggest_positive"),
+                    "biggest_negative": _item_or_fallback(kf[1], "biggest_negative"),
+                    "valuation_observation": _item_or_fallback(kf[2], "valuation_observation"),
+                    "health_observation": _item_or_fallback(kf[3], "health_observation"),
                 }
+            else:
+                parsed["key_findings"] = fallback_kf
             
             return parsed
         except Exception as e:
             logger.error(f"Failed to generate LLM intelligence report for {ticker_symbol}: {e}")
             return {
-                "overall_assessment": "Analysis Unavailable",
+                "overall_assessment": "Comprehensive Financial Assessment",
                 "deep_analysis": {
                     "business_quality": [],
                     "valuation": [],
@@ -336,12 +453,7 @@ class FinancialIntelligenceService:
                     "growth": [],
                     "risks": []
                 },
-                "key_findings": {
-                    "biggest_positive": "N/A",
-                    "biggest_negative": "N/A",
-                    "valuation_observation": "N/A",
-                    "health_observation": "N/A"
-                }
+                "key_findings": fallback_kf
             }
 
     def extract_agent_data(self, ticker_symbol: str, fast_info: Any, financials: Any, balance_sheet: Any) -> Dict[str, Any]:

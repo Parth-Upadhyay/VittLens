@@ -5,7 +5,7 @@ Exposes stock quotes, historical OHLCV series, company profiles, and key financi
 
 import json
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.config.settings import Settings
 from app.dependencies import get_settings, enforce_rate_limit
@@ -217,82 +217,43 @@ async def get_deep_analyze_synthesis(
 ) -> dict:
     """Return the LLM generated deep analysis report."""
     import asyncio
+    from app.services.financial_intelligence import FinancialIntelligenceService
     try:
         ticker_symbol = service.mapper.to_yfinance_ticker(symbol)
         
+        def _is_valid_finding(val: Any) -> bool:
+            if not val or not isinstance(val, str):
+                return False
+            val_clean = val.strip().lower()
+            invalid_patterns = [
+                "n/a", "no data", "none", "unavailable", "not available", 
+                "no positive", "no negative", "no valuation", "no financial",
+                "no metrics"
+            ]
+            if any(pat in val_clean for pat in invalid_patterns):
+                return False
+            return len(val.strip()) > 15
+
         cache_key = f"market:deep_synthesis:{ticker_symbol}"
         cached = await CacheService.get(cache_key)
-        if cached:
-            return {"symbol": symbol, "ticker": ticker_symbol, **cached}
+        if cached and isinstance(cached, dict):
+            kf = cached.get("key_findings", {})
+            # Only use cache if all key findings are valid analytical sentences
+            if (
+                isinstance(kf, dict) 
+                and _is_valid_finding(kf.get("biggest_positive"))
+                and _is_valid_finding(kf.get("biggest_negative"))
+                and _is_valid_finding(kf.get("valuation_observation"))
+                and _is_valid_finding(kf.get("health_observation"))
+            ):
+                return {"symbol": symbol, "ticker": ticker_symbol, **cached}
         
-        def _fetch_synthesis():
-            import pandas as pd
-            from app.services.financial_intelligence import FinancialIntelligenceService
-            
-            fin = None
-            bs = None
-            fast_info_obj = None
-            info = service.repository._fetch_info_with_yahooquery(ticker_symbol)
-            
-            try:
-                from yahooquery import Ticker as YQTicker
-                yq = YQTicker(ticker_symbol)
-                inc = yq.income_statement(frequency="a")
-                bsheet = yq.balance_sheet(frequency="a")
-                
-                def _format_yq_statement(df):
-                    if not isinstance(df, pd.DataFrame) or df.empty: return None
-                    if isinstance(df.index, pd.MultiIndex): df = df.droplevel(0)
-                    elif getattr(df.index, 'name', None) == 'symbol': df = df.reset_index(drop=True)
-                    if 'periodType' in df.columns: df = df[df['periodType'] == '12M']
-                    if 'asOfDate' in df.columns:
-                        df = df.sort_values('asOfDate', ascending=False)
-                        df = df.set_index('asOfDate')
-                    return df.T
-                
-                fin = _format_yq_statement(inc)
-                bs = _format_yq_statement(bsheet)
-                
-                price_data = yq.price.get(ticker_symbol, {})
-                stats = yq.key_stats.get(ticker_symbol, {})
-                class FastInfoProxy: pass
-                fast_info_obj = FastInfoProxy()
-                if isinstance(price_data, dict):
-                    fast_info_obj.last_price = price_data.get("regularMarketPrice")
-                    fast_info_obj.market_cap = price_data.get("marketCap")
-                    fast_info_obj.currency = price_data.get("currency", "INR")
-                if isinstance(stats, dict): fast_info_obj.shares = stats.get("sharesOutstanding")
-                detail = yq.summary_detail.get(ticker_symbol, {})
-                if isinstance(detail, dict):
-                    fast_info_obj.year_high = detail.get("fiftyTwoWeekHigh")
-                    fast_info_obj.year_low = detail.get("fiftyTwoWeekLow")
-                    fast_info_obj.last_volume = detail.get("volume")
-                    if not hasattr(fast_info_obj, 'last_price') or not fast_info_obj.last_price:
-                        fast_info_obj.last_price = detail.get("regularMarketPrice")
-            except Exception as e:
-                from app.utils import get_logger
-                get_logger("finnai.market_synthesis").warning(f"yahooquery failed for {ticker_symbol}: {e}. Trying yfinance...")
-                try:
-                    import yfinance as yf
-                    t = yf.Ticker(ticker_symbol, session=service.repository.session)
-                    fin = t.financials
-                    bs = t.balance_sheet
-                    fast_info_obj = getattr(t, "fast_info", {})
-                    try:
-                        yf_info = t.info
-                        if isinstance(yf_info, dict):
-                            for k, v in yf_info.items():
-                                if k not in info or info[k] is None: info[k] = v
-                    except Exception: pass
-                except Exception as e2:
-                    get_logger("finnai.market_synthesis").warning(f"yfinance failed for {ticker_symbol}: {e2}")
-                
-            fi_service = FinancialIntelligenceService()
-            metrics = fi_service.normalize_metrics(ticker_symbol, fast_info_obj, fin, bs, info)
-            report = fi_service.generate_intelligence_report(ticker_symbol, metrics)
-            return report
+        # Pull all deep metrics (both calculated ratios and supporting metrics)
+        metrics_payload = await get_deep_analyze_metrics(symbol, service)
+        metrics = metrics_payload.get("metrics", [])
         
-        report_data = await asyncio.to_thread(_fetch_synthesis)
+        fi_service = FinancialIntelligenceService()
+        report_data = await asyncio.to_thread(fi_service.generate_intelligence_report, ticker_symbol, metrics)
         await CacheService.set(cache_key, report_data, ttl=43200)  # 12 hours
         return {"symbol": symbol, "ticker": ticker_symbol, **report_data}
     except Exception as e:
