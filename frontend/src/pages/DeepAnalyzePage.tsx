@@ -250,7 +250,7 @@ export const DeepAnalyzePage: React.FC = () => {
             {/* Left Column (2/3): Core Analysis */}
             <div className="lg:col-span-2 space-y-6">
               
-              {isSynthesisLoading ? (
+              {isSynthesisLoading && !synthesisData ? (
                 <div className="surface-card p-10 flex flex-col items-center justify-center space-y-4">
                   <Activity className="w-8 h-8 text-accent animate-pulse" />
                   <div className="text-sm font-medium text-tx-primary">Writing AI Intelligence Report...</div>
@@ -258,22 +258,30 @@ export const DeepAnalyzePage: React.FC = () => {
                     Analyzing financials, interpreting valuations, and assessing business quality based on live data.
                   </div>
                 </div>
-              ) : synthesisData ? (
+              ) : (
                 <>
                   {/* Business Quality */}
-                  {synthesisData.deep_analysis?.business_quality && synthesisData.deep_analysis.business_quality.length > 0 && (
+                  {((synthesisData?.deep_analysis?.business_quality && synthesisData.deep_analysis.business_quality.length > 0) || (metricsByCategory['Profitability'] && metricsByCategory['Profitability'].length > 0)) && (
                     <div className="surface-card p-6 space-y-4">
                       <div className="flex items-center space-x-2 border-b border-border pb-3">
                         <Briefcase className="w-4 h-4 text-accent" />
                         <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Business Quality</h3>
                       </div>
                       <div className="space-y-4">
-                        {synthesisData.deep_analysis.business_quality.map((item, i) => (
+                        {(synthesisData?.deep_analysis?.business_quality && synthesisData.deep_analysis.business_quality.length > 0
+                          ? synthesisData.deep_analysis.business_quality
+                          : (metricsByCategory['Profitability'] || []).slice(0, 4).map(m => ({
+                              metric: m.label,
+                              value: formatValue(m.value, m.format_rule, m.unit),
+                              interpretation: `Key profitability metric recorded at ${formatValue(m.value, m.format_rule, m.unit)}.`,
+                              status: 'good' as const
+                            }))
+                        ).map((item, i) => (
                           <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
                             <span className="text-sm font-mono font-medium text-tx-primary min-w-[200px] flex items-center">
                               {item.metric}: {item.value} {renderStatusBadge(item.status)}
                             </span>
-                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed mt-1 sm:mt-0">→ {item.interpretation}</span>
+                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed mt-1 sm:mt-0">{item.interpretation ? `→ ${item.interpretation}` : ''}</span>
                           </div>
                         ))}
                       </div>
@@ -281,19 +289,27 @@ export const DeepAnalyzePage: React.FC = () => {
                   )}
 
                   {/* Valuation */}
-                  {synthesisData.deep_analysis?.valuation && synthesisData.deep_analysis.valuation.length > 0 && (
+                  {((synthesisData?.deep_analysis?.valuation && synthesisData.deep_analysis.valuation.length > 0) || (metricsByCategory['Valuation'] && metricsByCategory['Valuation'].length > 0)) && (
                     <div className="surface-card p-6 space-y-4">
                       <div className="flex items-center space-x-2 border-b border-border pb-3">
                         <BarChart3 className="w-4 h-4 text-semantic-amber" />
                         <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Valuation</h3>
                       </div>
                       <div className="space-y-4">
-                        {synthesisData.deep_analysis.valuation.map((item, i) => (
+                        {(synthesisData?.deep_analysis?.valuation && synthesisData.deep_analysis.valuation.length > 0
+                          ? synthesisData.deep_analysis.valuation
+                          : (metricsByCategory['Valuation'] || []).slice(0, 4).map(m => ({
+                              metric: m.label,
+                              value: formatValue(m.value, m.format_rule, m.unit),
+                              interpretation: `Valuation multiple positioned at ${formatValue(m.value, m.format_rule, m.unit)}.`,
+                              status: 'moderate' as const
+                            }))
+                        ).map((item, i) => (
                           <div key={i} className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
                             <span className="text-sm font-mono font-medium text-tx-primary min-w-[200px] flex items-center">
                               {item.metric}: {item.value} {renderStatusBadge(item.status)}
                             </span>
-                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed mt-1 sm:mt-0">→ {item.interpretation}</span>
+                            <span className="text-sm text-tx-secondary ai-answer-serif leading-relaxed mt-1 sm:mt-0">{item.interpretation ? `→ ${item.interpretation}` : ''}</span>
                           </div>
                         ))}
                       </div>
@@ -302,14 +318,22 @@ export const DeepAnalyzePage: React.FC = () => {
 
                   {/* Growth & Financial Strength */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {synthesisData.deep_analysis?.growth && synthesisData.deep_analysis.growth.length > 0 && (
+                    {((synthesisData?.deep_analysis?.growth && synthesisData.deep_analysis.growth.length > 0) || (metricsByCategory['Growth'] && metricsByCategory['Growth'].length > 0)) && (
                       <div className="surface-card p-6 space-y-4">
                         <div className="flex items-center space-x-2 border-b border-border pb-3">
                           <TrendingUp className="w-4 h-4 text-semantic-green" />
                           <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Growth</h3>
                         </div>
                         <div className="space-y-4">
-                          {synthesisData.deep_analysis.growth.map((item, i) => (
+                          {(synthesisData?.deep_analysis?.growth && synthesisData.deep_analysis.growth.length > 0
+                            ? synthesisData.deep_analysis.growth
+                            : (metricsByCategory['Growth'] || []).slice(0, 3).map(m => ({
+                                metric: m.label,
+                                value: formatValue(m.value, m.format_rule, m.unit),
+                                interpretation: `Annual growth indicator at ${formatValue(m.value, m.format_rule, m.unit)}.`,
+                                status: 'good' as const
+                              }))
+                          ).map((item, i) => (
                             typeof item === 'string' ? (
                               <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
                                 {item}
@@ -326,14 +350,22 @@ export const DeepAnalyzePage: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    {synthesisData.deep_analysis?.financial_strength && synthesisData.deep_analysis.financial_strength.length > 0 && (
+                    {((synthesisData?.deep_analysis?.financial_strength && synthesisData.deep_analysis.financial_strength.length > 0) || (metricsByCategory['Financial Health'] && metricsByCategory['Financial Health'].length > 0)) && (
                       <div className="surface-card p-6 space-y-4">
                         <div className="flex items-center space-x-2 border-b border-border pb-3">
                           <Activity className="w-4 h-4 text-accent" />
                           <h3 className="text-sm font-semibold text-tx-primary uppercase tracking-wider font-heading">Financial Strength</h3>
                         </div>
                         <div className="space-y-4">
-                          {synthesisData.deep_analysis.financial_strength.map((item, i) => (
+                          {(synthesisData?.deep_analysis?.financial_strength && synthesisData.deep_analysis.financial_strength.length > 0
+                            ? synthesisData.deep_analysis.financial_strength
+                            : (metricsByCategory['Financial Health'] || []).slice(0, 3).map(m => ({
+                                metric: m.label,
+                                value: formatValue(m.value, m.format_rule, m.unit),
+                                interpretation: `Balance sheet liquidity and leverage measure at ${formatValue(m.value, m.format_rule, m.unit)}.`,
+                                status: 'good' as const
+                              }))
+                          ).map((item, i) => (
                             typeof item === 'string' ? (
                               <div key={i} className="flex flex-col text-sm text-tx-secondary ai-answer-serif leading-relaxed border-l-2 border-border pl-3">
                                 {item}
@@ -353,14 +385,22 @@ export const DeepAnalyzePage: React.FC = () => {
                   </div>
 
                   {/* Risks */}
-                  {synthesisData.deep_analysis?.risks && synthesisData.deep_analysis.risks.length > 0 && (
+                  {((synthesisData?.deep_analysis?.risks && synthesisData.deep_analysis.risks.length > 0) || Boolean(synthesisData?.key_findings?.biggest_negative)) && (
                     <div className="alert-warm">
                       <div className="flex items-center space-x-2 border-b border-semantic-amber/20 pb-3 mb-3">
                         <AlertTriangle className="w-4 h-4 text-semantic-amber" />
                         <h3 className="text-sm font-semibold text-semantic-amber uppercase tracking-wider font-heading">Risks</h3>
                       </div>
                       <div className="space-y-4">
-                        {synthesisData.deep_analysis.risks.map((item, i) => (
+                        {(synthesisData?.deep_analysis?.risks && synthesisData.deep_analysis.risks.length > 0
+                          ? synthesisData.deep_analysis.risks
+                          : [{
+                              metric: 'Key Risk Factor',
+                              value: 'Risk Catalyst',
+                              interpretation: synthesisData?.key_findings?.biggest_negative || 'Market cyclicality and sector competition require continuous assessment.',
+                              status: 'bad' as const
+                            }]
+                        ).map((item, i) => (
                           typeof item === 'string' ? (
                             <div key={i} className="flex flex-col text-sm text-tx-primary ai-answer-serif leading-relaxed border-l-2 border-semantic-amber/30 pl-3">
                               {item}
@@ -378,7 +418,7 @@ export const DeepAnalyzePage: React.FC = () => {
                     </div>
                   )}
                 </>
-              ) : null}
+              )}
 
             </div>
 

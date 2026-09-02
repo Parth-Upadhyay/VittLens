@@ -329,21 +329,232 @@ class FinancialIntelligenceService:
             "health_observation": health_sentence,
         }
 
+    def _generate_fallback_deep_analysis(self, metrics: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+        """Generate structured deep analysis cards deterministically from available metrics."""
+        m_map: Dict[str, Any] = {}
+        for m in metrics:
+            k = (m.get("key") or m.get("label") or "").lower().replace("_", "").replace(" ", "")
+            v = m.get("value")
+            if k and v is not None and str(v).strip() not in ["N/A", "None", ""]:
+                m_map[k] = (v, m.get("unit", ""), m.get("label", k), m.get("format_rule", ""))
+
+        bq = []
+        val = []
+        fs = []
+        gr = []
+        rk = []
+
+        # Business Quality
+        if "roe" in m_map or "returnonequity" in m_map:
+            item = m_map.get("roe") or m_map.get("returnonequity")
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 15 else ("moderate" if num >= 10 else "bad")
+                interp = "Exceptional capital compounding" if num >= 20 else ("Healthy return on equity" if num >= 12 else "Subdued equity returns")
+                bq.append({"metric": "ROE", "value": f"{num:.1f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "operatingmargin" in m_map or "operating_margin" in m_map:
+            item = m_map.get("operatingmargin") or m_map.get("operating_margin")
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 15 else ("moderate" if num >= 8 else "bad")
+                interp = "Robust operating profitability" if num >= 15 else ("Stable operational margins" if num >= 8 else "Compressed operating margins")
+                bq.append({"metric": "Operating Margin", "value": f"{num:.1f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "netmargin" in m_map or "profitmargin" in m_map:
+            item = m_map.get("netmargin") or m_map.get("profitmargin")
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 10 else ("moderate" if num >= 5 else "bad")
+                interp = "High net earnings conversion" if num >= 10 else "Moderate bottom-line profitability"
+                bq.append({"metric": "Net Margin", "value": f"{num:.1f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "roa" in m_map or "returnonassets" in m_map:
+            item = m_map.get("roa") or m_map.get("returnonassets")
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 8 else ("moderate" if num >= 4 else "bad")
+                interp = "Efficient asset utilization" if num >= 8 else "Moderate asset return efficiency"
+                bq.append({"metric": "ROA", "value": f"{num:.1f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        # Valuation
+        if "trailingpe" in m_map or "pe" in m_map:
+            item = m_map.get("trailingpe") or m_map.get("pe")
+            try:
+                num = float(str(item[0]).replace("x", "").replace(",", ""))
+                status = "good" if num <= 20 else ("moderate" if num <= 35 else "bad")
+                interp = "Attractive earnings multiple" if num <= 20 else ("Fair historical multiple" if num <= 35 else "Premium growth valuation")
+                val.append({"metric": "Trailing P/E", "value": f"{num:.1f}x", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "forwardpe" in m_map:
+            item = m_map["forwardpe"]
+            try:
+                num = float(str(item[0]).replace("x", "").replace(",", ""))
+                status = "good" if num <= 18 else ("moderate" if num <= 30 else "bad")
+                interp = "Reasonable forward pricing" if num <= 25 else "Demanding forward growth expectations"
+                val.append({"metric": "Forward P/E", "value": f"{num:.1f}x", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "pricetobook" in m_map or "pb" in m_map:
+            item = m_map.get("pricetobook") or m_map.get("pb")
+            try:
+                num = float(str(item[0]).replace("x", "").replace(",", ""))
+                status = "good" if num <= 3 else ("moderate" if num <= 7 else "bad")
+                interp = "Comfortable book value premium" if num <= 4 else "Elevated price-to-book multiple"
+                val.append({"metric": "Price to Book", "value": f"{num:.1f}x", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "dividendyield" in m_map:
+            item = m_map["dividendyield"]
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 2 else ("moderate" if num >= 1 else "moderate")
+                interp = "Strong dividend cash return" if num >= 2 else "Modest shareholder yield"
+                val.append({"metric": "Dividend Yield", "value": f"{num:.2f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        # Financial Strength
+        if "debttoequity" in m_map or "debt/equity" in m_map:
+            item = m_map.get("debttoequity") or m_map.get("debt/equity")
+            try:
+                num = float(str(item[0]).replace("x", "").replace(",", ""))
+                status = "good" if num <= 0.5 else ("moderate" if num <= 1.0 else "bad")
+                interp = "Conservative leverage / Net cash" if num <= 0.5 else ("Manageable debt level" if num <= 1.0 else "Elevated financial debt")
+                fs.append({"metric": "Debt to Equity", "value": f"{num:.2f}x", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "currentratio" in m_map:
+            item = m_map["currentratio"]
+            try:
+                num = float(str(item[0]).replace("x", "").replace(",", ""))
+                status = "good" if num >= 1.5 else ("moderate" if num >= 1.0 else "bad")
+                interp = "Healthy short-term liquidity" if num >= 1.5 else "Adequate working capital buffer"
+                fs.append({"metric": "Current Ratio", "value": f"{num:.2f}x", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "quickratio" in m_map:
+            item = m_map["quickratio"]
+            try:
+                num = float(str(item[0]).replace("x", "").replace(",", ""))
+                status = "good" if num >= 1.0 else ("moderate" if num >= 0.7 else "bad")
+                interp = "Strong immediate cash liquidity" if num >= 1.0 else "Acceptable quick asset coverage"
+                fs.append({"metric": "Quick Ratio", "value": f"{num:.2f}x", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        # Growth
+        if "revenuegrowth" in m_map:
+            item = m_map["revenuegrowth"]
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 12 else ("moderate" if num >= 5 else "bad")
+                interp = "Strong top-line acceleration" if num >= 12 else ("Steady revenue expansion" if num >= 5 else "Sluggish revenue growth")
+                gr.append({"metric": "Revenue Growth", "value": f"{num:.1f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        if "earningsgrowth" in m_map:
+            item = m_map["earningsgrowth"]
+            try:
+                num = float(str(item[0]).replace("%", "").replace(",", ""))
+                status = "good" if num >= 15 else ("moderate" if num >= 5 else "bad")
+                interp = "Robust earnings expansion" if num >= 15 else "Moderate profit growth rate"
+                gr.append({"metric": "Earnings Growth", "value": f"{num:.1f}%", "interpretation": interp, "status": status})
+            except Exception: pass
+
+        # Risks
+        if "trailingpe" in m_map:
+            try:
+                num = float(str(m_map["trailingpe"][0]).replace("x", "").replace(",", ""))
+                if num > 35:
+                    rk.append({"metric": "Valuation Premium", "value": f"{num:.1f}x P/E", "interpretation": "High valuation multiple limits downside protection", "status": "bad"})
+            except Exception: pass
+
+        if "debttoequity" in m_map:
+            try:
+                num = float(str(m_map["debttoequity"][0]).replace("x", "").replace(",", ""))
+                if num > 1.2:
+                    rk.append({"metric": "Financial Leverage", "value": f"{num:.2f}x D/E", "interpretation": "High debt obligations sensitive to interest rate cycles", "status": "bad"})
+            except Exception: pass
+
+        if not rk:
+            rk.append({"metric": "Market & Industry Risk", "value": "Cyclical Risk", "interpretation": "Sector competition and macro cyclicality require active tracking", "status": "bad"})
+
+        return {
+            "business_quality": bq,
+            "valuation": val,
+            "financial_strength": fs,
+            "growth": gr,
+            "risks": rk
+        }
+
+    def _generate_overall_assessment(self, metrics: List[Dict[str, Any]]) -> str:
+        """Compose dynamic high-level overall assessment headline from key ratios."""
+        m_map: Dict[str, Any] = {}
+        for m in metrics:
+            k = (m.get("key") or m.get("label") or "").lower().replace("_", "").replace(" ", "")
+            v = m.get("value")
+            if k and v is not None and str(v).strip() not in ["N/A", "None", ""]:
+                m_map[k] = v
+
+        qual = "Solid Business Quality"
+        val = "Fair Valuation"
+        health = "Stable Balance Sheet"
+
+        if "roe" in m_map:
+            try:
+                num = float(str(m_map["roe"]).replace("%", "").replace(",", ""))
+                if num > 20: qual = "High-Quality Business"
+                elif num < 10: qual = "Moderate Business Quality"
+            except Exception: pass
+
+        if "trailingpe" in m_map:
+            try:
+                num = float(str(m_map["trailingpe"]).replace("x", "").replace(",", ""))
+                if num > 35: val = "Premium Valuation"
+                elif num < 18: val = "Attractive Valuation"
+            except Exception: pass
+
+        if "debttoequity" in m_map:
+            try:
+                num = float(str(m_map["debttoequity"]).replace("x", "").replace(",", ""))
+                if num < 0.5: health = "Strong Financial Health"
+                elif num > 1.2: health = "Moderate Leverage"
+            except Exception: pass
+
+        return f"{qual} / {val} / {health}"
+
     def generate_intelligence_report(self, ticker_symbol: str, metrics: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Uses LLM to interpret metrics and provide a structured JSON report."""
         
         fallback_kf = self._generate_fallback_findings(metrics)
+        fallback_da = self._generate_fallback_deep_analysis(metrics)
+        fallback_assessment = self._generate_overall_assessment(metrics)
 
-        # Build comprehensive metrics context including both primary and supporting metrics
+        # Build concise curated metrics context for fast, reliable LLM synthesis
+        curated_categories = {"Valuation", "Profitability", "Financial Health", "Growth", "Market Snapshot"}
+        curated_supporting_keys = {
+            "totalrevenue", "netincome", "ebitda", "ebit", "operatingincome",
+            "totaldebt", "cashandcashequivalents", "stockholdersequity", "freecashflow", "operatingcashflow"
+        }
+        
         context_lines = []
         for m in metrics:
             cat = m.get("category", "Metrics")
             label = m.get("label", "")
-            if label.startswith(("fin_", "bs_", "info_")):
-                label = label.split("_", 1)[1]
+            raw_k = (m.get("key") or label).lower().replace("_", "").replace(" ", "")
             val = m.get("value")
             unit = m.get("unit", "")
-            if val is not None and str(val).strip() not in ["N/A", "None", ""]:
+            if val is None or str(val).strip() in ["N/A", "None", ""]:
+                continue
+            
+            if label.startswith(("fin_", "bs_", "info_")):
+                label = label.split("_", 1)[1]
+
+            if cat in curated_categories or any(sk in raw_k for sk in curated_supporting_keys):
                 context_lines.append(f"- [{cat}] {label}: {val} {unit}".strip())
             
         metrics_context = "\n".join(context_lines)
@@ -351,12 +562,13 @@ class FinancialIntelligenceService:
         system_prompt = (
             "You are an expert financial analyst. Analyze the provided metrics for a company "
             "and output a strictly valid JSON object representing a 'Financial Intelligence Report'. "
+            "Provide 2-4 key metrics per deep analysis category. "
             "Follow this JSON schema EXACTLY:\n"
             "{\n"
             "  \"overall_assessment\": \"string (e.g. 'Strong Business / Reasonable Valuation / Moderate Growth')\",\n"
             "  \"deep_analysis\": {\n"
             "    \"business_quality\": [\n"
-            "        {\"metric\": \"string (e.g. 'ROE')\", \"value\": \"string (e.g. '45.9%')\", \"interpretation\": \"string (e.g. 'Excellent profitability')\", \"status\": \"good\" | \"moderate\" | \"bad\"}\n"
+            "        {\"metric\": \"string (e.g. 'ROE')\", \"value\": \"string (e.g. '45.9%')\", \"interpretation\": \"string (e.g. 'Exceptional profitability')\", \"status\": \"good\" | \"moderate\" | \"bad\"}\n"
             "    ],\n"
             "    \"valuation\": [\n"
             "        {\"metric\": \"string\", \"value\": \"string\", \"interpretation\": \"string\", \"status\": \"good\" | \"moderate\" | \"bad\"}\n"
@@ -379,12 +591,9 @@ class FinancialIntelligenceService:
             "  }\n"
             "}\n\n"
             "CRITICAL INSTRUCTIONS:\n"
-            "1. Synthesize insights from BOTH high-level ratios and supporting financial/balance sheet metrics provided.\n"
+            "1. Synthesize insights from BOTH ratios and financial/balance sheet metrics provided.\n"
             "2. Ensure all four fields in `key_findings` (`biggest_positive`, `biggest_negative`, `valuation_observation`, `health_observation`) are populated with clear, concrete analytical sentences.\n"
-            "3. Do NOT equate EBITDA directly to free cash flow. EBITDA represents operating profitability before interest, taxes, depreciation, and amortization.\n"
-            "4. Do NOT evaluate margins in a vacuum; consider business model and capital structure.\n"
-            "5. Debt/Equity ratios under 1.0x (and especially under 0.5x) indicate low leverage or a strong net cash position.\n"
-            "6. **STRICTLY USE ONLY THE METRICS PROVIDED IN THE PROMPT.** Do NOT invent external financial figures.\n"
+            "3. **STRICTLY USE ONLY THE METRICS PROVIDED IN THE PROMPT.** Do NOT invent external financial figures.\n"
             "Do NOT output markdown code blocks. Output ONLY raw parseable JSON."
         )
         
@@ -402,7 +611,28 @@ class FinancialIntelligenceService:
             if raw_text.startswith("```"):
                 raw_text = raw_text.replace("```", "").strip()
             
+            # Extract JSON substring if extra commentary is present
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', raw_text)
+            if json_match:
+                raw_text = json_match.group(0)
+            
             parsed = json.loads(raw_text)
+            
+            # Merge / Validate deep_analysis sections
+            da = parsed.get("deep_analysis", {})
+            if not isinstance(da, dict):
+                da = {}
+            for cat in ["business_quality", "valuation", "financial_strength", "growth", "risks"]:
+                items = da.get(cat)
+                if not items or not isinstance(items, list) or len(items) == 0:
+                    da[cat] = fallback_da.get(cat, [])
+            parsed["deep_analysis"] = da
+            
+            # Merge / Validate overall_assessment
+            oa = parsed.get("overall_assessment")
+            if not oa or str(oa).strip() in ["Analysis Unavailable", "N/A", ""]:
+                parsed["overall_assessment"] = fallback_assessment
             
             # Normalize key_findings and fill any missing or N/A fields from fallback_kf
             kf = parsed.get("key_findings", {})
@@ -445,14 +675,8 @@ class FinancialIntelligenceService:
         except Exception as e:
             logger.error(f"Failed to generate LLM intelligence report for {ticker_symbol}: {e}")
             return {
-                "overall_assessment": "Comprehensive Financial Assessment",
-                "deep_analysis": {
-                    "business_quality": [],
-                    "valuation": [],
-                    "financial_strength": [],
-                    "growth": [],
-                    "risks": []
-                },
+                "overall_assessment": fallback_assessment,
+                "deep_analysis": fallback_da,
                 "key_findings": fallback_kf
             }
 

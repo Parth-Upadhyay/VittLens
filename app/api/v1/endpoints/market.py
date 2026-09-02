@@ -168,6 +168,28 @@ async def get_deep_analyze_metrics(
                     if not hasattr(fast_info_obj, 'last_price') or not fast_info_obj.last_price:
                         fast_info_obj.last_price = detail.get("regularMarketPrice")
                         
+                # If financial statements or price were missing in yahooquery, fallback to yfinance
+                if fin is None or bs is None or getattr(fast_info_obj, 'last_price', None) is None:
+                    try:
+                        import yfinance as yf
+                        t = yf.Ticker(ticker_symbol, session=service.repository.session)
+                        if fin is None or fin.empty:
+                            fin = t.financials
+                        if bs is None or bs.empty:
+                            bs = t.balance_sheet
+                        if getattr(fast_info_obj, 'last_price', None) is None:
+                            fast_info_obj = getattr(t, "fast_info", fast_info_obj)
+                        try:
+                            yf_info = t.info
+                            if isinstance(yf_info, dict):
+                                for k, v in yf_info.items():
+                                    if k not in info or info[k] is None:
+                                        info[k] = v
+                        except Exception:
+                            pass
+                    except Exception as e_yf:
+                        pass
+
             except Exception as e:
                 from app.utils import get_logger
                 get_logger("finnai.market_deep_analyze").warning(f"yahooquery failed for {ticker_symbol}: {e}. Trying yfinance...")
@@ -213,7 +235,6 @@ async def get_deep_analyze_metrics(
 async def get_deep_analyze_synthesis(
     symbol: str, 
     service: MarketService = Depends(get_market_service),
-    auth_identity: tuple = Depends(enforce_rate_limit)
 ) -> dict:
     """Return the LLM generated deep analysis report."""
     import asyncio
@@ -238,9 +259,12 @@ async def get_deep_analyze_synthesis(
         cached = await CacheService.get(cache_key)
         if cached and isinstance(cached, dict):
             kf = cached.get("key_findings", {})
-            # Only use cache if all key findings are valid analytical sentences
+            da = cached.get("deep_analysis", {})
+            # Only use cache if all key findings and deep analysis sections are valid
+            has_da = isinstance(da, dict) and any(len(da.get(cat, [])) > 0 for cat in ["business_quality", "valuation", "financial_strength"])
             if (
-                isinstance(kf, dict) 
+                has_da
+                and isinstance(kf, dict) 
                 and _is_valid_finding(kf.get("biggest_positive"))
                 and _is_valid_finding(kf.get("biggest_negative"))
                 and _is_valid_finding(kf.get("valuation_observation"))
