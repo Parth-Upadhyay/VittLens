@@ -112,6 +112,28 @@ class FilingRepository:
                 limit=fetch_limit,
             ).points
 
+            # Fallback 1: If strict FY filter resulted in 0 points, retry with company filter only
+            if not points and detected_fy and db_company_variants:
+                logger.info(f"0 points found with FY filter {detected_fy}. Falling back to company filter only.")
+                comp_filter = models.Filter(must=[
+                    models.FieldCondition(key="company", match=models.MatchAny(any=db_company_variants))
+                ])
+                points = self.module.qdrant.query_points(
+                    collection_name=self.collection_name,
+                    query=query_vector,
+                    query_filter=comp_filter,
+                    limit=fetch_limit,
+                ).points
+
+            # Fallback 2: If company filter still resulted in 0 points, search globally
+            if not points and db_company_variants:
+                logger.info("0 points found with company filter. Falling back to global dense search.")
+                points = self.module.qdrant.query_points(
+                    collection_name=self.collection_name,
+                    query=query_vector,
+                    limit=fetch_limit,
+                ).points
+
             if not points:
                 logger.warning(f"Qdrant vector search returned 0 points for query '{query}'.")
                 return []

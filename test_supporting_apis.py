@@ -105,9 +105,10 @@ def test_supporting_apis() -> None:
     holding_id = res_add_port.json()["id"]
 
     res_get_port = client.get("/api/v1/portfolio")
-    print(f"GET Portfolio Status: {res_get_port.status_code} | Total Value: ₹{res_get_port.json().get('total_value')}")
+    print(f"GET Portfolio Status: {res_get_port.status_code} | Total Value: INR {res_get_port.json().get('total_value')}")
     assert res_get_port.status_code == 200
-
+    assert "holdings" in res_get_port.json()
+    
     res_del_port = client.delete(f"/api/v1/portfolio/{holding_id}")
     print(f"DELETE Portfolio Status: {res_del_port.status_code}")
     assert res_del_port.status_code == 200

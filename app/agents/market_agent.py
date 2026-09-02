@@ -55,9 +55,11 @@ class MarketAgent(BaseAgent):
                 curr = ad.get("current", {})
                 val = ad.get("valuation", {})
                 comp = ad.get("company", {})
-                health = ad.get("health", {})
-                fins = ad.get("financials", [])
-                recent_fin = fins[0] if fins else {}
+                comp_is_dict = isinstance(comp, dict)
+                comp_name = comp.get("name") if comp_is_dict else (comp if isinstance(comp, str) and comp else canonical)
+                health = ad.get("health", {}) if isinstance(ad.get("health"), dict) else {}
+                fins = ad.get("financials", []) if isinstance(ad.get("financials"), list) else []
+                recent_fin = fins[0] if fins and isinstance(fins[0], dict) else {}
 
                 quote = StockQuote(
                     symbol=ticker_symbol,
@@ -76,14 +78,14 @@ class MarketAgent(BaseAgent):
                 
                 profile = CompanyInfo(
                     canonical_symbol=canonical,
-                    company_name=comp.get("name") or canonical,
-                    sector=comp.get("sector"),
-                    industry=comp.get("industry"),
-                    description=comp.get("description"),
-                    website=comp.get("website"),
-                    employees=comp.get("employees"),
-                    country=comp.get("country"),
-                    headquarters=comp.get("headquarters"),
+                    company_name=comp_name or canonical,
+                    sector=comp.get("sector") if comp_is_dict else None,
+                    industry=comp.get("industry") if comp_is_dict else None,
+                    description=comp.get("description") if comp_is_dict else None,
+                    website=comp.get("website") if comp_is_dict else None,
+                    employees=comp.get("employees") if comp_is_dict else None,
+                    country=comp.get("country") if comp_is_dict else None,
+                    headquarters=comp.get("headquarters") if comp_is_dict else None,
                 )
 
                 metric_map = {m.get("key"): m.get("value") for m in deep_metrics}

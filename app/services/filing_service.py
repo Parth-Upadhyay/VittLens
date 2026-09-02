@@ -49,11 +49,18 @@ class FilingService:
             return None
 
         canonical = self.normalizer.normalize(symbol) or symbol.strip().upper()
+        variants = []
         if qdrant_mod and hasattr(qdrant_mod, "COMPANY_VARIANTS"):
-            variants = qdrant_mod.COMPANY_VARIANTS.get(canonical, [canonical])
-            return variants
+            q_variants = qdrant_mod.COMPANY_VARIANTS.get(canonical)
+            if q_variants:
+                variants.extend(q_variants)
 
-        return [canonical]
+        primary_name = self.normalizer.get_primary_name(canonical)
+        for item in [canonical, primary_name, symbol.strip()]:
+            if item and item not in variants:
+                variants.append(item)
+
+        return variants if variants else [canonical]
 
     @cache(ttl=86400, key_builder=lambda self, query, symbol=None, top_k=5: rag_query_key(query, f"{symbol}:{top_k}:search"), response_model=FilingSearchResult)
     async def search_filings(

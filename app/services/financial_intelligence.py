@@ -235,10 +235,20 @@ class FinancialIntelligenceService:
     def generate_intelligence_report(self, ticker_symbol: str, metrics: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Uses LLM to interpret metrics and provide a structured JSON report."""
         
-        metrics_context = "\n".join([
-            f"- {m['category']} | {m['label']}: {m['value']} {m['unit']} (Format: {m['format_rule']})"
-            for m in metrics if m['category'] != "Supporting Metrics"
-        ])
+        # Build comprehensive metrics context including both primary and supporting metrics
+        context_lines = []
+        for m in metrics:
+            cat = m.get("category", "Metrics")
+            label = m.get("label", "")
+            # Clean technical prefixes if present
+            if label.startswith(("fin_", "bs_", "info_")):
+                label = label.split("_", 1)[1]
+            val = m.get("value")
+            unit = m.get("unit", "")
+            fmt = m.get("format_rule", "")
+            context_lines.append(f"- [{cat}] {label}: {val} {unit}".strip())
+            
+        metrics_context = "\n".join(context_lines)
         
         system_prompt = (
             "You are an expert financial analyst. Analyze the provided metrics for a company "
@@ -264,20 +274,19 @@ class FinancialIntelligenceService:
             "    ]\n"
             "  },\n"
             "  \"key_findings\": {\n"
-            "    \"biggest_positive\": \"string\",\n"
-            "    \"biggest_negative\": \"string\",\n"
-            "    \"valuation_observation\": \"string\",\n"
-            "    \"health_observation\": \"string\"\n"
+            "    \"biggest_positive\": \"string (Concise analytical sentence highlighting the single biggest strength/positive catalyst)\",\n"
+            "    \"biggest_negative\": \"string (Concise analytical sentence highlighting the key risk, headwind, or weakness)\",\n"
+            "    \"valuation_observation\": \"string (Concise observation on current valuation, multiples, and pricing context)\",\n"
+            "    \"health_observation\": \"string (Concise assessment of balance sheet health, debt coverage, liquidity, and solvency)\"\n"
             "  }\n"
             "}\n\n"
             "CRITICAL INSTRUCTIONS:\n"
-            "1. If a category (e.g. Valuation, Growth) has NO supporting metrics in the data provided, completely omit it from the `deep_analysis` object instead of returning an empty list.\n"
-            "2. Do NOT equate EBITDA directly to free cash flow. EBITDA represents operating profitability before interest, taxes, depreciation, and amortization.\n"
-            "3. Do NOT evaluate margins (like Net Margin) in a vacuum. A 10% margin might be perfectly healthy depending on the industry.\n"
-            "4. Do NOT definitively label a company as 'Undervalued' or 'Overvalued' without examining multiples like P/E, P/B, or EV/EBITDA. If valuation metrics are missing, omit the valuation category.\n"
-            "5. Debt/Equity ratios under 1.0x (and especially under 0.5x) generally indicate low leverage or a net cash position. Do NOT label them as 'High Debt'.\n"
-            "6. **STRICTLY USE ONLY THE METRICS PROVIDED IN THE PROMPT.** Do NOT use outside knowledge, pre-trained facts, or hallucinate financial figures. If a data point is not in the 'Metrics Data', you must not mention it.\n"
-            "Provide insightful interpretations for metrics using ONLY the numbers given. Make your insights extremely analytical. "
+            "1. Synthesize insights from BOTH high-level ratios and supporting financial/balance sheet metrics provided.\n"
+            "2. Ensure all four fields in `key_findings` (`biggest_positive`, `biggest_negative`, `valuation_observation`, `health_observation`) are populated with clear, concrete analytical sentences.\n"
+            "3. Do NOT equate EBITDA directly to free cash flow. EBITDA represents operating profitability before interest, taxes, depreciation, and amortization.\n"
+            "4. Do NOT evaluate margins in a vacuum; consider business model and capital structure.\n"
+            "5. Debt/Equity ratios under 1.0x (and especially under 0.5x) indicate low leverage or a strong net cash position.\n"
+            "6. **STRICTLY USE ONLY THE METRICS PROVIDED IN THE PROMPT.** Do NOT invent external financial figures.\n"
             "Do NOT output markdown code blocks. Output ONLY raw parseable JSON."
         )
         
@@ -295,7 +304,27 @@ class FinancialIntelligenceService:
             if raw_text.startswith("```"):
                 raw_text = raw_text.replace("```", "").strip()
             
-            return json.loads(raw_text)
+            parsed = json.loads(raw_text)
+            
+            # Normalize key_findings to ensure consistent field names
+            kf = parsed.get("key_findings", {})
+            if isinstance(kf, dict):
+                normalized_kf = {
+                    "biggest_positive": kf.get("biggest_positive") or kf.get("positive") or kf.get("biggest_positives") or "N/A",
+                    "biggest_negative": kf.get("biggest_negative") or kf.get("negative") or kf.get("biggest_negatives") or "N/A",
+                    "valuation_observation": kf.get("valuation_observation") or kf.get("valuation") or kf.get("valuation_summary") or "N/A",
+                    "health_observation": kf.get("health_observation") or kf.get("financial_health") or kf.get("health") or kf.get("health_summary") or "N/A",
+                }
+                parsed["key_findings"] = normalized_kf
+            elif isinstance(kf, list):
+                parsed["key_findings"] = {
+                    "biggest_positive": kf[0] if len(kf) > 0 else "N/A",
+                    "biggest_negative": kf[1] if len(kf) > 1 else "N/A",
+                    "valuation_observation": kf[2] if len(kf) > 2 else "N/A",
+                    "health_observation": kf[3] if len(kf) > 3 else "N/A",
+                }
+            
+            return parsed
         except Exception as e:
             logger.error(f"Failed to generate LLM intelligence report for {ticker_symbol}: {e}")
             return {

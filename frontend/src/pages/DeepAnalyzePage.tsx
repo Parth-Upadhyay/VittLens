@@ -398,19 +398,27 @@ export const DeepAnalyzePage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="space-y-1">
                       <div className="text-[11px] text-tx-secondary uppercase tracking-wider font-semibold">Biggest Positive</div>
-                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">{synthesisData.key_findings?.biggest_positive || 'N/A'}</div>
+                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">
+                        {(synthesisData.key_findings as any)?.biggest_positive || (synthesisData.key_findings as any)?.positive || (synthesisData.key_findings as any)?.biggest_positives || 'N/A'}
+                      </div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-[11px] text-tx-secondary uppercase tracking-wider font-semibold">Biggest Negative</div>
-                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">{synthesisData.key_findings?.biggest_negative || 'N/A'}</div>
+                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">
+                        {(synthesisData.key_findings as any)?.biggest_negative || (synthesisData.key_findings as any)?.negative || (synthesisData.key_findings as any)?.biggest_negatives || 'N/A'}
+                      </div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-[11px] text-tx-secondary uppercase tracking-wider font-semibold">Valuation Observation</div>
-                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">{synthesisData.key_findings?.valuation_observation || 'N/A'}</div>
+                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">
+                        {(synthesisData.key_findings as any)?.valuation_observation || (synthesisData.key_findings as any)?.valuation || (synthesisData.key_findings as any)?.valuation_summary || 'N/A'}
+                      </div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-[11px] text-tx-secondary uppercase tracking-wider font-semibold">Financial Health</div>
-                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">{synthesisData.key_findings?.health_observation || 'N/A'}</div>
+                      <div className="text-[14px] text-tx-primary ai-answer-serif leading-relaxed">
+                        {(synthesisData.key_findings as any)?.health_observation || (synthesisData.key_findings as any)?.financial_health || (synthesisData.key_findings as any)?.health || (synthesisData.key_findings as any)?.health_summary || 'N/A'}
+                      </div>
                     </div>
                   </div>
                 </div>

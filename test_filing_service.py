@@ -13,6 +13,7 @@ Verifies:
 6. Zero LLM synthesis inside service layer (pure structured model return)
 """
 
+import asyncio
 import time
 from dotenv import load_dotenv
 
@@ -23,7 +24,7 @@ from app.utils import get_logger
 logger = get_logger("finnai.test_filing", "INFO")
 
 
-def main() -> None:
+async def async_main() -> None:
     load_dotenv()
     settings = Settings()
     logger.info("=== Starting Filing Service Verification ===")
@@ -39,7 +40,7 @@ def main() -> None:
     test_symbol = "RELIANCE"
 
     start_time = time.perf_counter()
-    result = service.search_filings(query=test_query, symbol=test_symbol, top_k=3)
+    result = await service.search_filings(query=test_query, symbol=test_symbol, top_k=3)
     latency = (time.perf_counter() - start_time) * 1000.0
 
     print(f"\nSearch Query:        '{result.query}'")
@@ -57,7 +58,7 @@ def main() -> None:
 
     # 3. Test Visual Chart Image Retrieval
     print("\n--- 3. Testing Visual Chart Image Retrieval ---")
-    img_result = service.get_filing_images(query="revenue segment breakdown visual chart", symbol=test_symbol, top_k=2)
+    img_result = await service.get_filing_images(query="revenue segment breakdown visual chart", symbol=test_symbol, top_k=2)
     print(f"Query:              '{img_result.query}'")
     print(f"Canonical Symbol:   '{img_result.canonical_symbol}'")
     print(f"Image URLs Found:   {len(img_result.image_urls)}")
@@ -71,7 +72,7 @@ def main() -> None:
     if result.chunks and result.chunks[0].filing_id:
         test_id = result.chunks[0].filing_id
         print(f"\n--- 4. Testing Point Metadata Lookup for ID: {test_id} ---")
-        meta = service.get_filing_metadata(test_id)
+        meta = await service.get_filing_metadata(test_id)
         print(f"  • Filing ID:     {meta.filing_id}")
         print(f"  • Symbol:        {meta.canonical_symbol}")
         print(f"  • Filing Type:   {meta.filing_type}")
@@ -81,6 +82,10 @@ def main() -> None:
     print("\n" + "=" * 70)
     print("        FILING SERVICE VERIFICATION COMPLETED SUCCEEDED!       ")
     print("=" * 70 + "\n")
+
+
+def main() -> None:
+    asyncio.run(async_main())
 
 
 if __name__ == "__main__":

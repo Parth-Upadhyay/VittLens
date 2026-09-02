@@ -25,16 +25,16 @@ def get_filing_service(settings: Settings = Depends(get_settings)) -> FilingServ
 
 
 @router.post("/search", response_model=FilingSearchResult, summary="Search SEC filing text chunks")
-def search_filings(
+async def search_filings(
     body: FilingSearchRequest, service: FilingService = Depends(get_filing_service)
 ) -> FilingSearchResult:
     """Execute vector similarity search across SEC annual reports and quarterly filings."""
-    return service.search_filings(query=body.query, symbol=body.symbol, top_k=body.top_k)
+    return await service.search_filings(query=body.query, symbol=body.symbol, top_k=body.top_k)
 
 
 @router.post("/images", response_model=FilingImageResult, summary="Retrieve visual chart image URLs")
-def get_filing_images(
+async def get_filing_images(
     body: FilingSearchRequest, service: FilingService = Depends(get_filing_service)
 ) -> FilingImageResult:
     """Search visual chart images, diagrams, and figures in retrieved filing payloads."""
-    return service.get_filing_images(query=body.query, symbol=body.symbol, top_k=body.top_k)
+    return await service.get_filing_images(query=body.query, symbol=body.symbol, top_k=body.top_k)

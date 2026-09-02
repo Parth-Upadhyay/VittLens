@@ -89,97 +89,6 @@ class OrchestratorPromptBuilder:
         if any(term in impact_lower for term in universal_terms):
             return True
             
-"""
-Orchestrator Prompt Builder for FinnAI Platform.
-Converts InvestorContext into a structured, highly formatted prompt string for Groq LLM.
-Supports single-symbol deep dives and multi-symbol side-by-side comparison layouts.
-Includes automated Lakh Crore currency conversion and sector metadata injection.
-"""
-
-from typing import List, Optional, Dict, Any, Set
-from pathlib import Path
-import json
-from app.schemas import InvestorContext
-
-_COMPANY_META_PATH = Path(__file__).parent.parent / "macro_agent" / "rules" / "company_metadata.json"
-try:
-    with open(_COMPANY_META_PATH, encoding="utf-8") as _f:
-        _COMPANY_META: Dict[str, Any] = json.load(_f)
-except Exception:
-    _COMPANY_META: Dict[str, Any] = {}
-
-
-class OrchestratorPromptBuilder:
-    """
-    Constructs comprehensive multi-agent financial prompts for single LLM synthesis calls.
-    """
-
-    @staticmethod
-    def format_pct(val: Optional[float]) -> str:
-        """Format raw decimal float into clean percentage string (e.g. 0.1384 -> 13.84%)."""
-        if val is None:
-            return "N/A"
-        return f"{val * 100.0:.2f}%"
-
-    @staticmethod
-    def format_num(val: Optional[float], suffix: str = "") -> str:
-        """Format ratio or numeric float cleanly."""
-        if val is None:
-            return "N/A"
-        return f"{val:.2f}{suffix}"
-
-    @staticmethod
-    def format_market_cap(raw_cap: Optional[int]) -> str:
-        """
-        Format raw market cap in INR into clean Lakh Crores and Crores.
-
-        1 Crore = 10,000,000 INR (10^7)
-        1 Lakh Crore = 10,000,000,000,000 INR (10^12)
-        """
-        if not raw_cap or raw_cap <= 0:
-            return "N/A"
-
-        cap_in_crores = raw_cap / 10_000_000.0
-        cap_in_lakh_crores = raw_cap / 1_000_000_000_000.0
-
-        if cap_in_lakh_crores >= 1.0:
-            return f"₹{cap_in_lakh_crores:.2f} Lakh Crores (₹{cap_in_crores:,.0f} Crores)"
-        else:
-            return f"₹{cap_in_crores:,.0f} Crores"
-
-    @staticmethod
-    def _get_queried_sectors(symbols: List[str]) -> Set[str]:
-        """Return all sectors/subsectors for the queried symbols using company_metadata.json."""
-        sectors: Set[str] = set()
-        for sym in symbols:
-            meta = _COMPANY_META.get(sym)
-            if meta:
-                if meta.get("sector"):
-                    sectors.add(meta["sector"])
-                for sub in meta.get("subsectors", []):
-                    sectors.add(sub)
-        return sectors
-
-    @staticmethod
-    def _sectors_overlap(impact_sectors_str: str, queried_sectors: Set[str]) -> bool:
-        """Check if a macro sector impact string overlaps with any queried sector or contains universal macro terms."""
-        if not impact_sectors_str:
-            return False
-            
-        impact_lower = impact_sectors_str.lower()
-        
-        # Universal macro terms that should ALWAYS trigger a connection
-        universal_terms = [
-            "economy", "global", "india", "market", "finance", "macro", 
-            "geopolitics", "index", "nifty", "interest", "rate", "inflation", 
-            "war", "broad", "all", "general", "world", "crisis", "growth",
-            "gdp", "fdi", "export", "import", "currency", "rupee", "usd",
-            "rbi", "fed", "central bank", "policy", "treasury", "bond"
-        ]
-        
-        if any(term in impact_lower for term in universal_terms):
-            return True
-            
         if not queried_sectors:
             return False
             
@@ -426,7 +335,7 @@ class OrchestratorPromptBuilder:
                 f"2. TABLE: {table_rule}\n"
                 "3. NO RAW CHUNK DUMPS: Do NOT output tables of raw filing chunks or '[Evidence Chunk...' tags. Extract clear factual points as narrative.\n"
                 "4. SECTOR ACCURACY: Banking institutions (HDFCBANK, SBIN) are capital-intensive financials evaluated on NIM and loan growth (NOT asset-light IT models).\n"
-                "5. STRICT NO HALLUCINATION: You MUST NOT invent, guess, or use external knowledge for any numbers (Price, Market Cap, P/E, Margins). Use ONLY the exact numbers provided in this prompt under 'REAL-TIME MARKET DATA' and 'FINANCIAL RATIOS'. If a metric is missing or 'N/A', state 'N/A'. DO NOT fill in gaps with pre-trained knowledge.\n"
+                "5. STRICT NO HALLUCINATION: You MUST NOT invent, guess, or use external knowledge for any numbers (Price, Market Cap, P/E, Margins). Use ONLY the exact numbers provided in this prompt under 'REAL-TIME MARKET DATA', 'FINANCIAL RATIOS', 'SEC & ANNUAL REPORT FILING EVIDENCE', and 'SUPPORTING EVIDENCE'. If a metric is missing or 'N/A', state 'N/A'. Extract key insights, segment figures, operational highlights, and risk factors from the SEC & Annual Report Filing Evidence whenever available.\n"
                 "6. NO DISCLAIMER: Do NOT write legal disclaimer paragraphs. The website UI auto-displays a SEBI disclaimer.\n"
                 "7. MACRO & NEWS WEIGHTAGE: Use the provided macro events and sector impacts to inform your overall analysis. However, ONLY explicitly mention them in your response if they have a clear, direct, and significant impact on the specific stocks the user queried. Do NOT summarize unrelated macro news just because it is present in the prompt. Focus entirely on the queried stock(s).\n"
                 "8. LIVE NEWS: When company-specific news articles are present, lead the ### News & Macro Catalysts section with them, then add relevant macro context below.\n"

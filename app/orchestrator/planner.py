@@ -252,16 +252,16 @@ class Planner:
         has_market = any(kw in q_lower for kw in ["price", "quote", "chart", "volume", "market cap", "52-week", "stock", "high", "low"])
         has_news = any(kw in q_lower for kw in ["news", "headline", "sentiment", "event", "recent", "announcement"])
         has_quant = any(kw in q_lower for kw in ["ratio", "pe", "p/e", "roe", "margin", "cagr", "valuation", "debt", "dividend", "stats", "fundamentals"])
-        has_filing = any(kw in q_lower for kw in ["filing", "annual report", "10-k", "10-q", "segment", "breakdown", "strategy", "management", "sec", "visual", "table"])
+        has_filing = any(kw in q_lower for kw in ["filing", "annual report", "annual reports", "10-k", "10-q", "segment", "breakdown", "strategy", "management", "sec", "visual", "table", "concall", "transcript", "earnings call", "rag"])
 
+        if has_filing and not (has_market or has_news):
+            return "filing"
         if has_market and not (has_news or has_quant or has_filing):
             return "market"
         if has_news and not (has_market or has_quant or has_filing):
             return "news"
         if has_quant and not (has_market or has_news or has_filing):
             return "quant"
-        if has_filing and not (has_market or has_news or has_quant):
-            return "filing"
 
         return "comprehensive"
 
@@ -280,11 +280,13 @@ class Planner:
 
         tasks: List[AgentTask] = []
         q = request.question
+        q_lower = q.lower()
 
         logger.info(f"Planner created plan for query: '{q[:40]}...' | Intent: '{intent}' | Symbols: {symbols}")
 
-        all_agents_requested = any(kw in q.lower() for kw in ["all agents", "every agent", "full analysis", "run all agents"])
-        google_rss_requested = any(kw in q.lower() for kw in ["rss", "google rss", "live news"])
+        all_agents_requested = any(kw in q_lower for kw in ["all agents", "every agent", "full analysis", "run all agents"])
+        google_rss_requested = any(kw in q_lower for kw in ["rss", "google rss", "live news"])
+        has_filing_kw = any(kw in q_lower for kw in ["filing", "annual report", "annual reports", "10-k", "10-q", "segment", "breakdown", "strategy", "management", "sec", "visual", "table", "concall", "transcript", "earnings call", "rag"])
 
         news_params = {"limit": 5}
         if google_rss_requested:
@@ -299,25 +301,35 @@ class Planner:
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
+            tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         elif intent in ["comparison", "comprehensive"]:
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
+            tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         elif intent == "prediction":
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
+            if has_filing_kw:
+                tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         elif intent == "market":
             tasks.append(AgentTask(agent_name="MarketAgent", symbols=symbols, query=q, params={"period": "1mo"}))
+            if has_filing_kw:
+                tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         elif intent == "news":
             tasks.append(AgentTask(agent_name="NewsAgent", symbols=symbols, query=q, params=news_params))
+            if has_filing_kw:
+                tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         elif intent == "quant":
             tasks.append(AgentTask(agent_name="QuantAgent", symbols=symbols, query=q, params={}))
+            if has_filing_kw:
+                tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
 
         elif intent == "filing":
             tasks.append(AgentTask(agent_name="FilingAgent", symbols=symbols, query=q, params={"top_k": 5}))
